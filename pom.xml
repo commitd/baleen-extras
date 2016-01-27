@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>uk.gov.dstl.baleen</groupId>
+		<artifactId>baleen</artifactId>
+		<version>2.2.0-SNAPSHOT</version>
+	</parent>
+	
+	<properties>
+		<baleen-extra.version>2.2.0-SNAPSHOT</baleen-extra.version>
+	</properties>
+
+	<groupId>com.tenode.baleen</groupId>
+	<artifactId>baleen-extra</artifactId>
+	<!-- Version as per the Baleen version -->
+	<version>${baleen-extra.version}</version>
+
+	<packaging>pom</packaging>
+	<name>Baleen Extras</name>
+	<description>Additional components for Baleen</description>
+	<url>https://github.com/tenode/baleen-extra</url>
+	<inceptionYear>2016</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Chris Flatley</name>
+		</developer>
+		<developer>
+			<name>Stuart Hendren</name>
+		</developer>
+	</developers>
+	
+	<scm>
+		<url>https://github.com/tenode/baleen-extra</url>
+	</scm>
+
+	<modules>
+		<module>baleen-extra-common</module>
+		<module>baleen-annotators-clearnlp</module>
+		<module>baleen-annotators-maltparser</module>
+		<module>baleen-annotators-opennlp</module>
+		<module>baleen-resources-wordnet</module>
+	</modules>
+</project>
