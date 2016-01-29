@@ -19,19 +19,19 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 public abstract class AbstractInteractionBasedRelationshipAnnotator extends BaleenAnnotator {
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
 		try {
 			preExtract(jCas);
 
-			for (Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
+			for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
 
-				List<Interaction> interactions = JCasUtil.selectCovered(jCas, Interaction.class, sentence);
-				List<Entity> entities = JCasUtil.selectCovered(jCas, Entity.class, sentence);
+				final List<Interaction> interactions = JCasUtil.selectCovered(jCas, Interaction.class, sentence);
+				final List<Entity> entities = JCasUtil.selectCovered(jCas, Entity.class, sentence);
 
 				// Check we have enough in the sentence to warrant further work
 				if (!interactions.isEmpty() && entities.size() >= 2) {
-					Stream<Relation> relations = extract(jCas, sentence, interactions, entities);
+					final Stream<Relation> relations = extract(jCas, sentence, interactions, entities);
 
 					if (relations != null) {
 						relations.forEach(r -> {
@@ -45,16 +45,17 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		}
 	}
 
-	protected void preExtract(JCas jCas) {
+	protected void preExtract(final JCas jCas) {
 		// Do nothing
 	}
 
-	protected void postExtract(JCas jCas) {
+	protected void postExtract(final JCas jCas) {
 		// Do nothing
 	}
 
-	protected Relation createRelation(JCas jCas, Interaction interaction, Entity source, Entity target) {
-		Relation r = new Relation(jCas);
+	protected Relation createRelation(final JCas jCas, final Interaction interaction, final Entity source,
+			final Entity target) {
+		final Relation r = new Relation(jCas);
 		r.setBegin(interaction.getBegin());
 		r.setEnd(interaction.getEnd());
 		r.setRelationshipType(interaction.getRelationshipType());
@@ -64,8 +65,9 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		return r;
 	}
 
-	protected Stream<Relation> createPairwiseRelations(JCas jCas, Interaction interaction, List<Entity> sources,
-			List<Entity> targets) {
+	protected Stream<Relation> createPairwiseRelations(final JCas jCas, final Interaction interaction,
+			final List<Entity> sources,
+			final List<Entity> targets) {
 		return sources.stream().flatMap(l -> {
 			return targets.stream().map(r -> {
 				return createRelation(jCas, interaction, l, r);
@@ -73,15 +75,16 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		});
 	}
 
-	protected Stream<Relation> createMeshedRelations(JCas jCas, Interaction interaction, List<Entity> entities) {
+	protected Stream<Relation> createMeshedRelations(final JCas jCas, final Interaction interaction,
+			final List<Entity> entities) {
 
-		List<Relation> relations = new LinkedList<>();
+		final List<Relation> relations = new LinkedList<>();
 
 		for (int i = 0; i < entities.size(); i++) {
 			for (int j = i + 1; j < entities.size(); j++) {
 
-				Entity source = entities.get(i);
-				Entity target = entities.get(j);
+				final Entity source = entities.get(i);
+				final Entity target = entities.get(j);
 
 				relations.add(createRelation(jCas, interaction, source, target));
 			}
@@ -93,7 +96,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	protected abstract Stream<Relation> extract(JCas jCas, Sentence sentence, List<Interaction> interactions,
 			List<Entity> entities);
 
-	protected Stream<Relation> distinct(Stream<Relation> stream) {
+	protected Stream<Relation> distinct(final Stream<Relation> stream) {
 		return stream.map(RelationWrapper::new)
 				.distinct()
 				.map(RelationWrapper::getRelation);
@@ -102,7 +105,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	private static class RelationWrapper {
 		private final Relation relation;
 
-		public RelationWrapper(Relation relation) {
+		public RelationWrapper(final Relation relation) {
 			this.relation = relation;
 		}
 
@@ -116,11 +119,11 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		// the same?
 
 		@Override
-		public boolean equals(Object other) {
+		public boolean equals(final Object other) {
 			if (!(other instanceof RelationWrapper)) {
 				return false;
 			} else {
-				Relation or = ((RelationWrapper) other).getRelation();
+				final Relation or = ((RelationWrapper) other).getRelation();
 				if (relation.getBegin() != or.getBegin()) {
 					return false;
 				} else if (relation.getEnd() != or.getEnd()) {

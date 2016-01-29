@@ -21,39 +21,50 @@ import uk.gov.dstl.baleen.types.language.WordLemma;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * A ClearNlp based dependency parser annotator.
+ *
+ * ClearNlp needs a considerable amount of memory to load its models. Suggest running with -Xmx4g at
+ * least. This annotator will take around 30 seconds to initialise (load its model).
+ *
+ * This annotator generates Dependency annotations.
+ *
+ * @baleen.javadoc
+ *
+ */
 public class ClearNlpParser extends BaleenAnnotator {
 
 	private AbstractDEPParser depParser;
 
 	@Override
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
-		TLanguage language = TLanguage.ENGLISH;
+		final TLanguage language = TLanguage.ENGLISH;
 
 		depParser = NLPUtils.getDEPParser(language, "general-en-dep.xz",
 				new DEPConfiguration("root"));
 	}
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
-		for (Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
-			List<WordToken> tokens = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
+		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
+			final List<WordToken> tokens = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
 
-			DEPTree tree = createTreeFromTokens(tokens);
+			final DEPTree tree = ClearNlpParser.createTreeFromTokens(tokens);
 
 			// Perform parsing
 			depParser.process(tree);
 
 			// Convert tree back to our annotations
 			for (int i = 0; i < tree.size(); i++) {
-				DEPNode node = tree.get(i);
+				final DEPNode node = tree.get(i);
 
 				// Logic taken from DKPro Core (ASL)
 				// https://github.com/dkpro/dkpro-core/blob/master/dkpro-core-clearnlp-asl/src/main/java/de/tudarmstadt/ukp/dkpro/core/clearnlp/ClearNlpParser.java
 				if (node.hasHead()) {
-					Dependency dep = new Dependency(jCas);
+					final Dependency dep = new Dependency(jCas);
 					if (node.getHead().getID() != 0) {
 						dep.setGovernor(tokens.get(node.getHead().getID()));
 						dep.setDependencyType(node.getLabel());
@@ -77,16 +88,16 @@ public class ClearNlpParser extends BaleenAnnotator {
 	 *            the tokens
 	 * @return the DEP tree
 	 */
-	private static DEPTree createTreeFromTokens(List<WordToken> tokens) {
+	private static DEPTree createTreeFromTokens(final List<WordToken> tokens) {
 		// Generate DEPTree from WordTokens
-		DEPTree tree = new DEPTree(tokens.size());
+		final DEPTree tree = new DEPTree(tokens.size());
 		int tokenIndex = 0;
-		for (WordToken wt : tokens) {
-			DEPNode node = new DEPNode(tokenIndex++, wt.getCoveredText());
+		for (final WordToken wt : tokens) {
+			final DEPNode node = new DEPNode(tokenIndex++, wt.getCoveredText());
 			node.setPOSTag(wt.getPartOfSpeech());
-			FSArray lemmas = wt.getLemmas();
+			final FSArray lemmas = wt.getLemmas();
 			if (lemmas != null && lemmas.size() > 0) {
-				WordLemma wl = (WordLemma) lemmas.get(0);
+				final WordLemma wl = (WordLemma) lemmas.get(0);
 				node.setLemma(wl.getLemmaForm());
 			}
 			tree.add(node);

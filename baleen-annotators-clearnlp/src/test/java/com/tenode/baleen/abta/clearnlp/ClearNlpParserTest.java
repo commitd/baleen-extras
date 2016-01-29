@@ -1,7 +1,5 @@
 package com.tenode.baleen.abta.clearnlp;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -13,7 +11,7 @@ import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.resource.ExternalResourceDescription;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.tenode.baleen.annotators.clearnlp.ClearNlpParser;
@@ -39,16 +37,18 @@ public class ClearNlpParserTest extends AnnotatorTestBase {
 	public void beforeTest() throws UIMAException {
 		super.beforeTest();
 
-		ExternalResourceDescription tokensDesc = ExternalResourceFactory.createExternalResourceDescription("lexica",
+		final ExternalResourceDescription tokensDesc = ExternalResourceFactory.createExternalResourceDescription(
+				"lexica",
 				ClearNlpLexica.class);
 
-		AnalysisEngineDescription tokeniserDesc = AnalysisEngineFactory.createEngineDescription(ClearNlpTokeniser.class,
+		final AnalysisEngineDescription tokeniserDesc = AnalysisEngineFactory.createEngineDescription(
+				ClearNlpTokeniser.class,
 				"lexica",
 				tokensDesc);
 
 		tokeniserAe = AnalysisEngineFactory.createEngine(tokeniserDesc);
 
-		AnalysisEngineDescription parserDesc = AnalysisEngineFactory.createEngineDescription(ClearNlpParser.class,
+		final AnalysisEngineDescription parserDesc = AnalysisEngineFactory.createEngineDescription(ClearNlpParser.class,
 				"lexica",
 				tokensDesc);
 
@@ -56,20 +56,18 @@ public class ClearNlpParserTest extends AnnotatorTestBase {
 	}
 
 	@Test
-	// Ignored due to memory requirements for CI (excess of 4g)
-	@Ignore
 	public void test() throws Exception {
-		String text = "The fox jumps over the dog.";
+		final String text = "The fox jumps over the dog.";
 		jCas.setDocumentText(text);
 
 		SimplePipeline.runPipeline(jCas, tokeniserAe, ae);
 
-		Collection<Sentence> select = JCasUtil.select(jCas, Sentence.class);
-		Sentence s1 = select.iterator().next();
+		final Collection<Sentence> select = JCasUtil.select(jCas, Sentence.class);
+		final Sentence s1 = select.iterator().next();
 
-		List<Dependency> dependencies = JCasUtil.selectCovered(jCas, Dependency.class, s1);
+		final List<Dependency> dependencies = JCasUtil.selectCovered(jCas, Dependency.class, s1);
 
-		for (Dependency d : dependencies) {
+		for (final Dependency d : dependencies) {
 			System.out.println("------");
 			System.out.println(d.getDependencyType());
 			System.out.println(d.getDependent().getCoveredText());
@@ -83,7 +81,7 @@ public class ClearNlpParserTest extends AnnotatorTestBase {
 
 		// TODO: MOre tests after further use
 
-		assertEquals(7, dependencies.size()); // 5 tokens in the first sentence
+		Assert.assertEquals(7, dependencies.size()); // 5 tokens in the first sentence
 
 	}
 }

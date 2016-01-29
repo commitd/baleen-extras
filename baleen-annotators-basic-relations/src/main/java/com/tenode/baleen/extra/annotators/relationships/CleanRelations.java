@@ -31,17 +31,17 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 public class CleanRelations extends BaleenAnnotator {
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
-		List<Relation> relations = new ArrayList<>(JCasUtil.select(jCas, Relation.class));
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
+		final List<Relation> relations = new ArrayList<>(JCasUtil.select(jCas, Relation.class));
 
-		Set<Relation> toRemove = new HashSet<>();
+		final Set<Relation> toRemove = new HashSet<>();
 
 		for (int i = 0; i < relations.size(); i++) {
-			Relation a = relations.get(i);
+			final Relation a = relations.get(i);
 
 			if (!toRemove.contains(a)) {
 				for (int j = i + 1; i < relations.size(); j++) {
-					Relation b = relations.get(j);
+					final Relation b = relations.get(j);
 
 					if (isSame(a, b)) {
 						toRemove.add(b);
@@ -53,18 +53,18 @@ public class CleanRelations extends BaleenAnnotator {
 		}
 	}
 
-	private boolean isSame(Relation a, Relation b) {
+	private boolean isSame(final Relation a, final Relation b) {
 		return isSame(a.getSource(), b.getSource()) && isSame(a.getTarget(), b.getTarget())
 				&& isSame(a.getRelationshipType(), a.getRelationshipType())
 				&& isSame(a.getRelationshipType(), a.getRelationshipType());
 	}
 
-	private boolean isSame(Entity a, Entity b) {
+	private boolean isSame(final Entity a, final Entity b) {
 		// TODO: is the value test enough?
 		return a.getType() == b.getType() && isSame(a.getValue(), b.getValue());
 	}
 
-	private boolean isSame(String a, String b) {
+	private boolean isSame(final String a, final String b) {
 		if (a == b) {
 			return true;
 		} else if (a == null || b == null) {

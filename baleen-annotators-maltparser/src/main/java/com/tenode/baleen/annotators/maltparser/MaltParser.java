@@ -25,45 +25,72 @@ import uk.gov.dstl.baleen.types.language.WordLemma;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * Use MaltParser to create a dependency grammar.
+ *
+ * See http://www.maltparser.org/ for more details of the implementation.
+ *
+ * The English language model of maltparser is trained on the Penn Treebank corpus, and as such its
+ * is not freely licensed. To avoid this this project contains an english model trained form the
+ * English universal dependencies dataset (http://universaldependencies.org/docs/) where the
+ * original data is licensed under https://creativecommons.org/licenses/by-sa/4.0/. As such the
+ * training data is licenced under the same agreement.
+ *
+ * The universal depedency model uses their own tags. This annotator converts between the UD and
+ * standard tags.
+ *
+ * The MaltParser appears to be fast, low memory use and stable. As all trained alogirthms it will
+ * function only as well as its training set. We found the original Penn Treebank to be
+ * (subjectively) better than the Universal Dependency model. However if an algorithm requires only
+ * dependency distance or an understanding of word linkage the universal dependency model functions
+ * well enough.
+ *
+ * The output of this annotator is Dependency annotations.
+ *
+ * @baleen.javadoc
+ */
 public class MaltParser extends BaleenAnnotator {
 
 	/**
 	 * The model file, (.mco), to be loaded into the parser.
 	 *
-	 * No protocol is provided will attempt to load from the classpath> Default to the inbuilt
-	 * (universal dependency trained) model, though that behaves poorly currently.
+	 * No protocol is provided will attempt to load from the classpath.
+	 *
+	 * Default to the inbuilt (universal dependency trained) model.
 	 *
 	 * @baleen.config maltparser-universaldependencies-en.mco
 	 */
 	public static final String PARAM_FILE_NAME = "modelUrl";
-	@ConfigurationParameter(name = PARAM_FILE_NAME, defaultValue = "maltparser-universaldependencies-en.mco")
+	@ConfigurationParameter(name = MaltParser.PARAM_FILE_NAME, defaultValue = "maltparser-universaldependencies-en.mco")
 	private String modelUrl;
 
 	/**
-	 * Convert to Universal Dependendency tags before input.
+	 * Convert to POS annotations to Universal Dependendency tags before input.
+	 *
+	 * This is required if the model is trained on a UD dataset.
 	 *
 	 * @baleen.config true
 	 */
 	public static final String PARAM_CONVERT_TO_UD = "udTags";
-	@ConfigurationParameter(name = PARAM_CONVERT_TO_UD, defaultValue = "true")
+	@ConfigurationParameter(name = MaltParser.PARAM_CONVERT_TO_UD, defaultValue = "true")
 	private Boolean udTags;
 
 	private ConcurrentMaltParserModel model;
 
 	@Override
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
 		URL url;
 		try {
 			url = new URL(modelUrl);
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			url = getClass().getClassLoader().getResource(modelUrl);
 		}
 
 		try {
 			model = ConcurrentMaltParserService.initializeParserModel(url);
-		} catch (MaltChainedException e) {
+		} catch (final MaltChainedException e) {
 			throw new ResourceInitializationException(e);
 		}
 
@@ -71,38 +98,38 @@ public class MaltParser extends BaleenAnnotator {
 	}
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
-		for (Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
+		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
 
-			List<WordToken> wordTokens = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
+			final List<WordToken> wordTokens = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
 
-			String[] tokens = new String[wordTokens.size()];
+			final String[] tokens = new String[wordTokens.size()];
 
 			int i = 0;
-			for (WordToken wt : wordTokens) {
+			for (final WordToken wt : wordTokens) {
 
 				// TODO: Can include the lemma too
-				String pos = wt.getPartOfSpeech();
-				String lemma = getLemma(wt);
-				String tag = udTags ? convertPennToUniversal(pos) : pos;
+				final String pos = wt.getPartOfSpeech();
+				final String lemma = getLemma(wt);
+				final String tag = udTags ? convertPennToUniversal(pos) : pos;
 				tokens[i] = String.format("%d\t%s\t%s\t%s\t%s\t_", i + 1, wt.getCoveredText(), lemma, tag, pos);
 				// System.out.println(tokens[i]);
 				i++;
 			}
 
 			try {
-				ConcurrentDependencyGraph graph = model.parse(tokens);
+				final ConcurrentDependencyGraph graph = model.parse(tokens);
 				for (int j = 0; j < graph.nDependencyNodes(); j++) {
-					ConcurrentDependencyNode node = graph.getDependencyNode(j);
+					final ConcurrentDependencyNode node = graph.getDependencyNode(j);
 
 					if (node.hasHead()) {
-						Dependency dep = new Dependency(jCas);
+						final Dependency dep = new Dependency(jCas);
 						// System.out.println(node.getIndex() + " : " + node.isRoot() + ": " +
 						// node.getHeadIndex());
 						if (node.getHeadIndex() != 0) {
 							dep.setGovernor(wordTokens.get(node.getHeadIndex() - 1));
-							String label = node.getLabel(7);
+							final String label = node.getLabel(7);
 							dep.setDependencyType(label);
 						} else {
 							dep.setGovernor(wordTokens.get(node.getIndex() - 1));
@@ -115,15 +142,15 @@ public class MaltParser extends BaleenAnnotator {
 					}
 				}
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new AnalysisEngineProcessException(e);
 			}
 
 		}
 	}
 
-	private String getLemma(WordToken token) {
-		FSArray array = token.getLemmas();
+	private String getLemma(final WordToken token) {
+		final FSArray array = token.getLemmas();
 		if (array == null || array.size() == 0) {
 			return "_";
 		} else {
@@ -135,56 +162,56 @@ public class MaltParser extends BaleenAnnotator {
 
 	static {
 		// See http://universaldependencies.github.io/docs/tagset-conversion/en-penn-uposf.html
-		pennToUniversalTags.put("#", "SYM");
-		pennToUniversalTags.put("$", "SYM");
-		pennToUniversalTags.put("\"", "PUNCT");
-		pennToUniversalTags.put(",", "PUNCT");
-		pennToUniversalTags.put("-LRB-", "PUNCT");
-		pennToUniversalTags.put("-RRB-", "PUNCT");
-		pennToUniversalTags.put(".", "PUNCT");
-		pennToUniversalTags.put(":", "PUNCT");
-		pennToUniversalTags.put("AFX", "ADJ");
-		pennToUniversalTags.put("CC", "CONJ");
-		pennToUniversalTags.put("CD", "NUM");
-		pennToUniversalTags.put("DT", "DET");
-		pennToUniversalTags.put("EX", "ADV");
-		pennToUniversalTags.put("FW", "X");
-		pennToUniversalTags.put("HYPH", "PUNCT");
-		pennToUniversalTags.put("IN", "ADP");
-		pennToUniversalTags.put("JJ", "ADJ");
-		pennToUniversalTags.put("JJR", "ADJ");
-		pennToUniversalTags.put("JJS", "ADJ");
-		pennToUniversalTags.put("LS", "PUNCT");
-		pennToUniversalTags.put("MD", "VERB");
-		pennToUniversalTags.put("NN", "NOUN");
-		pennToUniversalTags.put("NNP", "PROPN");
-		pennToUniversalTags.put("NNPS", "PROPN");
-		pennToUniversalTags.put("NNS", "NOUN");
-		pennToUniversalTags.put("PDT", "DET");
-		pennToUniversalTags.put("POS", "PART");
-		pennToUniversalTags.put("PRP", "PRON");
-		pennToUniversalTags.put("PRP$", "DET");
-		pennToUniversalTags.put("RB", "ADV");
-		pennToUniversalTags.put("RBR", "ADV");
-		pennToUniversalTags.put("RBS", "ADV");
-		pennToUniversalTags.put("RP", "PART");
-		pennToUniversalTags.put("SYM", "SYM");
-		pennToUniversalTags.put("TO", "PART");
-		pennToUniversalTags.put("UH", "INTJ");
-		pennToUniversalTags.put("VB", "VERB");
-		pennToUniversalTags.put("VBD", "VERB");
-		pennToUniversalTags.put("VBG", "VERB");
-		pennToUniversalTags.put("VBN", "VERB");
-		pennToUniversalTags.put("VBP", "VERB");
-		pennToUniversalTags.put("VBZ", "VERB");
-		pennToUniversalTags.put("WDT", "DET");
-		pennToUniversalTags.put("WP", "PRON");
-		pennToUniversalTags.put("WP$", "DET");
-		pennToUniversalTags.put("WRB", "ADV");
-		pennToUniversalTags.put("`", "PUNCT");
+		MaltParser.pennToUniversalTags.put("#", "SYM");
+		MaltParser.pennToUniversalTags.put("$", "SYM");
+		MaltParser.pennToUniversalTags.put("\"", "PUNCT");
+		MaltParser.pennToUniversalTags.put(",", "PUNCT");
+		MaltParser.pennToUniversalTags.put("-LRB-", "PUNCT");
+		MaltParser.pennToUniversalTags.put("-RRB-", "PUNCT");
+		MaltParser.pennToUniversalTags.put(".", "PUNCT");
+		MaltParser.pennToUniversalTags.put(":", "PUNCT");
+		MaltParser.pennToUniversalTags.put("AFX", "ADJ");
+		MaltParser.pennToUniversalTags.put("CC", "CONJ");
+		MaltParser.pennToUniversalTags.put("CD", "NUM");
+		MaltParser.pennToUniversalTags.put("DT", "DET");
+		MaltParser.pennToUniversalTags.put("EX", "ADV");
+		MaltParser.pennToUniversalTags.put("FW", "X");
+		MaltParser.pennToUniversalTags.put("HYPH", "PUNCT");
+		MaltParser.pennToUniversalTags.put("IN", "ADP");
+		MaltParser.pennToUniversalTags.put("JJ", "ADJ");
+		MaltParser.pennToUniversalTags.put("JJR", "ADJ");
+		MaltParser.pennToUniversalTags.put("JJS", "ADJ");
+		MaltParser.pennToUniversalTags.put("LS", "PUNCT");
+		MaltParser.pennToUniversalTags.put("MD", "VERB");
+		MaltParser.pennToUniversalTags.put("NN", "NOUN");
+		MaltParser.pennToUniversalTags.put("NNP", "PROPN");
+		MaltParser.pennToUniversalTags.put("NNPS", "PROPN");
+		MaltParser.pennToUniversalTags.put("NNS", "NOUN");
+		MaltParser.pennToUniversalTags.put("PDT", "DET");
+		MaltParser.pennToUniversalTags.put("POS", "PART");
+		MaltParser.pennToUniversalTags.put("PRP", "PRON");
+		MaltParser.pennToUniversalTags.put("PRP$", "DET");
+		MaltParser.pennToUniversalTags.put("RB", "ADV");
+		MaltParser.pennToUniversalTags.put("RBR", "ADV");
+		MaltParser.pennToUniversalTags.put("RBS", "ADV");
+		MaltParser.pennToUniversalTags.put("RP", "PART");
+		MaltParser.pennToUniversalTags.put("SYM", "SYM");
+		MaltParser.pennToUniversalTags.put("TO", "PART");
+		MaltParser.pennToUniversalTags.put("UH", "INTJ");
+		MaltParser.pennToUniversalTags.put("VB", "VERB");
+		MaltParser.pennToUniversalTags.put("VBD", "VERB");
+		MaltParser.pennToUniversalTags.put("VBG", "VERB");
+		MaltParser.pennToUniversalTags.put("VBN", "VERB");
+		MaltParser.pennToUniversalTags.put("VBP", "VERB");
+		MaltParser.pennToUniversalTags.put("VBZ", "VERB");
+		MaltParser.pennToUniversalTags.put("WDT", "DET");
+		MaltParser.pennToUniversalTags.put("WP", "PRON");
+		MaltParser.pennToUniversalTags.put("WP$", "DET");
+		MaltParser.pennToUniversalTags.put("WRB", "ADV");
+		MaltParser.pennToUniversalTags.put("`", "PUNCT");
 	}
 
-	private String convertPennToUniversal(String tag) {
-		return pennToUniversalTags.getOrDefault(tag, tag);
+	private String convertPennToUniversal(final String tag) {
+		return MaltParser.pennToUniversalTags.getOrDefault(tag, tag);
 	}
 }

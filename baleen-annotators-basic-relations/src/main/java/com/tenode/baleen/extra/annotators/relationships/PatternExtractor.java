@@ -11,8 +11,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 
-import com.tenode.baleen.abta.common.stopwords.StopWordRemover;
 import com.tenode.baleen.extra.annotators.relationships.data.PatternExtract;
+import com.tenode.baleen.extras.common.language.StopWordRemover;
 
 import uk.gov.dstl.baleen.types.language.Pattern;
 import uk.gov.dstl.baleen.types.language.Sentence;
@@ -20,6 +20,25 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * Find patterns in the document text.
+ *
+ * A pattern is a set of words between two entities. They are typically used to form a training set
+ * for relationship extraction.
+ *
+ * As a result this annotator must be run after Entity and WordToken annotations have been added to
+ * the JCas. That is post POS tagging (eg by OpenNlp) and after entity extraction (and ideally clean
+ * up).
+ *
+ * The algorithm is basically described as follow. For each sentence we find entities which are less
+ * than "windowSize" away from each other (measured in words). This are our candidate patterns. We
+ * filter any patterns containing negatives (eg the words no or not). We then remove from the
+ * pattern any stop words and any other entities which appear within the pattern text. We remove any
+ * empty patterns and then create a new Pattern annotation. The Pattern annotation holds the
+ * original range, plus the list of retained words (in the form of WordTokens).
+ *
+ * @baleen.javadoc
+ */
 public class PatternExtractor extends BaleenAnnotator {
 
 	/**
@@ -31,34 +50,34 @@ public class PatternExtractor extends BaleenAnnotator {
 	 * @baleen.config 5
 	 */
 	public static final String PARAM_WINDOW_SIZE = "windowSize";
-	@ConfigurationParameter(name = PARAM_WINDOW_SIZE, defaultValue = "5")
+	@ConfigurationParameter(name = PatternExtractor.PARAM_WINDOW_SIZE, defaultValue = "5")
 	private int windowSize;
 
 	private final StopWordRemover stopWordRemover = new StopWordRemover();
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
-		for (Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
+		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
 
-			List<Entity> entities = JCasUtil.selectCovered(jCas, Entity.class, sentence);
-			List<WordToken> words = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
+			final List<Entity> entities = JCasUtil.selectCovered(jCas, Entity.class, sentence);
+			final List<WordToken> words = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
 
 			// Remove words which are covered by an entity
-			List<WordToken> nonEntityWords = words.stream().filter(w -> !entities.stream().anyMatch(e -> {
+			final List<WordToken> nonEntityWords = words.stream().filter(w -> !entities.stream().anyMatch(e -> {
 				return e.getBegin() <= w.getBegin() && w.getEnd() <= e.getEnd();
 			})).collect(Collectors.toList());
 
 			// Find entities within (windowSize) words of one another
 
-			String text = jCas.getDocumentText();
-			String lowerText = text.toLowerCase();
-			List<PatternExtract> patterns = new ArrayList<PatternExtract>();
+			final String text = jCas.getDocumentText();
+			final String lowerText = text.toLowerCase();
+			final List<PatternExtract> patterns = new ArrayList<PatternExtract>();
 			for (int i = 0; i < entities.size(); i++) {
 				for (int j = i + 1; j < entities.size(); j++) {
 
-					Entity a = entities.get(i);
-					Entity b = entities.get(j);
+					final Entity a = entities.get(i);
+					final Entity b = entities.get(j);
 
 					if (a.getEnd() < b.getBegin()) {
 						// A is before B
@@ -76,9 +95,11 @@ public class PatternExtractor extends BaleenAnnotator {
 
 			patterns.stream()
 					.filter(p -> {
-						int count = countWordsBetween(p, words);
+						final int count = countWordsBetween(p, words);
 						return count >= 0 && count < windowSize;
 					})
+					// TODO: Bug we should look for \bword\b since we are discarding patterns
+					// contain words like nothing here!
 					.filter(p -> !p.contains(lowerText, "no", "not", "neither"))
 					.forEach(p -> {
 						// Remove any other entities from the pattern
@@ -99,12 +120,12 @@ public class PatternExtractor extends BaleenAnnotator {
 
 	}
 
-	private int countWordsBetween(PatternExtract p, List<WordToken> words) {
+	private int countWordsBetween(final PatternExtract p, final List<WordToken> words) {
 		int startWord = -1;
 		int endWord = -1;
 
 		int i = 0;
-		for (WordToken w : words) {
+		for (final WordToken w : words) {
 			if (w.getBegin() <= p.getStart() && w.getEnd() >= p.getStart()) {
 				startWord = i;
 			}
@@ -123,23 +144,23 @@ public class PatternExtractor extends BaleenAnnotator {
 		return endWord - startWord;
 	}
 
-	private Stream<WordToken> removeAdditionalWords(PatternExtract pe, Stream<WordToken> tokens) {
+	private Stream<WordToken> removeAdditionalWords(final PatternExtract pe, final Stream<WordToken> tokens) {
 		return tokens
 				.filter(t -> t.getBegin() >= pe.getStart() && t.getEnd() <= pe.getEnd())
 				.filter(t -> !stopWordRemover.isStopWord(t.getCoveredText()));
 	}
 
-	private void outputPattern(JCas jCas, PatternExtract pattern) {
-		Pattern a = new Pattern(jCas);
+	private void outputPattern(final JCas jCas, final PatternExtract pattern) {
+		final Pattern a = new Pattern(jCas);
 		a.setBegin(pattern.getStart());
 		a.setEnd(pattern.getEnd());
 		a.setSource(pattern.getFrom());
 		a.setTarget(pattern.getTo());
 
-		List<WordToken> tokens = pattern.getWordTokens();
-		FSArray array = new FSArray(jCas, tokens.size());
+		final List<WordToken> tokens = pattern.getWordTokens();
+		final FSArray array = new FSArray(jCas, tokens.size());
 		int i = 0;
-		for (WordToken w : tokens) {
+		for (final WordToken w : tokens) {
 			array.set(i, w);
 			i++;
 		}

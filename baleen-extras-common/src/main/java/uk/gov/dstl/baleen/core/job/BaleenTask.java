@@ -13,12 +13,12 @@ public abstract class BaleenTask extends JCasAnnotator_ImplBase {
 	private UimaMonitor monitor;
 
 	@Override
-	public void initialize(UimaContext context) throws ResourceInitializationException {
+	public void initialize(final UimaContext context) throws ResourceInitializationException {
 		// This will do initialization of resources,
 		// but won't be included in the metrics
 		super.initialize(context);
 
-		String pipelineName = UimaUtils.getPipelineName(context);
+		final String pipelineName = UimaUtils.getPipelineName(context);
 		monitor = createMonitor(pipelineName);
 
 		monitor.startFunction("initialize");
@@ -28,7 +28,7 @@ public abstract class BaleenTask extends JCasAnnotator_ImplBase {
 		monitor.finishFunction("initialize");
 	}
 
-	protected UimaMonitor createMonitor(String pipelineName) {
+	protected UimaMonitor createMonitor(final String pipelineName) {
 		return new UimaMonitor(pipelineName, this.getClass());
 	}
 
@@ -39,12 +39,12 @@ public abstract class BaleenTask extends JCasAnnotator_ImplBase {
 	 * @param aContext
 	 *            UimaContext object passed by the Collection Processing Engine
 	 */
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		// Do nothing - this should be overridden in most cases
 	}
 
 	@Override
-	public final void process(JCas aJCas) throws AnalysisEngineProcessException {
+	public final void process(final JCas aJCas) throws AnalysisEngineProcessException {
 		monitor.startFunction("execute");
 
 		execute(new JobSettings(aJCas));
@@ -82,7 +82,7 @@ public abstract class BaleenTask extends JCasAnnotator_ImplBase {
 
 	/**
 	 * Get the UIMA monitor for this annotator.
-	 * 
+	 *
 	 * @return the uima monitor
 	 */
 	protected UimaMonitor getMonitor() {

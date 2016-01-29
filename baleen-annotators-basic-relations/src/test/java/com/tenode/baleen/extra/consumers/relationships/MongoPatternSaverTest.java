@@ -1,6 +1,4 @@
-package com.tenode.baleen.extra.annotators.relationships;
-
-import static org.junit.Assert.assertEquals;
+package com.tenode.baleen.extra.consumers.relationships;
 
 import java.util.Collections;
 
@@ -15,13 +13,14 @@ import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.impl.CustomResourceSpecifier_impl;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.tenode.baleen.extra.annotators.relationships.MongoPatternSaver;
+import com.tenode.baleen.extra.consumers.relationships.MongoPatternSaver;
 
 import uk.gov.dstl.baleen.annotators.testing.AnnotatorTestBase;
 import uk.gov.dstl.baleen.resources.SharedFongoResource;
@@ -41,11 +40,11 @@ public class MongoPatternSaverTest extends AnnotatorTestBase {
 	public void setUp() throws ResourceInitializationException, ResourceAccessException {
 		// Create a description of an external resource - a fongo instance, in the same way we would
 		// have created a shared mongo resource
-		ExternalResourceDescription erd = ExternalResourceFactory.createExternalResourceDescription(
+		final ExternalResourceDescription erd = ExternalResourceFactory.createExternalResourceDescription(
 				SharedFongoResource.class, "fongo.collection", "test", "fongo.data", "[]");
 
 		// Create the analysis engine
-		AnalysisEngineDescription aed = AnalysisEngineFactory.createEngineDescription(MongoPatternSaver.class,
+		final AnalysisEngineDescription aed = AnalysisEngineFactory.createEngineDescription(MongoPatternSaver.class,
 				MongoPatternSaver.KEY_MONGO, erd,
 				"collection", "test");
 		ae = AnalysisEngineFactory.createEngine(aed);
@@ -68,27 +67,27 @@ public class MongoPatternSaverTest extends AnnotatorTestBase {
 
 		jCas.setDocumentText("The cow jumps over the moon.");
 
-		Entity cow = new Person(jCas);
+		final Entity cow = new Person(jCas);
 		cow.setBegin(4);
 		cow.setEnd(7);
 		cow.addToIndexes(jCas);
 
-		Entity moon = new Location(jCas);
+		final Entity moon = new Location(jCas);
 		moon.setBegin(23);
 		moon.setEnd(27);
 		moon.addToIndexes(jCas);
 
-		WordToken jumps = new WordToken(jCas);
+		final WordToken jumps = new WordToken(jCas);
 		jumps.setBegin(8);
 		jumps.setEnd(8 + "jumps".length());
 		jumps.setPartOfSpeech("VB");
-		WordLemma jumpLemma = new WordLemma(jCas);
+		final WordLemma jumpLemma = new WordLemma(jCas);
 		jumpLemma.setLemmaForm("jump");
 		jumps.setLemmas(new FSArray(jCas, 1));
 		jumps.setLemmas(0, jumpLemma);
 		jumps.addToIndexes();
 
-		Pattern pattern = new Pattern(jCas);
+		final Pattern pattern = new Pattern(jCas);
 		pattern.setBegin(8);
 		pattern.setBegin(22);
 		pattern.setWords(new FSArray(jCas, 1));
@@ -99,26 +98,26 @@ public class MongoPatternSaverTest extends AnnotatorTestBase {
 
 		ae.process(jCas);
 
-		DBCollection collection = sfr.getDB().getCollection("test");
-		assertEquals(1, collection.count());
+		final DBCollection collection = sfr.getDB().getCollection("test");
+		Assert.assertEquals(1, collection.count());
 
-		DBObject object = collection.find().next();
+		final DBObject object = collection.find().next();
 
-		DBObject source = (DBObject) object.get("source");
-		DBObject target = (DBObject) object.get("target");
-		BasicDBList words = (BasicDBList) object.get("words");
+		final DBObject source = (DBObject) object.get("source");
+		final DBObject target = (DBObject) object.get("target");
+		final BasicDBList words = (BasicDBList) object.get("words");
 
-		assertEquals("cow", source.get("text"));
-		assertEquals("uk.gov.dstl.baleen.types.common.Person", source.get("type"));
+		Assert.assertEquals("cow", source.get("text"));
+		Assert.assertEquals("uk.gov.dstl.baleen.types.common.Person", source.get("type"));
 
-		assertEquals("moon", target.get("text"));
-		assertEquals("uk.gov.dstl.baleen.types.semantic.Location", target.get("type"));
+		Assert.assertEquals("moon", target.get("text"));
+		Assert.assertEquals("uk.gov.dstl.baleen.types.semantic.Location", target.get("type"));
 
-		assertEquals(1, words.size());
-		DBObject word = (DBObject) words.get(0);
-		assertEquals("jumps", word.get("text"));
-		assertEquals("VB", word.get("pos"));
-		assertEquals("jump", word.get("lemma"));
+		Assert.assertEquals(1, words.size());
+		final DBObject word = (DBObject) words.get(0);
+		Assert.assertEquals("jumps", word.get("text"));
+		Assert.assertEquals("VB", word.get("pos"));
+		Assert.assertEquals("jump", word.get("lemma"));
 
 	}
 

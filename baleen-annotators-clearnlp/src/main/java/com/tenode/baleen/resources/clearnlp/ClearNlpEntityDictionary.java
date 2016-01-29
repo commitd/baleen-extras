@@ -9,10 +9,15 @@ import org.apache.uima.resource.ResourceSpecifier;
 import edu.emory.clir.clearnlp.component.utils.GlobalLexica;
 import uk.gov.dstl.baleen.uima.BaleenResource;
 
+/**
+ * A fake shared model which sets up ClearNlp entity dictionary.
+ *
+ * Fake in the sense the this class provides no public additional functions.
+ */
 public class ClearNlpEntityDictionary extends BaleenResource {
 
 	@Override
-	protected boolean doInitialize(ResourceSpecifier specifier, Map<String, Object> additionalParams)
+	protected boolean doInitialize(final ResourceSpecifier specifier, final Map<String, Object> additionalParams)
 			throws ResourceInitializationException {
 
 		GlobalLexica.initDistributionalSemanticsWords(

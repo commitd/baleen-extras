@@ -28,44 +28,44 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 public class MongoInteractions extends Mongo {
 
 	@Override
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		// Replace the default value for interaction.
 		type = type.equals("Entity") ? "Interaction" : type;
 		super.doInitialize(aContext);
 	}
 
 	@Override
-	public void doProcess(JCas jCas) throws AnalysisEngineProcessException {
+	public void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 		try {
-			JCas lemmaJCas = processLemmaForm(jCas);
+			final JCas lemmaJCas = processLemmaForm(jCas);
 
 			super.doProcess(lemmaJCas);
 
 			moveAnnotations(lemmaJCas, jCas);
 
-		} catch (UIMAException e) {
+		} catch (final UIMAException e) {
 			throw new AnalysisEngineProcessException(e);
 		}
 	}
 
-	private JCas processLemmaForm(JCas jCas) throws UIMAException {
-		JCas lemmaJCas = JCasFactory.createJCas();
+	private JCas processLemmaForm(final JCas jCas) throws UIMAException {
+		final JCas lemmaJCas = JCasFactory.createJCas();
 
-		StringBuilder lemmaText = new StringBuilder();
-		for (Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
-			List<WordToken> tokens = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
+		final StringBuilder lemmaText = new StringBuilder();
+		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
+			final List<WordToken> tokens = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
 
 			if (!tokens.isEmpty()) {
 				// TODO: This could be improved for a general utility function, adding back
 				// punctuation, etc but it does sufficient for here.
 				tokens.forEach(t -> {
-					int begin = lemmaText.length();
+					final int begin = lemmaText.length();
 					lemmaText.append(t.getCoveredText());
-					int end = lemmaText.length();
+					final int end = lemmaText.length();
 					lemmaText.append(" ");
 
 					// We reference this the original word token from this annotation
-					Pointer ptr = new Pointer(lemmaJCas);
+					final Pointer ptr = new Pointer(lemmaJCas);
 					ptr.setBegin(begin);
 					ptr.setEnd(end);
 					ptr.setTarget(t);
@@ -81,16 +81,17 @@ public class MongoInteractions extends Mongo {
 		return lemmaJCas;
 	}
 
-	private void moveAnnotations(JCas lemmaJCas, JCas jCas) {
-		for (Interaction interaction : JCasUtil.select(lemmaJCas, Interaction.class)) {
-			Interaction coveringInteraction = JCasUtil.selectCovered(lemmaJCas, Pointer.class, interaction).stream()
+	private void moveAnnotations(final JCas lemmaJCas, final JCas jCas) {
+		for (final Interaction interaction : JCasUtil.select(lemmaJCas, Interaction.class)) {
+			final Interaction coveringInteraction = JCasUtil.selectCovered(lemmaJCas, Pointer.class, interaction)
+					.stream()
 					.map(p -> p.getTarget())
 					.reduce(new Interaction(jCas), this::include, this::include);
 			coveringInteraction.addToIndexes();
 		}
 	}
 
-	private Interaction include(Interaction a, Annotation b) {
+	private Interaction include(final Interaction a, final Annotation b) {
 		if (a.getBegin() > b.getBegin()) {
 			a.setBegin(b.getBegin());
 		}

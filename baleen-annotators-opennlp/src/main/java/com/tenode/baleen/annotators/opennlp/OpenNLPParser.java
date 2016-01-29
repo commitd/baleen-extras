@@ -1,4 +1,4 @@
-package com.tenode.baleen.abta.annotators;
+package com.tenode.baleen.annotators.opennlp;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,55 +29,37 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 /**
  * Perform grammatical parsing with OpenNLP parser.
  *
- * <p>
  * The document content is passed through the OpenNLP parser in order to create a parse tree.
- * </p>
  *
- * <p>
  * It is assumed that first the document has been passed through the OpenNLP pipeline (or similar)
- * so that sentences, POS, etc are extracted into the jCAS.
- * </p>
+ * so that sentences, POS, etc are extracted into the jCas. Note that this annotator will REMOVE any
+ * PhraseChunks and replace them with its output.
  *
+ *
+ * @baleen.javadoc
  */
 public class OpenNLPParser extends BaleenAnnotator {
 
-	private static final Set<String> PHRASE_TYPES = new HashSet<String>(Arrays.asList("ADJP",
-			"ADVP",
-			"FRAG",
-			"INTJ",
-			"LST",
-			"NAC",
-			"NP",
-			"NX",
-			"PP",
-			"PRN",
-			"PRT",
-			"QP",
-			"RRC",
-			"UCP",
-			"VP",
-			"WHADJP",
-			"WHAVP",
-			"WHNP",
-			"WHPP",
-			"X"));
+	private static final Set<String> PHRASE_TYPES = new HashSet<String>(
+			Arrays.asList("ADJP", "ADVP", "FRAG", "INTJ", "LST", "NAC", "NP", "NX", "PP", "PRN", "PRT", "QP", "RRC",
+					"UCP", "VP", "WHADJP", "WHAVP", "WHNP", "WHPP", "X"));
 
 	/**
 	 * OpenNLP Resource (chunker) - use en-parser-chunking.bin
 	 *
 	 * @baleen.resource uk.gov.dstl.baleen.resources.SharedOpenNLPModel
 	 */
-	public static final String KEY_TOKEN = "parserChunking";
-	@ExternalResource(key = KEY_TOKEN)
+	public static final String PARAM_TOKEN = "parserChunking";
+	@ExternalResource(key = OpenNLPParser.PARAM_TOKEN)
 	private SharedOpenNLPModel parserChunkingModel;
 
 	private Parser parser;
 
 	@Override
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		try {
 			parserChunkingModel.loadModel(ParserModel.class, getClass().getResourceAsStream("en-parser-chunking.bin"));
-		} catch (BaleenException be) {
+		} catch (final BaleenException be) {
 			getMonitor().error("Unable to load OpenNLP Language Models", be);
 			throw new ResourceInitializationException(be);
 		}
@@ -85,51 +67,52 @@ public class OpenNLPParser extends BaleenAnnotator {
 		try {
 			parser = ParserFactory.create((ParserModel) parserChunkingModel.getModel());
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			getMonitor().error("Unable to create OpenNLP parser", e);
 			throw new ResourceInitializationException(e);
 		}
 	}
 
 	@Override
-	public void doProcess(JCas jCas) throws AnalysisEngineProcessException {
-		// For each sentence (in the JCas)e, we recreate the spans from our WordTokens.
+	public void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
+		// For each sentence (in the JCas)e, we recreate the spans from our
+		// WordTokens.
 
-		Map<Sentence, Collection<WordToken>> sentences = JCasUtil.indexCovered(jCas, Sentence.class, WordToken.class);
+		final Map<Sentence, Collection<WordToken>> sentences = JCasUtil.indexCovered(jCas, Sentence.class,
+				WordToken.class);
 
-		sentences.entrySet().stream()
-				.filter(e -> !e.getValue().isEmpty())
-				.forEach(e -> {
+		sentences.entrySet().stream().filter(e -> !e.getValue().isEmpty()).forEach(e -> {
 
-					Sentence sentence = e.getKey();
-					Collection<WordToken> tokens = e.getValue();
+			final Sentence sentence = e.getKey();
+			final Collection<WordToken> tokens = e.getValue();
 
-					Parse parsed = parseSentence(sentence, tokens);
+			final Parse parsed = parseSentence(sentence, tokens);
 
-					updatePhraseChunks(jCas, sentence, parsed);
+			updatePhraseChunks(jCas, sentence, parsed);
 
-				});
+		});
 	}
 
-	private void updatePhraseChunks(JCas jCas, Sentence sentence, Parse parsed) {
-		// We remove all the existing PhraseChunks as they are going to be replace with the parsed
+	private void updatePhraseChunks(final JCas jCas, final Sentence sentence, final Parse parsed) {
+		// We remove all the existing PhraseChunks as they are going to be
+		// replace with the parsed
 		// version
-		// TODO: Or should we create a new ConstiuentPhraseChunk?
+		// TODO: Or should we create a new ConstiuentPhraseChunk type in Uima?
 		removeFromJCasIndex(JCasUtil.selectCovered(jCas, PhraseChunk.class, sentence));
 
 		addParsedAsAnnotations(jCas, sentence.getBegin(), parsed);
 
 	}
 
-	private void addParsedAsAnnotations(JCas jCas, int offset, Parse parsed) {
-		String type = parsed.getType();
+	private void addParsedAsAnnotations(final JCas jCas, final int offset, final Parse parsed) {
+		final String type = parsed.getType();
 
 		// Ignore non phrase types
-		if (PHRASE_TYPES.contains(type)) {
+		if (OpenNLPParser.PHRASE_TYPES.contains(type)) {
 			// Otherwise add new ParseChunks
 
-			Span span = parsed.getSpan();
-			PhraseChunk phraseChunk = new PhraseChunk(jCas);
+			final Span span = parsed.getSpan();
+			final PhraseChunk phraseChunk = new PhraseChunk(jCas);
 			phraseChunk.setBegin(offset + span.getStart());
 			phraseChunk.setEnd(offset + span.getEnd());
 			phraseChunk.setChunkType(parsed.getType());
@@ -141,26 +124,17 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	}
 
-	private Parse parseSentence(Sentence sentence, Collection<WordToken> tokens) {
-		String text = sentence.getCoveredText();
+	private Parse parseSentence(final Sentence sentence, final Collection<WordToken> tokens) {
+		final String text = sentence.getCoveredText();
 
-		final Parse parse = new Parse(text,
-				new Span(0, text.length()),
-				AbstractBottomUpParser.INC_NODE,
-				1,
-				0);
+		final Parse parse = new Parse(text, new Span(0, text.length()), AbstractBottomUpParser.INC_NODE, 1, 0);
 
 		// Add in the POS
 		int index = 0;
-		for (WordToken token : tokens) {
-			Span span = new Span(token.getBegin() - sentence.getBegin(),
-					token.getEnd() - sentence.getBegin());
+		for (final WordToken token : tokens) {
+			final Span span = new Span(token.getBegin() - sentence.getBegin(), token.getEnd() - sentence.getBegin());
 
-			parse.insert(new Parse(text,
-					span,
-					AbstractBottomUpParser.TOK_NODE,
-					0,
-					index));
+			parse.insert(new Parse(text, span, AbstractBottomUpParser.TOK_NODE, 0, index));
 			index++;
 		}
 

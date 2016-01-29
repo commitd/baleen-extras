@@ -1,12 +1,11 @@
 package com.tenode.baleen.resources.wordnet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Collections;
+import java.util.Optional;
 
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.impl.CustomResourceSpecifier_impl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,15 +24,29 @@ public class WordNetResourceTest {
 	}
 
 	@Test
+	public void testDestory() {
+		wnr.destroy();
+	}
+
+	@Test
 	public void testGetDictionary() {
-		assertNotNull(wnr.getDictionary());
+		Assert.assertNotNull(wnr.getDictionary());
 	}
 
 	@Test
 	public void testGetWord() throws JWNLException {
-		IndexWord word = wnr.getWord(POS.VERB, "employs");
-		assertNotNull(word);
-		assertEquals("employ", word.getLemma());
+		final Optional<IndexWord> missing = wnr.getWord(POS.VERB, "employs");
+		Assert.assertFalse(missing.isPresent());
+
+		final IndexWord employ = wnr.getWord(POS.VERB, "employ").get();
+		Assert.assertNotNull(employ);
+		Assert.assertEquals("employ", employ.getLemma());
+	}
+
+	@Test
+	public void testLookupWord() throws JWNLException {
+		final IndexWord word = wnr.lookupWord(POS.VERB, "employs").get();
+		Assert.assertEquals("employ", word.getLemma());
 
 		// Check that we can go from verb to noun
 		assert word.getSenses().stream().filter(p -> p.getPOS() != POS.NOUN).count() > 0;

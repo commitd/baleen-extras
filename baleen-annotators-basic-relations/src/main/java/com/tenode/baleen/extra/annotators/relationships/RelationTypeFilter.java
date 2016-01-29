@@ -29,7 +29,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.resource uk.gov.dstl.baleen.resources.SharedMongoResource
 	 */
 	public static final String KEY_MONGO = "mongo";
-	@ExternalResource(key = KEY_MONGO)
+	@ExternalResource(key = RelationTypeFilter.KEY_MONGO)
 	private SharedMongoResource mongo;
 
 	/**
@@ -38,7 +38,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config gazetteer
 	 */
 	public static final String PARAM_COLLECTION = "collection";
-	@ConfigurationParameter(name = PARAM_COLLECTION, defaultValue = "relationTypes")
+	@ConfigurationParameter(name = RelationTypeFilter.PARAM_COLLECTION, defaultValue = "relationTypes")
 	private String collection;
 
 	/**
@@ -47,7 +47,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config type
 	 */
 	public static final String PARAM_TYPE_FIELD = "typeField";
-	@ConfigurationParameter(name = PARAM_TYPE_FIELD, defaultValue = "type")
+	@ConfigurationParameter(name = RelationTypeFilter.PARAM_TYPE_FIELD, defaultValue = "type")
 	private String typeField;
 
 	/**
@@ -56,7 +56,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config source
 	 */
 	public static final String PARAM_SOURCE_FIELD = "typeField";
-	@ConfigurationParameter(name = PARAM_SOURCE_FIELD, defaultValue = "type")
+	@ConfigurationParameter(name = RelationTypeFilter.PARAM_SOURCE_FIELD, defaultValue = "type")
 	private String sourceField;
 
 	/**
@@ -65,7 +65,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config target
 	 */
 	public static final String PARAM_TARGET_FIELD = "typeField";
-	@ConfigurationParameter(name = PARAM_TARGET_FIELD, defaultValue = "type")
+	@ConfigurationParameter(name = RelationTypeFilter.PARAM_TARGET_FIELD, defaultValue = "type")
 	private String targetField;
 
 	/**
@@ -79,7 +79,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config false
 	 */
 	public static final String PARAM_STRICT = "strict";
-	@ConfigurationParameter(name = PARAM_STRICT, defaultValue = "false")
+	@ConfigurationParameter(name = RelationTypeFilter.PARAM_STRICT, defaultValue = "false")
 	private boolean strict;
 
 	/**
@@ -88,19 +88,19 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config true
 	 */
 	public static final String PARAM_SYMMETRIC = "symmetric";
-	@ConfigurationParameter(name = PARAM_SYMMETRIC, defaultValue = "true")
+	@ConfigurationParameter(name = RelationTypeFilter.PARAM_SYMMETRIC, defaultValue = "true")
 	private boolean symetric;
 
 	private final Map<String, Set<RelationConstraint>> constraints = new HashMap<>();
 
 	@Override
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
-		DBCollection dbCollection = mongo.getDB().getCollection(collection);
+		final DBCollection dbCollection = mongo.getDB().getCollection(collection);
 
 		dbCollection.find().forEach(o -> {
-			RelationConstraint constraint = new RelationConstraint((String) o.get(typeField),
+			final RelationConstraint constraint = new RelationConstraint((String) o.get(typeField),
 					(String) o.get(sourceField),
 					(String) o.get(targetField));
 
@@ -117,10 +117,10 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	}
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
-		for (Relation relation : JCasUtil.select(jCas, Relation.class)) {
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
+		for (final Relation relation : JCasUtil.select(jCas, Relation.class)) {
 
-			Set<RelationConstraint> rcs = constraints.get(relation.getRelationshipType());
+			final Set<RelationConstraint> rcs = constraints.get(relation.getRelationshipType());
 
 			boolean remove;
 			if (rcs == null || rcs.isEmpty()) {
@@ -142,7 +142,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 		}
 	}
 
-	private boolean check(Set<RelationConstraint> rcs, Relation relation) {
+	private boolean check(final Set<RelationConstraint> rcs, final Relation relation) {
 		return rcs.stream().anyMatch(p -> {
 			return p.matches(relation, symetric);
 		});
@@ -153,7 +153,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 		private final String source;
 		private final String target;
 
-		private RelationConstraint(String type, String source, String target) {
+		private RelationConstraint(final String type, final String source, final String target) {
 			this.type = type;
 			this.source = source;
 			this.target = target;
@@ -168,15 +168,15 @@ public class RelationTypeFilter extends BaleenAnnotator {
 			return !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(source) && !Strings.isNullOrEmpty(target);
 		}
 
-		public boolean matches(Relation relation, boolean symmetric) {
-			Entity sourceEntity = relation.getSource();
-			Entity targetEntity = relation.getTarget();
+		public boolean matches(final Relation relation, final boolean symmetric) {
+			final Entity sourceEntity = relation.getSource();
+			final Entity targetEntity = relation.getTarget();
 
 			// TODO: Allow inheritence here?
 			// TODO: Use the full name (and/or allow short type for baleen types only)
 
-			String sourceType = sourceEntity.getTypeName();
-			String targetType = targetEntity.getTypeName();
+			final String sourceType = sourceEntity.getTypeName();
+			final String targetType = targetEntity.getTypeName();
 
 			if (!symmetric) {
 				return sourceType.equalsIgnoreCase(source) && targetType.equalsIgnoreCase(target);

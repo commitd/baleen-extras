@@ -8,11 +8,11 @@ public class PeriodicScheduler extends BaleenScheduler {
 
 	/**
 	 * The time in seconds between runs
-	 * 
+	 *
 	 * @baleen.config 3600
 	 */
 	public static final String PARAM_PERIOD = "period";
-	@ConfigurationParameter(name = PARAM_PERIOD, defaultValue = "3600")
+	@ConfigurationParameter(name = PeriodicScheduler.PARAM_PERIOD, defaultValue = "3600")
 	private long period;
 
 	private long lastRunTime = -1;
@@ -20,8 +20,8 @@ public class PeriodicScheduler extends BaleenScheduler {
 	@Override
 	protected boolean await() {
 
-		long periodInMs = period * 1000;
-		long timeSinceLast = System.currentTimeMillis() - lastRunTime;
+		final long periodInMs = period * 1000;
+		final long timeSinceLast = System.currentTimeMillis() - lastRunTime;
 
 		// We are are already over due, run now
 		if (timeSinceLast < periodInMs) {
@@ -34,7 +34,7 @@ public class PeriodicScheduler extends BaleenScheduler {
 			Thread.sleep(timeSinceLast - periodInMs);
 			lastRunTime = System.currentTimeMillis();
 			return true;
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			getMonitor().warn("Interrupted, stopping the scheduler");
 			return false;
 		}

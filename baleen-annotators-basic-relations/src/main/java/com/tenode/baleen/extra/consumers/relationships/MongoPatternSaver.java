@@ -1,4 +1,4 @@
-package com.tenode.baleen.extra.annotators.relationships;
+package com.tenode.baleen.extra.consumers.relationships;
 
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -18,9 +18,24 @@ import uk.gov.dstl.baleen.types.Base;
 import uk.gov.dstl.baleen.types.language.Pattern;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
-import uk.gov.dstl.baleen.uima.BaleenAnnotator;
+import uk.gov.dstl.baleen.uima.BaleenConsumer;
 
-public class MongoPatternSaver extends BaleenAnnotator {
+/**
+ * Saves patterns in a JCas to a Mongo collection.
+ *
+ * Use this after a pattern extraction annotator (eg PatternExtractor) in order to create a training
+ * set in Mongo for offlne analysis. In other words this annotator will save UIMA Pattern types to
+ * Mongo.
+ *
+ * This will NOT clear the existing collection, so that should be done manually between runs.
+ *
+ * Note this is BaleenConsumer but, like all consumers, it can be used as annotator. So if you wish
+ * to save midway through a pipeline, clear the result and then create more patterns that is
+ * supported with Baleen.
+ *
+ * @baleen.javadoc
+ */
+public class MongoPatternSaver extends BaleenConsumer {
 
 	/**
 	 * Connection to Mongo
@@ -28,7 +43,7 @@ public class MongoPatternSaver extends BaleenAnnotator {
 	 * @baleen.resource uk.gov.dstl.baleen.resources.SharedMongoResource
 	 */
 	public static final String KEY_MONGO = "mongo";
-	@ExternalResource(key = KEY_MONGO)
+	@ExternalResource(key = MongoPatternSaver.KEY_MONGO)
 	private SharedMongoResource mongo;
 
 	/**
@@ -37,20 +52,20 @@ public class MongoPatternSaver extends BaleenAnnotator {
 	 * @baleen.config patterns
 	 */
 	public static final String KEY_COLLECTION = "collection";
-	@ConfigurationParameter(name = KEY_COLLECTION, defaultValue = "patterns")
+	@ConfigurationParameter(name = MongoPatternSaver.KEY_COLLECTION, defaultValue = "patterns")
 	private String collection;
 
 	private DBCollection dbCollection;
 
 	@Override
-	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
 		dbCollection = mongo.getDB().getCollection(collection);
 	}
 
 	@Override
-	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
+	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
 		for (final Pattern pattern : JCasUtil.select(jCas, Pattern.class)) {
 			final Base source = pattern.getSource();
@@ -67,7 +82,7 @@ public class MongoPatternSaver extends BaleenAnnotator {
 		}
 	}
 
-	private DBObject saveWords(Pattern pattern) {
+	private DBObject saveWords(final Pattern pattern) {
 		final BasicDBList list = new BasicDBList();
 		for (int i = 0; i < pattern.getWords().size(); i++) {
 			final WordToken w = pattern.getWords(i);
@@ -84,7 +99,7 @@ public class MongoPatternSaver extends BaleenAnnotator {
 		return list;
 	}
 
-	private DBObject saveEntity(Entity entity) {
+	private DBObject saveEntity(final Entity entity) {
 		return new BasicDBObject()
 				.append("text", entity.getCoveredText())
 				.append("type", entity.getTypeName());

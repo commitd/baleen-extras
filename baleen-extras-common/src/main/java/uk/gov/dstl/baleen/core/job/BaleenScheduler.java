@@ -21,18 +21,18 @@ public abstract class BaleenScheduler extends JCasCollectionReader_ImplBase {
 	private Map<String, String> config;
 
 	@Override
-	public final void initialize(UimaContext context) throws ResourceInitializationException {
+	public final void initialize(final UimaContext context) throws ResourceInitializationException {
 		// This will do initialization of resources,
 		// but won't be included in the metrics
 		super.initialize(context);
 
-		String pipelineName = UimaUtils.getPipelineName(context);
+		final String pipelineName = UimaUtils.getPipelineName(context);
 		monitor = new UimaMonitor(pipelineName, this.getClass());
 
 		monitor.startFunction("initialize");
 
 		// Pull the config parameters out for job settings
-		config = getConfigParameters(context);
+		config = BaleenScheduler.getConfigParameters(context);
 
 		doInitialize(context);
 
@@ -47,17 +47,17 @@ public abstract class BaleenScheduler extends JCasCollectionReader_ImplBase {
 	 * @param context
 	 *            The UimaContext for the collection reader
 	 */
-	protected void doInitialize(UimaContext context) throws ResourceInitializationException {
+	protected void doInitialize(final UimaContext context) throws ResourceInitializationException {
 		// Do nothing by default
 	}
 
 	@Override
-	public final void getNext(JCas jCas) throws IOException, CollectionException {
+	public final void getNext(final JCas jCas) throws IOException, CollectionException {
 		monitor.startFunction("getNext");
 		MetricsFactory.getInstance().getPipelineMetrics(monitor.getPipelineName()).startDocumentProcess();
 
-		JobSettings settings = new JobSettings(jCas);
-		for (Map.Entry<String, String> e : config.entrySet()) {
+		final JobSettings settings = new JobSettings(jCas);
+		for (final Map.Entry<String, String> e : config.entrySet()) {
 			settings.set(e.getKey(), e.getValue());
 		}
 
@@ -78,7 +78,7 @@ public abstract class BaleenScheduler extends JCasCollectionReader_ImplBase {
 		super.destroy();
 		try {
 			doDestroy();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			getMonitor().warn("Close on destroy", e);
 		}
 	}
@@ -111,10 +111,10 @@ public abstract class BaleenScheduler extends JCasCollectionReader_ImplBase {
 	 *            the context
 	 * @return non-empty map of config param name to config param value
 	 */
-	protected static Map<String, String> getConfigParameters(UimaContext context) {
+	protected static Map<String, String> getConfigParameters(final UimaContext context) {
 		// TODO: String, String due to Metadata (probably correct but limiting)
-		Map<String, String> ret = new HashMap<>();
-		for (String name : context.getConfigParameterNames()) {
+		final Map<String, String> ret = new HashMap<>();
+		for (final String name : context.getConfigParameterNames()) {
 			ret.put(name, context.getConfigParameterValue(name).toString());
 		}
 

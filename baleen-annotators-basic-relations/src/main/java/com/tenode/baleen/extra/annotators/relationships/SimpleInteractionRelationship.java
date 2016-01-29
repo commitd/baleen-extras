@@ -38,14 +38,14 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
 public class SimpleInteractionRelationship extends AbstractInteractionBasedRelationshipAnnotator {
 
 	@Override
-	protected Stream<Relation> extract(JCas jCas, Sentence sentence, List<Interaction> interactions,
-			List<Entity> entities) {
+	protected Stream<Relation> extract(final JCas jCas, final Sentence sentence, final List<Interaction> interactions,
+			final List<Entity> entities) {
 
 		return interactions.stream().flatMap(i -> {
 
-			List<Entity> leftOfInteraction = entities.stream().filter(e -> e.getEnd() < i.getBegin())
+			final List<Entity> leftOfInteraction = entities.stream().filter(e -> e.getEnd() < i.getBegin())
 					.collect(Collectors.toList());
-			List<Entity> rightOfInteraction = entities.stream().filter(e -> e.getBegin() > i.getEnd())
+			final List<Entity> rightOfInteraction = entities.stream().filter(e -> e.getBegin() > i.getEnd())
 					.collect(Collectors.toList());
 
 			return createPairwiseRelations(jCas, i, leftOfInteraction, rightOfInteraction);
