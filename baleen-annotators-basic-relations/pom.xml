@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.tenode.baleen</groupId>
-		<artifactId>baleen-extra</artifactId>
-		<version>${baleen-extra.version}</version>
+		<artifactId>baleen-extras</artifactId>
+		<version>${baleen-extras.version}</version>
 	</parent>
 	<artifactId>baleen-annotators-basic-relations</artifactId>
 	<name>Baleen Basic Relations</name>
@@ -13,8 +13,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.tenode.baleen</groupId>
-			<artifactId>baleen-extra-common</artifactId>
-			<version>${baleen-extra.version}</version>
+			<artifactId>baleen-extras-common</artifactId>
+			<version>${baleen-extras.version}</version>
 		</dependency>
 	</dependencies>
 </project>

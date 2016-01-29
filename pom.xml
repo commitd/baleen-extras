@@ -8,18 +8,18 @@
 	</parent>
 	
 	<properties>
-		<baleen-extra.version>2.2.0-SNAPSHOT</baleen-extra.version>
+		<baleen-extras.version>2.2.0-SNAPSHOT</baleen-extras.version>
 	</properties>
 
 	<groupId>com.tenode.baleen</groupId>
-	<artifactId>baleen-extra</artifactId>
+	<artifactId>baleen-extras</artifactId>
 	<!-- Version as per the Baleen version -->
-	<version>${baleen-extra.version}</version>
+	<version>${baleen-extras.version}</version>
 
 	<packaging>pom</packaging>
 	<name>Baleen Extras</name>
 	<description>Additional components for Baleen</description>
-	<url>https://github.com/tenode/baleen-extra</url>
+	<url>https://github.com/tenode/baleen-extras</url>
 	<inceptionYear>2016</inceptionYear>
 
 	<licenses>
@@ -39,15 +39,15 @@
 	</developers>
 	
 	<scm>
-		<url>https://github.com/tenode/baleen-extra</url>
+		<url>https://github.com/tenode/baleen-extras</url>
 	</scm>
 
 	<modules>
-		<module>baleen-extra-common</module>
+		<module>baleen-extras-common</module>
 		<module>baleen-annotators-clearnlp</module>
 		<module>baleen-annotators-maltparser</module>
 		<module>baleen-annotators-opennlp</module>
-		<module>baleen-resources-wordnet</module>
 		<module>baleen-annotators-basic-relations</module>
+		<module>baleen-resources-wordnet</module>
 	</modules>
 </project>
