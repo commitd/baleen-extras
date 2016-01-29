@@ -48,5 +48,6 @@
 		<module>baleen-annotators-maltparser</module>
 		<module>baleen-annotators-opennlp</module>
 		<module>baleen-resources-wordnet</module>
+		<module>baleen-annotators-basic-relations</module>
 	</modules>
 </project>

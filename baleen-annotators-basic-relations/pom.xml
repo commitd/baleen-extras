@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.tenode.baleen</groupId>
+		<artifactId>baleen-extra</artifactId>
+		<version>${baleen-extra.version}</version>
+	</parent>
+	<artifactId>baleen-annotators-basic-relations</artifactId>
+	<name>Baleen Basic Relations</name>
+	<description>Relationship annotators which perform basic or simply functions</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.tenode.baleen</groupId>
+			<artifactId>baleen-extra-common</artifactId>
+			<version>${baleen-extra.version}</version>
+		</dependency>
+	</dependencies>
+</project>
