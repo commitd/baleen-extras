@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.tenode.baleen</groupId>
+		<artifactId>baleen-extras</artifactId>
+		<version>${baleen-extras.version}</version>
+	</parent>
+	<artifactId>baleen-extras-readers</artifactId>
+	<name>Baleen Extra Readers</name>
+	<description>Additional collection readers for Baleen</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>uk.gov.dstl.baleen</groupId>
+			<artifactId>baleen-collectionreaders</artifactId>
+			<version>${baleen.version}</version>
+			<type>test-jar</type>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.dstl.baleen</groupId>
+			<artifactId>baleen-core</artifactId>
+			<version>${baleen.version}</version>
+		</dependency>
+	</dependencies>
+</project>

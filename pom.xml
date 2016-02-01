@@ -49,5 +49,6 @@
 		<module>baleen-annotators-opennlp</module>
 		<module>baleen-annotators-basic-relations</module>
 		<module>baleen-resources-wordnet</module>
+		<module>baleen-extras-readers</module>
 	</modules>
 </project>
