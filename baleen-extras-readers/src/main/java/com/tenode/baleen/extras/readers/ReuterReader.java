@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -14,16 +13,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.uima.UimaContext;
-import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.resource.ResourceInitializationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import uk.gov.dstl.baleen.uima.BaleenCollectionReader;
+import uk.gov.dstl.baleen.exceptions.BaleenException;
 
 /**
  * A collection reader which loads SGM files from the Reuters21578 archive.
@@ -32,7 +29,7 @@ import uk.gov.dstl.baleen.uima.BaleenCollectionReader;
  *
  * Extract the data (use 'tar xvf reuters21579.tar.gz' or 7zip on Windows).
  */
-public class ReuterReader extends BaleenCollectionReader {
+public class ReuterReader extends AbstractStreamCollectionReader<String> {
 
 	public ReuterReader() {
 		// Do nothing
@@ -45,28 +42,26 @@ public class ReuterReader extends BaleenCollectionReader {
 	 */
 	public static final String KEY_PATH = "path";
 	@ExternalResource(key = KEY_PATH, mandatory = false)
-	String sgmPath;
-
-	private Iterator<String> documents;
+	private String sgmPath;
 
 	public void setSgmPath(final String sgmPath) {
 		this.sgmPath = sgmPath;
 	}
 
 	@Override
-	protected void doInitialize(final UimaContext context) throws ResourceInitializationException {
+	protected Stream<String> initializeStream(UimaContext context) throws BaleenException {
 		final File[] files = new File(sgmPath)
-				.listFiles(f -> f.getName().endsWith(".sgm"));
+				.listFiles(f -> f.getName().endsWith(".sgm") && f.isFile());
 
 		DocumentBuilder documentBuilder;
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			documentBuilder = factory.newDocumentBuilder();
 		} catch (final Exception e) {
-			throw new ResourceInitializationException(e);
+			throw new BaleenException(e);
 		}
 
-		documents = Arrays.stream(files)
+		return Arrays.stream(files)
 				.flatMap(sgmlFile -> {
 
 					try {
@@ -95,7 +90,7 @@ public class ReuterReader extends BaleenCollectionReader {
 					return nodeListToText(e.getElementsByTagName("BODY"));
 				}).filter(s -> {
 					return !s.isEmpty();
-				}).iterator();
+				});
 	}
 
 	private Stream<String> nodeListToText(final NodeList list) {
@@ -125,13 +120,7 @@ public class ReuterReader extends BaleenCollectionReader {
 	}
 
 	@Override
-	public boolean doHasNext() throws IOException, CollectionException {
-		return documents.hasNext();
-	}
-
-	@Override
-	public void doGetNext(final JCas jCas) throws IOException, CollectionException {
-		final String text = documents.next();
+	protected void apply(String text, JCas jCas) {
 		jCas.setDocumentLanguage("en");
 		jCas.setDocumentText(text);
 	}
