@@ -1,4 +1,4 @@
-package com.tenode.baleen.resources.wordnet;
+package com.tenode.baleen.wordnet.resources;
 
 import java.util.Map;
 import java.util.Optional;
@@ -71,8 +71,13 @@ public class WordNetResource extends BaleenResource {
 	 * @throws JWNLException
 	 *             the JWNL exception
 	 */
-	public Optional<IndexWord> lookupWord(final POS pos, final String word) throws JWNLException {
-		return Optional.ofNullable(dictionary.lookupIndexWord(pos, word));
+	public Optional<IndexWord> lookupWord(final POS pos, final String word) {
+		try {
+			return Optional.ofNullable(dictionary.lookupIndexWord(pos, word));
+		} catch (JWNLException e) {
+			getMonitor().warn("Lookup word failed", e);
+			return Optional.empty();
+		}
 	}
 
 	/**
@@ -86,8 +91,13 @@ public class WordNetResource extends BaleenResource {
 	 * @throws JWNLException
 	 *             the JWNL exception
 	 */
-	public Optional<IndexWord> getWord(final POS pos, final String lemma) throws JWNLException {
-		return Optional.ofNullable(dictionary.getIndexWord(pos, lemma));
+	public Optional<IndexWord> getWord(final POS pos, final String lemma) {
+		try {
+			return Optional.ofNullable(dictionary.getIndexWord(pos, lemma));
+		} catch (JWNLException e) {
+			getMonitor().warn("Get word failed", e);
+			return Optional.empty();
+		}
 	}
 
 }

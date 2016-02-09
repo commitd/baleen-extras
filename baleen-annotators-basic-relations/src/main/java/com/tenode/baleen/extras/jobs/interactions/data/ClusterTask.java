@@ -16,7 +16,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
-import com.tenode.baleen.resources.wordnet.WordNetResource;
+import com.tenode.baleen.wordnet.resources.WordNetResource;
 
 import net.sf.extjwnl.data.POS;
 import uk.gov.dstl.baleen.resources.SharedMongoResource;
