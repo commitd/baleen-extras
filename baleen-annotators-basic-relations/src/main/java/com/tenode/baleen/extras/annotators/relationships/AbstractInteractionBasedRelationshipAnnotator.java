@@ -62,6 +62,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		r.setRelationSubType(interaction.getRelationSubType());
 		r.setSource(source);
 		r.setTarget(target);
+		r.setValue(interaction.getValue());
 		return r;
 	}
 

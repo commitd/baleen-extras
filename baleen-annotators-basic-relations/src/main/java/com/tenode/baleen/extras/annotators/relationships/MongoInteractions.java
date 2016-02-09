@@ -1,6 +1,8 @@
 package com.tenode.baleen.extras.annotators.relationships;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.UimaContext;
@@ -26,6 +28,8 @@ import uk.gov.dstl.baleen.types.language.WordToken;
  * Note you can not override the type. The type to be entity type will be Interaction.
  */
 public class MongoInteractions extends Mongo {
+
+	private final Map<Long, WordToken> wordTokenReference = new HashMap<>();
 
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
@@ -59,8 +63,14 @@ public class MongoInteractions extends Mongo {
 				// TODO: This could be improved for a general utility function, adding back
 				// punctuation, etc but it does sufficient for here.
 				tokens.forEach(t -> {
+					wordTokenReference.put(t.getInternalId(), t);
+
 					final int begin = lemmaText.length();
-					lemmaText.append(t.getCoveredText());
+					if (t.getLemmas() != null && t.getLemmas().size() > 0) {
+						lemmaText.append(t.getLemmas(0).getLemmaForm());
+					} else {
+						lemmaText.append(t.getCoveredText());
+					}
 					final int end = lemmaText.length();
 					lemmaText.append(" ");
 
@@ -68,10 +78,9 @@ public class MongoInteractions extends Mongo {
 					final Pointer ptr = new Pointer(lemmaJCas);
 					ptr.setBegin(begin);
 					ptr.setEnd(end);
-					ptr.setTarget(t);
+					ptr.setTargetId(t.getInternalId());
 					ptr.addToIndexes();
 				});
-				lemmaText.append(".");
 			}
 
 		}
@@ -82,11 +91,17 @@ public class MongoInteractions extends Mongo {
 	}
 
 	private void moveAnnotations(final JCas lemmaJCas, final JCas jCas) {
+		getMonitor().info("Found {}", JCasUtil.select(lemmaJCas, Interaction.class).size());
+
 		for (final Interaction interaction : JCasUtil.select(lemmaJCas, Interaction.class)) {
 			final Interaction coveringInteraction = JCasUtil.selectCovered(lemmaJCas, Pointer.class, interaction)
 					.stream()
-					.map(p -> p.getTarget())
-					.reduce(new Interaction(jCas), this::include, this::include);
+					.map(p -> wordTokenReference.get(p.getTargetId()))
+					.reduce(new Interaction(jCas, interaction.getBegin(), interaction.getEnd()), this::include,
+							this::include);
+			coveringInteraction.setRelationshipType(interaction.getRelationshipType());
+			coveringInteraction.setRelationSubType(interaction.getRelationSubType());
+			coveringInteraction.setValue(interaction.getCoveredText());
 			coveringInteraction.addToIndexes();
 		}
 	}

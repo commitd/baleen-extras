@@ -147,7 +147,8 @@ public class PatternExtractor extends BaleenAnnotator {
 	private Stream<WordToken> removeAdditionalWords(final PatternExtract pe, final Stream<WordToken> tokens) {
 		return tokens
 				.filter(t -> t.getBegin() >= pe.getStart() && t.getEnd() <= pe.getEnd())
-				.filter(t -> !stopWordRemover.isStopWord(t.getCoveredText()));
+				.filter(t -> !stopWordRemover.isStopWord(t.getCoveredText()))
+				.filter(t -> t.getCoveredText().trim().length() > 1);
 	}
 
 	private void outputPattern(final JCas jCas, final PatternExtract pattern) {
