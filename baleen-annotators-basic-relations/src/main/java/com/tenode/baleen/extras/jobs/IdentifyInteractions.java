@@ -14,8 +14,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.tenode.baleen.extras.consumers.relationships.MongoPatternSaver;
 import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
+import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
 import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
 import com.tenode.baleen.wordnet.WordNetUtils;
@@ -53,13 +53,23 @@ public class IdentifyInteractions extends BaleenTask {
 	private SharedMongoResource mongo;
 
 	/**
-	 * The name of the Mongo collection to hold the patterns
 	 *
-	 * @baleen.config patterns
+	 * The name of the Mongo collection to output the words to
+	 *
+	 * @baleen.config relationTypes
 	 */
 	public static final String KEY_PATTERN_COLLECTION = "patternCollection";
 	@ConfigurationParameter(name = KEY_PATTERN_COLLECTION, defaultValue = "patterns")
 	private String patternCollection;
+
+	/**
+	 * The name of the Mongo collection to outputs type (source, target, type) constraints too
+	 *
+	 * @baleen.config patterns
+	 */
+	public static final String KEY_RELATIONSHIP_COLLECTION = "relationTypesCollection";
+	@ConfigurationParameter(name = KEY_RELATIONSHIP_COLLECTION, defaultValue = "relationTypes")
+	private String relationTypesCollection;
 
 	/**
 	 * The name of the Mongo collection to output the words to
@@ -85,18 +95,18 @@ public class IdentifyInteractions extends BaleenTask {
 	 * @baleen.config patterns 0.2
 	 */
 	public static final String KEY_THRESHOLD = "threshold";
-	@ConfigurationParameter(name = MongoPatternSaver.KEY_COLLECTION, defaultValue = "0.2")
+	@ConfigurationParameter(name = KEY_THRESHOLD, defaultValue = "0.2")
 	private double threshold;
+
+	private Dictionary dictionary;
 
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
-
-		Dictionary dictionary = wordnet.getDictionary();
-		InteractionIdentifier identifier = new InteractionIdentifier(minPatternsInCluster, threshold, dictionary);
+		dictionary = wordnet.getDictionary();
+		InteractionIdentifier identifier = new InteractionIdentifier(minPatternsInCluster, threshold);
 		List<PatternReference> patterns = readPatternsFromMongo();
-		Stream<String> words = identifier.process(patterns);
-		writeWordsToMongo(words);
-
+		Stream<InteractionWord> words = identifier.process(patterns);
+		writeToMongo(words);
 	}
 
 	private List<PatternReference> readPatternsFromMongo() {
@@ -128,24 +138,47 @@ public class IdentifyInteractions extends BaleenTask {
 			}).filter(w -> w.getPos() != null)
 					.collect(Collectors.toList());
 
-			patterns.add(new PatternReference(o.get("_id").toString(), tokens));
+			PatternReference pattern = new PatternReference(o.get("_id").toString(), tokens);
+			pattern.setSourceType(((BasicDBObject) o.get("source")).getString("type"));
+			pattern.setTargetType(((BasicDBObject) o.get("target")).getString("type"));
+			patterns.add(pattern);
 		}
 
 		return patterns;
 
 	}
 
-	private void writeWordsToMongo(Stream<String> words) {
-		DBCollection collection = mongo.getDB().getCollection(interactionCollection);
-		words.map(w -> {
-			w = w.toLowerCase().trim();
-			BasicDBObject dbo = new BasicDBObject("value", w);
-			// Add in relationship type info so these are passed through to the interaction after
-			// annotation
-			dbo.put("relationshipType", w);
-			dbo.put("relationSubType", w);
-			return dbo;
-		}).forEach(collection::save);
+	private void writeToMongo(Stream<InteractionWord> words) {
+		DBCollection interactions = mongo.getDB().getCollection(interactionCollection);
+		DBCollection relationTypes = mongo.getDB().getCollection(relationTypesCollection);
+
+		words.forEach(interaction -> {
+			List<String> alternatives = interaction.getAlternativeWords(dictionary)
+					.map(s -> s.trim().toLowerCase())
+					.filter(s -> s.length() > 2)
+					.collect(Collectors.toList());
+			String lemma = interaction.getWord().getLemma();
+
+			if (!alternatives.isEmpty()) {
+
+				// Write to the interactions collection
+				// ADd in relationshiptype and subtype (which can be manually changed later)
+				BasicDBObject interactionObject = new BasicDBObject("value", alternatives);
+				interactionObject.put("relationshipType", lemma);
+				interactionObject.put("relationSubType", lemma);
+				interactions.save(interactionObject);
+
+				// Write out to the relationship constraints
+				interaction.getPairs().stream().forEach(p -> {
+					BasicDBObject relationTypeObject = new BasicDBObject()
+							.append("source", p.getSource())
+							.append("target", p.getTarget())
+							.append("type", lemma);
+					relationTypes.save(relationTypeObject);
+				});
+			}
+
+		});
 	}
 
 }

@@ -9,6 +9,10 @@ public final class PatternReference {
 
 	private final String id;
 
+	private String sourceType;
+
+	private String targetType;
+
 	private final List<Word> tokens;
 
 	private int[] termFrequency;
@@ -23,6 +27,22 @@ public final class PatternReference {
 	public PatternReference(String id, Word... tokens) {
 		this.id = id;
 		this.tokens = Arrays.asList(tokens);
+	}
+
+	public String getSourceType() {
+		return sourceType;
+	}
+
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
+
+	public String getTargetType() {
+		return targetType;
+	}
+
+	public void setTargetType(String targetType) {
+		this.targetType = targetType;
 	}
 
 	public String getId() {

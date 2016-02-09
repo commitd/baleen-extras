@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
+import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
 import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
 
@@ -24,12 +25,13 @@ import net.sf.extjwnl.dictionary.Dictionary;
 @RunWith(MockitoJUnitRunner.class)
 public class InteractionIdentifierTest {
 
-	private InteractionIdentifier identifier;;
+	private InteractionIdentifier identifier;
+	private Dictionary dictionary;;
 
 	@Before
 	public void before() throws JWNLException {
-		Dictionary dictionary = Dictionary.getDefaultResourceInstance();
-		identifier = new InteractionIdentifier(1, 0.2, dictionary);
+		dictionary = Dictionary.getDefaultResourceInstance();
+		identifier = new InteractionIdentifier(1, 0.2);
 	}
 
 	@Test
@@ -53,9 +55,12 @@ public class InteractionIdentifierTest {
 				new PatternReference("10", new Word("was", POS.VERB), new Word("penalised", POS.VERB),
 						new Word("extent", POS.NOUN), new Word("law", POS.NOUN)));
 
-		Stream<String> words = identifier.process(patterns);
+		Stream<InteractionWord> words = identifier.process(patterns);
 
-		List<String> list = words.collect(Collectors.toList());
+		List<String> list = words
+				.flatMap(w -> w.getAlternativeWords(dictionary))
+				.distinct()
+				.collect(Collectors.toList());
 		// Only mother, brother and law appear often enough to be consider interaction words
 		assertTrue(list.contains("mother"));
 		assertTrue(list.contains("law"));

@@ -2,6 +2,8 @@ package com.tenode.baleen.extras.jobs.interactions.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClusteredPatterns {
 
@@ -35,6 +37,12 @@ public class ClusteredPatterns {
 
 	public int size() {
 		return patterns.size();
+	}
+
+	public Set<RelationPair> getPairs() {
+		return patterns.stream()
+				.map(RelationPair::new)
+				.collect(Collectors.toSet());
 	}
 
 }

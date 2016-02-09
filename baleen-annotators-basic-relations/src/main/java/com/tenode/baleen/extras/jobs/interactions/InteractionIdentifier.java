@@ -11,27 +11,24 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.tenode.baleen.extras.jobs.interactions.data.ClusteredPatterns;
+import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
 import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
+import com.tenode.baleen.extras.jobs.interactions.data.RelationPair;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
 
-import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
-import net.sf.extjwnl.dictionary.Dictionary;
 
 public class InteractionIdentifier {
 
 	private final int minPatternsInCluster;
 	private final double threshold;
-	private final Dictionary dictionary;
 
-	public InteractionIdentifier(int minPatternsInCluster, double threshold, Dictionary dictionary) {
+	public InteractionIdentifier(int minPatternsInCluster, double threshold) {
 		this.minPatternsInCluster = minPatternsInCluster;
 		this.threshold = threshold;
-		this.dictionary = dictionary;
 	}
 
-	public Stream<String> process(List<PatternReference> patterns) {
+	public Stream<InteractionWord> process(List<PatternReference> patterns) {
 
 		Set<Word> terms = gatherTerms(patterns);
 
@@ -46,53 +43,36 @@ public class InteractionIdentifier {
 		// Remove small clusters
 		filterClusters(clusters);
 
-		clusters.forEach(c -> {
-			System.out.println("-----------------");
-			c.getPatterns().forEach(p -> System.out.println(p));
-		});
+		// For debugging:
+		// clusters.forEach(c -> {
+		// System.out.println("-----------------");
+		// c.getPatterns().forEach(p -> System.out.println(p));
+		// });
 
 		// Find interaction words
 		return extractInteractionWords(clusters);
 
 	}
 
-	private Stream<String> extractInteractionWords(List<ClusteredPatterns> clusters) {
-		Stream<Word> distinctWords = clusters.stream().flatMap(cluster -> {
+	private Stream<InteractionWord> extractInteractionWords(List<ClusteredPatterns> clusters) {
+		Stream<InteractionWord> distinctWords = clusters.stream().flatMap(cluster -> {
 			// TODO: Should we use token or terms here?
 			Map<Word, Long> wordCount = cluster.getPatterns().stream()
 					.flatMap(p -> p.getTokens().stream())
 					.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
+			Set<RelationPair> relationPairs = cluster.getPairs();
+
 			return wordCount.entrySet().stream()
 					.filter(e -> e.getValue() >= 2)
-					.map(e -> e.getKey());
+					.map(e -> new InteractionWord(e.getKey(), relationPairs));
 
-		}).filter(w -> w.getPos() == POS.NOUN || w.getPos() == POS.VERB).distinct();
+		}).filter(w -> w.getWord().getPos() == POS.NOUN || w.getWord().getPos() == POS.VERB).distinct();
 
 		// We need to map verbs and nouns to lemmas (which might have already been done)
 		// Then map verbs to nouns and vice versa.
 
-		return distinctWords.flatMap(w -> {
-			IndexWord word = null;
-			try {
-				word = dictionary.lookupIndexWord(w.getPos(), w.getLemma());
-			} catch (JWNLException e) {
-				// Ignore
-			}
-
-			if (word == null) {
-				return Stream.of(w.getLemma());
-			}
-
-			POS desiredPos = w.getPos() == POS.VERB ? POS.NOUN : POS.VERB;
-
-			Stream<String> otherWords = word.getSenses().stream()
-					.filter(s -> s.getPOS() == desiredPos)
-					.flatMap(s -> s.getWords().stream())
-					.map(x -> x.getLemma());
-
-			return Stream.concat(Stream.of(word.getLemma()), otherWords);
-		}).distinct();
+		return distinctWords;
 
 	}
 
@@ -127,8 +107,6 @@ public class InteractionIdentifier {
 					bestCluster = cp;
 				}
 			}
-
-			System.out.println(maxScore);
 
 			if (maxScore > threshold && bestCluster != null) {
 				// use the existing cluster
