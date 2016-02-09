@@ -41,7 +41,8 @@ public class StopWordRemover {
 			"upon", "us", "very", "via", "was", "we", "well", "were", "what", "whatever", "when", "whence", "whenever",
 			"where", "whereafter", "whereas", "whereby", "wherein", "whereupon", "wherever", "whether", "which",
 			"while", "whither", "who", "whoever", "whole", "whom", "whose", "why", "will", "with", "within", "without",
-			"would", "yet", "you", "your", "yours", "yourself", "yourselves" };
+			"would", "yet", "you", "your", "yours", "yourself", "yourselves", ",", ";", "-", ":", "(", ")", "[", "]",
+			"=" };
 
 	private final Set<String> stopWords;
 
