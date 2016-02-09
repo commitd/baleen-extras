@@ -119,8 +119,19 @@ public final class PatternExtract {
 	 * @return true, if successful
 	 */
 	public boolean contains(final String documentText, final String... needles) {
-		final String text = documentText.substring(start, end);
+		final String text = getCoveredText(documentText);
 		return Arrays.stream(needles).anyMatch(text::contains);
+	}
+
+	/**
+	 * Gets the covered text.
+	 *
+	 * @param documentText
+	 *            the document text
+	 * @return the covered text
+	 */
+	public String getCoveredText(final String documentText) {
+		return documentText.substring(start, end);
 	}
 
 	/**

@@ -55,6 +55,8 @@ public class PatternExtractor extends BaleenAnnotator {
 
 	private final StopWordRemover stopWordRemover = new StopWordRemover();
 
+	private final java.util.regex.Pattern negationRegex = java.util.regex.Pattern.compile("\b((no)|(neither)|(not))\b");
+
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
@@ -98,9 +100,7 @@ public class PatternExtractor extends BaleenAnnotator {
 						final int count = countWordsBetween(p, words);
 						return count >= 0 && count < windowSize;
 					})
-					// TODO: Bug we should look for \bword\b since we are discarding patterns
-					// contain words like nothing here!
-					.filter(p -> !p.contains(lowerText, "no", "not", "neither"))
+					.filter(p -> !negationRegex.matcher(p.getCoveredText(lowerText)).matches())
 					.forEach(p -> {
 						// Remove any other entities from the pattern
 						// Remove stop words from the pattern

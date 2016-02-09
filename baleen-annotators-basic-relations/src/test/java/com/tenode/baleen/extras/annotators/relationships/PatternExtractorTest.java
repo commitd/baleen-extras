@@ -12,8 +12,6 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.tenode.baleen.extras.annotators.relationships.PatternExtractor;
-
 import uk.gov.dstl.baleen.annotators.testing.AnnotatorTestBase;
 import uk.gov.dstl.baleen.types.language.Pattern;
 import uk.gov.dstl.baleen.types.language.Sentence;
@@ -31,6 +29,50 @@ public class PatternExtractorTest extends AnnotatorTestBase {
 		final AnalysisEngineDescription desc = AnalysisEngineFactory.createEngineDescription(PatternExtractor.class);
 
 		ae = AnalysisEngineFactory.createEngine(desc);
+	}
+
+	@Test
+	public void testNegationProcess() throws AnalysisEngineProcessException {
+		final String text = "The fox did not jump over the dog.";
+		jCas.setDocumentText(text);
+
+		final Sentence sentence = new Sentence(jCas);
+		sentence.setBegin(0);
+		sentence.setEnd(text.length());
+		sentence.addToIndexes(jCas);
+
+		int offset = 0;
+		while (offset < text.length()) {
+			int end = text.indexOf(" ", offset);
+			if (end == -1) {
+				end = text.indexOf(".", offset);
+			}
+
+			if (end > 0) {
+				final WordToken wordToken = new WordToken(jCas);
+				wordToken.setBegin(offset);
+				wordToken.setEnd(end);
+				wordToken.addToIndexes(jCas);
+				offset = end + 1;
+			} else {
+				offset = text.length();
+			}
+		}
+
+		final Entity fox = new Entity(jCas);
+		fox.setBegin(4);
+		fox.setEnd(7);
+		fox.addToIndexes(jCas);
+
+		final Entity dog = new Entity(jCas);
+		dog.setBegin(30);
+		dog.setEnd(33);
+		dog.addToIndexes(jCas);
+
+		SimplePipeline.runPipeline(jCas, ae);
+
+		final Collection<Pattern> patterns = JCasUtil.select(jCas, Pattern.class);
+		Assert.assertEquals(0, patterns.size());
 	}
 
 	@Test
