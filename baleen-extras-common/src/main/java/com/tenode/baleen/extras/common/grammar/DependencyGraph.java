@@ -153,8 +153,9 @@ public class DependencyGraph {
 		final StringBuilder sb = new StringBuilder();
 		edges.asMap().entrySet().stream().forEach(e -> {
 			sb.append(e.getKey().getCoveredText());
+			sb.append(": ");
+			e.getValue().stream().forEach(w -> sb.append(" " + w.getCoveredText()));
 			sb.append("\n");
-			e.getValue().stream().forEach(w -> sb.append("\t" + w.getCoveredText()));
 		});
 
 		DependencyGraph.LOGGER.info("Dependeny graph: {}", sb.toString());
@@ -174,7 +175,7 @@ public class DependencyGraph {
 		final DependencyGraph graph = new DependencyGraph();
 
 		JCasUtil.select(jCas, Dependency.class).stream().forEach(d -> {
-			if ((d.getDependencyType() == null || d.getDependencyType().equals("ROOT")) && d.getGovernor() != null
+			if ((d.getDependencyType() == null || !d.getDependencyType().equals("ROOT")) && d.getGovernor() != null
 					&& d.getDependent() != null) {
 				graph.addEdge(d.getGovernor(), d.getDependent());
 			}
