@@ -29,7 +29,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.resource uk.gov.dstl.baleen.resources.SharedMongoResource
 	 */
 	public static final String KEY_MONGO = "mongo";
-	@ExternalResource(key = RelationTypeFilter.KEY_MONGO)
+	@ExternalResource(key = KEY_MONGO)
 	private SharedMongoResource mongo;
 
 	/**
@@ -38,7 +38,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config gazetteer
 	 */
 	public static final String PARAM_COLLECTION = "collection";
-	@ConfigurationParameter(name = RelationTypeFilter.PARAM_COLLECTION, defaultValue = "relationTypes")
+	@ConfigurationParameter(name = PARAM_COLLECTION, defaultValue = "relationTypes")
 	private String collection;
 
 	/**
@@ -47,7 +47,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config type
 	 */
 	public static final String PARAM_TYPE_FIELD = "typeField";
-	@ConfigurationParameter(name = RelationTypeFilter.PARAM_TYPE_FIELD, defaultValue = "type")
+	@ConfigurationParameter(name = PARAM_TYPE_FIELD, defaultValue = "type")
 	private String typeField;
 
 	/**
@@ -56,7 +56,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config source
 	 */
 	public static final String PARAM_SOURCE_FIELD = "typeField";
-	@ConfigurationParameter(name = RelationTypeFilter.PARAM_SOURCE_FIELD, defaultValue = "type")
+	@ConfigurationParameter(name = PARAM_SOURCE_FIELD, defaultValue = "source")
 	private String sourceField;
 
 	/**
@@ -65,13 +65,13 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config target
 	 */
 	public static final String PARAM_TARGET_FIELD = "typeField";
-	@ConfigurationParameter(name = RelationTypeFilter.PARAM_TARGET_FIELD, defaultValue = "type")
+	@ConfigurationParameter(name = PARAM_TARGET_FIELD, defaultValue = "target")
 	private String targetField;
 
 	/**
 	 * Determines strictness of filtering.
 	 *
-	 * In strict mode the relatiosnship type must be defined and the source and target type the same
+	 * In strict mode the relationsship type must be defined and the source and target type the same
 	 * in order to pass the filter. In non-strict mode, if the relationship type has no constraints
 	 * then the relationship will pass. If the relationship type has constraints then these must be
 	 * adhered too.
@@ -137,7 +137,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 			}
 
 			if (remove) {
-				relation.removeFromIndexes();
+				removeFromJCasIndex(relation);
 			}
 		}
 	}
@@ -185,6 +185,52 @@ public class RelationTypeFilter extends BaleenAnnotator {
 						|| sourceType.equalsIgnoreCase(target) && targetType.equalsIgnoreCase(source);
 			}
 
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (source == null ? 0 : source.hashCode());
+			result = prime * result + (target == null ? 0 : target.hashCode());
+			result = prime * result + (type == null ? 0 : type.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			RelationConstraint other = (RelationConstraint) obj;
+			if (source == null) {
+				if (other.source != null) {
+					return false;
+				}
+			} else if (!source.equals(other.source)) {
+				return false;
+			}
+			if (target == null) {
+				if (other.target != null) {
+					return false;
+				}
+			} else if (!target.equals(other.target)) {
+				return false;
+			}
+			if (type == null) {
+				if (other.type != null) {
+					return false;
+				}
+			} else if (!type.equals(other.type)) {
+				return false;
+			}
+			return true;
 		}
 
 	}

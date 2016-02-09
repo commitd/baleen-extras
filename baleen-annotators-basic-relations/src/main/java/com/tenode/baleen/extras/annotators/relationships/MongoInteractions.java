@@ -102,7 +102,7 @@ public class MongoInteractions extends Mongo {
 			coveringInteraction.setRelationshipType(interaction.getRelationshipType());
 			coveringInteraction.setRelationSubType(interaction.getRelationSubType());
 			coveringInteraction.setValue(interaction.getCoveredText());
-			coveringInteraction.addToIndexes();
+			addToJCasIndex(coveringInteraction);
 		}
 	}
 

@@ -40,7 +40,7 @@ public class CleanRelations extends BaleenAnnotator {
 			final Relation a = relations.get(i);
 
 			if (!toRemove.contains(a)) {
-				for (int j = i + 1; i < relations.size(); j++) {
+				for (int j = i + 1; j < relations.size(); j++) {
 					final Relation b = relations.get(j);
 
 					if (isSame(a, b)) {
@@ -51,6 +51,8 @@ public class CleanRelations extends BaleenAnnotator {
 			}
 
 		}
+
+		removeFromJCasIndex(toRemove);
 	}
 
 	private boolean isSame(final Relation a, final Relation b) {
