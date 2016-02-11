@@ -108,8 +108,6 @@ public class MaltParser extends BaleenAnnotator {
 
 			int i = 0;
 			for (final WordToken wt : wordTokens) {
-
-				// TODO: Can include the lemma too
 				final String pos = wt.getPartOfSpeech();
 				final String lemma = getLemma(wt);
 				final String tag = udTags ? convertPennToUniversal(pos) : pos;

@@ -60,4 +60,5 @@ public class MaltParserTest extends AbstractMultiAnnotatorTest {
 		assertEquals(7, dependencies.size());
 
 	}
+
 }
