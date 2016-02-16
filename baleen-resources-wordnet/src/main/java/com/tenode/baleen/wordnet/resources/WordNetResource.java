@@ -1,7 +1,11 @@
 package com.tenode.baleen.wordnet.resources;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceSpecifier;
@@ -9,6 +13,7 @@ import org.apache.uima.resource.ResourceSpecifier;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
+import net.sf.extjwnl.data.Synset;
 import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.uima.BaleenResource;
 
@@ -98,6 +103,24 @@ public class WordNetResource extends BaleenResource {
 			getMonitor().warn("Get word failed", e);
 			return Optional.empty();
 		}
+	}
+
+	public Stream<String> getSuperSenses(POS pos, String word) {
+		Optional<IndexWord> indexWord = lookupWord(pos, word);
+
+		if (!indexWord.isPresent()) {
+			return Stream.empty();
+		} else {
+			// TODO: This doesn't work, but is the same as the below:
+			// indexWord.get().getSenses().stream().map(Synset::getLexFileName).distinct();
+			List<Synset> senses = indexWord.get().getSenses();
+			Set<String> set = new HashSet<>();
+			for (Synset s : senses) {
+				set.add(s.getLexFileName());
+			}
+			return set.stream();
+		}
+
 	}
 
 }

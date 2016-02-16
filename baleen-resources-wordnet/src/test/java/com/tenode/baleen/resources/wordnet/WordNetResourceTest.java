@@ -1,7 +1,9 @@
 package com.tenode.baleen.resources.wordnet;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.impl.CustomResourceSpecifier_impl;
@@ -52,6 +54,14 @@ public class WordNetResourceTest {
 
 		// Check that we can go from verb to noun
 		assert word.getSenses().stream().filter(p -> p.getPOS() != POS.NOUN).count() > 0;
+	}
+
+	@Test
+	public void testSuperSense() throws JWNLException {
+		final List<String> word = wnr.getSuperSenses(POS.VERB, "employs").collect(Collectors.toList());
+
+		Assert.assertEquals("verb.consumption", word.get(0));
+		Assert.assertEquals("verb.social", word.get(1));
 	}
 
 }
