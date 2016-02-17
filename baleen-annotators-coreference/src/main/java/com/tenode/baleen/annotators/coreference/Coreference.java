@@ -3,11 +3,14 @@ package com.tenode.baleen.annotators.coreference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -51,15 +54,15 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * The following details implementation to date:
  * <ul>
  * <li>Mention detection: Done
- * <li>Pass 1 Speaker Identification:
+ * <li>Pass 1 Speaker Identification: TODO
  * <li>Pass 2 Exact String Match: Done
  * <li>Pass 3 Relaxed String Match: Done
- * <li>Pass 4 Precise Constructs: appositive. Not: predicate, role appositive, relative pronoun,
- * acronym, demonym
- * <li>Pass 5-7 Strict Head Match:
- * <li>Pass 8 Proper Head Noun Match:
- * <li>Pass 9 Relaxed Head Match:
- * <li>Pass 10 Pronoun Resolution:
+ * <li>Pass 4 Precise Constructs: appositive, predicate. Not relative pronoun, acronym, demonym. Not
+ * role appositive (since Baleen doens't have a role entity to mark up)
+ * <li>Pass 5-7 Strict Head Match: TODO
+ * <li>Pass 8 Proper Head Noun Match: TODO
+ * <li>Pass 9 Relaxed Head Match: TODO
+ * <li>Pass 10 Pronoun Resolution: TODO
  * <li>Post process: Done
  * <li>Output: Done
  * </ul>
@@ -174,10 +177,14 @@ public class Coreference extends BaleenAnnotator {
 		for (Mention mention : mentions) {
 
 			String head = getHeadWords(jCas, parseTree, mention);
-			if (head == null || head.isEmpty()) {
+			if (head != null && !head.isEmpty()) {
 				mention.setHead(head);
 			}
 
+			Set<String> acronyms = getAcronyms(jCas, parseTree, mention);
+			if (acronyms != null) {
+				mention.setAcronym(acronyms);
+			}
 		}
 	}
 
@@ -212,6 +219,86 @@ public class Coreference extends BaleenAnnotator {
 		}
 
 		return sb.toString().trim();
+	}
+
+	public Set<String> getAcronyms(JCas jCas, ParseTree parseTree, Mention mention) {
+		// Stanford just use the uppercases but only on the NNP parts,
+		// We are looking at everything in the next
+		// If we have more than two upper cases, we do the lower case
+
+		if (mention.isAcronym()) {
+			return Collections.singleton(mention.getText().toUpperCase());
+		}
+
+		Collection<WordToken> words;
+		switch (mention.getType()) {
+		default:
+		case PRONOUN:
+			return null;
+		case ENTITY:
+			words = JCasUtil.selectCovered(jCas, WordToken.class, mention.getAnnotation());
+			break;
+		case NP:
+			PhraseChunk chunk = (PhraseChunk) mention.getAnnotation();
+			words = parseTree.getChildWords(chunk, x -> true).collect(Collectors.toList());
+			break;
+		}
+
+		Set<String> acronyms = new HashSet<>();
+
+		// Generate acrynoms based on the covered text
+
+		String text = mention.getText();
+
+		StringBuilder upperCase = new StringBuilder();
+		StringBuilder upperAndLowerCase = new StringBuilder();
+
+		boolean considerNext = true;
+		for (int i = 0; i < text.length(); i++) {
+			char c = text.charAt(i);
+			if (considerNext == true) {
+				if (Character.isUpperCase(c)) {
+					upperCase.append(c);
+					upperAndLowerCase.append(c);
+				} else {
+					upperAndLowerCase.append(c);
+				}
+			}
+
+			if (Character.isWhitespace(c)) {
+				considerNext = true;
+			}
+		}
+
+		// We require two upper case to avoid obvious captialisation (start of sentences)
+		if (upperCase.length() > 2) {
+			acronyms.add(upperCase.toString());
+		} else if (upperCase.length() > 2 && upperAndLowerCase.length() != upperCase.length()) {
+			acronyms.add(upperAndLowerCase.toString().toUpperCase());
+		}
+
+		// Now create acronym based on just the NNS,
+		// but unlike stanford use lower and upper case again
+
+		StringBuilder upperCaseNNP = new StringBuilder();
+		StringBuilder upperAndLowerCaseNNP = new StringBuilder();
+		words.stream().filter(p -> p.getPartOfSpeech().equals("NNP")).map(w -> w.getCoveredText().charAt(0))
+				.forEach(c -> {
+					if (Character.isUpperCase(c)) {
+						upperCaseNNP.append(c);
+						upperAndLowerCaseNNP.append(c);
+					} else {
+						upperAndLowerCaseNNP.append(c);
+					}
+				});
+
+		if (upperCaseNNP.length() > 2) {
+			acronyms.add(upperCaseNNP.toString());
+		} else if (upperCaseNNP.length() > 2 && upperAndLowerCase.length() != upperCaseNNP.length()) {
+			acronyms.add(upperAndLowerCaseNNP.toString().toUpperCase());
+		}
+
+		return acronyms;
 	}
 
 	private List<Cluster> sieve(JCas jCas, ParseTree parseTree, List<Mention> mentions) {

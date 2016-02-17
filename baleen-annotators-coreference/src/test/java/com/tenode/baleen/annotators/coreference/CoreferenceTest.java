@@ -25,6 +25,7 @@ import com.tenode.baleen.wordnet.resources.WordNetResource;
 import uk.gov.dstl.baleen.annotators.language.OpenNLP;
 import uk.gov.dstl.baleen.annotators.testing.AbstractMultiAnnotatorTest;
 import uk.gov.dstl.baleen.resources.SharedOpenNLPModel;
+import uk.gov.dstl.baleen.types.common.Organisation;
 import uk.gov.dstl.baleen.types.common.Person;
 import uk.gov.dstl.baleen.types.semantic.Location;
 import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
@@ -81,6 +82,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	@Ignore
 	public void testExistingRefTargets() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "Chris went to London and he saw Big Ben there.";
+		// there - london
 		jCas.setDocumentText(text);
 
 		Person chris = new Person(jCas);
@@ -116,6 +118,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	@Ignore
 	public void testExactStringMatch() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "Chris went to London and in London he saw Big Ben.";
+		// london - london
 		jCas.setDocumentText(text);
 
 		Person chris = new Person(jCas);
@@ -146,6 +149,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	@Ignore
 	public void testRelaxStringMatch() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The University of Warwick is near Coventry and that was the University at which Chris studied.";
+		// university of warwick - university
 		jCas.setDocumentText(text);
 
 		Person chris = new Person(jCas);
@@ -166,6 +170,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	@Ignore
 	public void testPreciseConstructApositive() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The prime minister, David Cameron explained on Tuesday.";
+		// david camera - prime minister
 		jCas.setDocumentText(text);
 
 		processJCas();
@@ -175,8 +180,10 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
+	@Ignore
 	public void testPreciseConstructPredicate() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The David Cameron is the prime minister.";
+		// david camera - prime minister
 		jCas.setDocumentText(text);
 
 		processJCas();
@@ -184,4 +191,58 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
 		assertEquals(1, targets.size());
 	}
+
+	// NOT IMPLEMENTED
+	@Test
+	@Ignore
+	public void testPreciseConstructRole() throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "President Obama visited today.";
+		// president - obama
+		jCas.setDocumentText(text);
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(1, targets.size());
+	}
+
+	@Test
+	@Ignore
+	public void testPreciseConstructRelativePronoun()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "The police want to catch a man who ran away.";
+		// man - who
+		jCas.setDocumentText(text);
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(1, targets.size());
+	}
+
+	@Test
+	public void testPreciseConstructAcronym()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "The British Broadcasting Corporation or the BBC if you prefer shows television programmes.";
+		// British Broadcasting Corporation - BBC
+		jCas.setDocumentText(text);
+
+		// We need these in otherwise we just get one long setence from the mention detector
+
+		Organisation beeb = new Organisation(jCas);
+		beeb.setBegin(text.indexOf("British Broadcasting Corporation"));
+		beeb.setEnd(beeb.getBegin() + "British Broadcasting Corporation".length());
+		beeb.addToIndexes();
+
+		Organisation bbc = new Organisation(jCas);
+		bbc.setBegin(text.indexOf("BBC"));
+		bbc.setEnd(bbc.getBegin() + "BBC".length());
+		bbc.addToIndexes();
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(1, targets.size());
+	}
+
 }

@@ -85,7 +85,7 @@ public class ParseTree {
 					chunkToNode.put(parent, parentNode);
 				}
 
-				treeNode.setParent(parent);
+				treeNode.setParent(parentNode);
 				parentNode.addChild(treeNode);
 
 			}
@@ -144,7 +144,7 @@ public class ParseTree {
 
 		private final PhraseChunk chunk;
 
-		private PhraseChunk parent;
+		private TreeNode parent;
 
 		private final List<TreeNode> children = new LinkedList<>();
 
@@ -175,7 +175,7 @@ public class ParseTree {
 			return chunk;
 		}
 
-		public void setParent(PhraseChunk parent) {
+		public void setParent(TreeNode parent) {
 			this.parent = parent;
 		}
 
@@ -187,7 +187,7 @@ public class ParseTree {
 			return !children.isEmpty();
 		}
 
-		public PhraseChunk getParent() {
+		public TreeNode getParent() {
 			return parent;
 		}
 

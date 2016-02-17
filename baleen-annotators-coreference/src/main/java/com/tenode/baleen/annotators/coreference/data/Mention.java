@@ -3,6 +3,8 @@ package com.tenode.baleen.annotators.coreference.data;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.util.StringUtils;
+
 import uk.gov.dstl.baleen.types.Base;
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
@@ -24,6 +26,8 @@ public class Mention {
 	private final Set<Cluster> clusters = new HashSet<>();
 
 	private String head;
+
+	private Set<String> acronyms;
 
 	private Mention(Base annotation, MentionType type) {
 		this.annotation = annotation;
@@ -109,6 +113,19 @@ public class Mention {
 
 	public void setHead(String head) {
 		this.head = head;
+	}
+
+	public boolean isAcronym() {
+		return !StringUtils.containsWhitespace(getText())
+				&& org.apache.commons.lang3.StringUtils.isAllUpperCase(getText());
+	}
+
+	public void setAcronym(Set<String> acronyms) {
+		this.acronyms = acronyms;
+	}
+
+	public Set<String> getAcronyms() {
+		return acronyms;
 	}
 
 	/*

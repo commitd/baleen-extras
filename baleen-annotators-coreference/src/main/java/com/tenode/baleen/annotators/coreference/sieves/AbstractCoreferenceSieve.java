@@ -3,11 +3,14 @@ package com.tenode.baleen.annotators.coreference.sieves;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
+
+import uk.gov.dstl.baleen.types.language.PhraseChunk;
 
 public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
@@ -60,6 +63,25 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 		cluster.addAll(a);
 		cluster.addAll(b);
 
+	}
+
+	protected void addCoveredToCluster(PhraseChunk a, PhraseChunk b) {
+		List<Mention> aMentions = findMentionsBetween(a.getBegin(), a.getEnd());
+		List<Mention> bMentions = findMentionsBetween(b.getBegin(), b.getEnd());
+
+		addPairwiseToCluster(aMentions, bMentions);
+	}
+
+	protected List<Mention> findMentionsBetween(int begin, int end) {
+		return getMentions().stream()
+				.filter(m -> begin <= m.getAnnotation().getBegin() && m.getAnnotation().getEnd() <= end)
+				.collect(Collectors.toList());
+	}
+
+	protected List<Mention> findMentionAbove(int begin, int end) {
+		return getMentions().stream()
+				.filter(m -> m.getAnnotation().getBegin() <= begin && end <= m.getAnnotation().getEnd())
+				.collect(Collectors.toList());
 	}
 
 }

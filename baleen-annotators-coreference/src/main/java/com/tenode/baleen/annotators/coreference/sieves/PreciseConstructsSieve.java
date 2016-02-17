@@ -2,18 +2,18 @@ package com.tenode.baleen.annotators.coreference.sieves;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.uima.jcas.JCas;
 
+import com.google.common.collect.Sets;
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.extras.common.grammar.ParseTree;
 import com.tenode.baleen.extras.common.grammar.ParseTree.TreeNode;
 
-import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
 /**
@@ -70,27 +70,46 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 							.findFirst();
 
 					if (np.isPresent() && is.isPresent()) {
-						addCoveredToCluster(a.getChunk(), b.getChunk());
+						addCoveredToCluster(a.getChunk(), np.get().getChunk());
 					}
 
 				}
 
+				// Relative pronoun
+
+				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("WHNP")) {
+					// The NP could be something that interests us, or it could a subpart of a large
+					// NP.
+					List<Mention> mention = findMentionAbove(a.getChunk().getBegin(), b.getChunk().getEnd());
+					List<Mention> pronoun = findMentionsBetween(b.getChunk().getBegin(), b.getChunk().getEnd());
+					addPairwiseToCluster(mention, pronoun);
+				}
 			}
 		});
 
-	}
+		// TODO: Role appositive - slightly unclear how this is used. I guess its the "The actress
+		// Rachel is in the show. The actress plays a single role"
+		// Which is an the import anamorphic relation. However in that example "actress" is not
+		// found as a NP / Entity in baleen. Perhaps we should create a
+		// role annotation and then use that? (effective look for ROLE PERSON to fulfil this rule)
 
-	protected void addCoveredToCluster(PhraseChunk a, PhraseChunk b) {
-		List<Mention> aMentions = findMentionsBetween(a.getBegin(), a.getEnd());
-		List<Mention> bMentions = findMentionsBetween(b.getBegin(), b.getEnd());
+		// Acronym
+		// The implement here depends on the acronym generator
+		for (int i = 0; i < getMentions().size(); i++) {
+			Mention a = getMentions().get(i);
+			Set<String> aAcronyms = a.getAcronyms();
 
-		addPairwiseToCluster(aMentions, bMentions);
-	}
+			for (int j = i + 1; j < getMentions().size(); j++) {
+				Mention b = getMentions().get(j);
+				Set<String> bAcronyms = b.getAcronyms();
 
-	private List<Mention> findMentionsBetween(int begin, int end) {
-		return getMentions().stream()
-				.filter(m -> begin <= m.getAnnotation().getBegin() && m.getAnnotation().getEnd() <= end)
-				.collect(Collectors.toList());
+				if (b.isAcronym() != a.isAcronym()
+						&& !Sets.intersection(aAcronyms, bAcronyms).isEmpty()) {
+					addToCluster(a, b);
+				}
+
+			}
+		}
 	}
 
 }
