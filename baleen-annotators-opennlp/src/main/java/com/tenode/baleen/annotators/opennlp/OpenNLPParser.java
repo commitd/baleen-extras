@@ -12,6 +12,8 @@ import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.Parse;
@@ -39,6 +41,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * @baleen.javadoc
  */
 public class OpenNLPParser extends BaleenAnnotator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(OpenNLPParser.class);
 
 	private static final Set<String> PHRASE_TYPES = new HashSet<String>(
 			Arrays.asList("ADJP", "ADVP", "FRAG", "INTJ", "LST", "NAC", "NP", "NX", "PP", "PRN", "PRT", "QP", "RRC",
@@ -118,6 +121,8 @@ public class OpenNLPParser extends BaleenAnnotator {
 			phraseChunk.setChunkType(parsed.getType());
 
 			addToJCasIndex(phraseChunk);
+
+			LOGGER.debug("{} [{}]", phraseChunk.getCoveredText(), phraseChunk.getChunkType());
 		}
 
 		Arrays.stream(parsed.getChildren()).forEach(p -> addParsedAsAnnotations(jCas, offset, p));
