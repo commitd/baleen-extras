@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,10 +28,12 @@ import com.tenode.baleen.annotators.coreference.sieves.ExactStringMatchSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExtractReferenceTargets;
 import com.tenode.baleen.annotators.coreference.sieves.PreciseConstructsSieve;
 import com.tenode.baleen.annotators.coreference.sieves.RelaxedStringMatchSieve;
+import com.tenode.baleen.annotators.coreference.sieves.StrictHeadMatchSieve;
 import com.tenode.baleen.extras.common.grammar.DependencyGraph;
 import com.tenode.baleen.extras.common.grammar.ParseTree;
 
 import uk.gov.dstl.baleen.types.Base;
+import uk.gov.dstl.baleen.types.language.Dependency;
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
@@ -57,8 +60,9 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * <li>Pass 1 Speaker Identification: TODO
  * <li>Pass 2 Exact String Match: Done
  * <li>Pass 3 Relaxed String Match: Done
- * <li>Pass 4 Precise Constructs: appositive, predicate. Not relative pronoun, acronym, demonym. Not
- * role appositive (since Baleen doens't have a role entity to mark up)
+ * <li>Pass 4 Precise Constructs: Done - appositive, predicate. relative pronoun, acronym. Not done
+ * - role appositive (since Baleen doens't have a role entity to mark up). Done elsewhere - demonym
+ * are covered in the NationalityToLocation annotator.
  * <li>Pass 5-7 Strict Head Match: TODO
  * <li>Pass 8 Proper Head Noun Match: TODO
  * <li>Pass 9 Relaxed Head Match: TODO
@@ -99,7 +103,7 @@ public class Coreference extends BaleenAnnotator {
 
 		// Extract head words and other aspects needed for later, determine acronyms, denonym,
 		// gender, etc
-		enhanceMention(jCas, parseTree, mentions);
+		enhanceMention(jCas, dependencyGraph, parseTree, mentions);
 
 		mentions.forEach(System.out::println);
 
@@ -173,10 +177,11 @@ public class Coreference extends BaleenAnnotator {
 		return mentions;
 	}
 
-	private void enhanceMention(JCas jCas, ParseTree parseTree, List<Mention> mentions) {
+	private void enhanceMention(JCas jCas, DependencyGraph dependencyGraph, ParseTree parseTree,
+			List<Mention> mentions) {
 		for (Mention mention : mentions) {
 
-			String head = getHeadWords(jCas, parseTree, mention);
+			String head = getHeadWords(jCas, dependencyGraph, parseTree, mention);
 			if (head != null && !head.isEmpty()) {
 				mention.setHead(head);
 			}
@@ -188,7 +193,7 @@ public class Coreference extends BaleenAnnotator {
 		}
 	}
 
-	private String getHeadWords(JCas jCas, ParseTree parseTree, Mention mention) {
+	private String getHeadWords(JCas jCas, DependencyGraph dependencyGraph, ParseTree parseTree, Mention mention) {
 		Collection<WordToken> words;
 		switch (mention.getType()) {
 		default:
@@ -199,26 +204,61 @@ public class Coreference extends BaleenAnnotator {
 			break;
 		case NP:
 			PhraseChunk chunk = (PhraseChunk) mention.getAnnotation();
-			words = parseTree.getChildWords(chunk, NP_FILTER).collect(Collectors.toList());
+			words = parseTree.getChildWords(chunk, p -> true).collect(Collectors.toList());
 			break;
 		}
 
-		boolean foundNN = false;
-		StringBuilder sb = new StringBuilder();
-		for (WordToken w : words) {
-			if (w.getPartOfSpeech().startsWith("N")) {
-				foundNN = true;
-				sb.append(w.getCoveredText());
-				sb.append(" ");
-			} else if (foundNN) {
-				// Left our head words
-				break;
-			} else {
-				// Not found a NN yet, so... carry on
+		// A dependency grammar approach to head word extraction
+		// - find the Noun in the noun phrase which is the link out of the words
+		// - this seems to be the head word
+		// TODO: Investigate other approachces Collin 1999, etc. Do they give the same/better
+		// results?
+
+		List<WordToken> candidates = new LinkedList<WordToken>();
+		for (WordToken word : words) {
+			if (word.getPartOfSpeech().startsWith("N")) {
+				Set<Dependency> governors = dependencyGraph.getGovernors(word);
+				if (!words.containsAll(governors)) {
+					candidates.add(word);
+				}
 			}
 		}
 
-		return sb.toString().trim();
+		if (candidates.isEmpty()) {
+			return null;
+		}
+
+		// TODO: No idea if its it possible to get more than one if all things work.
+		// I think this would be a case of marking an entity which cross the NP boundary and is
+		// likely wrong.
+		WordToken head = candidates.get(0);
+
+		// TODO: Not sure if we should pull out compound words here. ie the head word Bill Clinton
+		// or Clinton
+		// Set<WordToken> compoundWords = dependencyGraph.nearestWords(1,
+		// d -> d.getDependencyType().equalsIgnoreCase("compound"), candidates);
+		// words.removeIf(w -> !compoundWords.contains(w));
+		// return words.stream().map(WordToken::getCoveredText).collect(Collectors.joining(" "));
+
+		return head.getCoveredText();
+
+		//
+		// boolean foundNN = false;
+		// StringBuilder sb = new StringBuilder();
+		// for (WordToken w : words) {
+		// if (w.getPartOfSpeech().startsWith("N")) {
+		// foundNN = true;
+		// sb.append(w.getCoveredText());
+		// sb.append(" ");
+		// } else if (foundNN) {
+		// // Left our head words
+		// break;
+		// } else {
+		// // Not found a NN yet, so... carry on
+		// }
+		// }
+		//
+		// return sb.toString().trim();
 	}
 
 	public Set<String> getAcronyms(JCas jCas, ParseTree parseTree, Mention mention) {
@@ -312,9 +352,9 @@ public class Coreference extends BaleenAnnotator {
 				new RelaxedStringMatchSieve(jCas, clusters, mentions),
 				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions),
 				// Pass A-C are all strict head with different params
-				// new StrictHeadMatchSieve(jCas, true, true, clusters, mentions),
-				// new StrictHeadMatchSieve(jCas, true, false, clusters, mentions),
-				// new ProperHeadMatchSieve(jCas, false, true, clusters, mentions),
+				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true),
+				// new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
+				// new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
 				// new RelaxedHeadMatchSieve(jCas, clusters, mentions),
 				// new PronounResolutionSieve(jCas, clusters, mentions)
 		};

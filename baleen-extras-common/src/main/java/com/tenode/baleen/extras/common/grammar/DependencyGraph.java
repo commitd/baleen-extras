@@ -58,11 +58,11 @@ public class DependencyGraph {
 	}
 
 	public Set<Dependency> getDependents(WordToken word) {
-		return dependents.get(word);
+		return Collections.unmodifiableSet(dependents.get(word));
 	}
 
 	public Set<Dependency> getGovernors(WordToken word) {
-		return governors.get(word);
+		return Collections.unmodifiableSet(governors.get(word));
 	}
 
 	private void addEdge(final Dependency dependency) {

@@ -128,6 +128,12 @@ public class Mention {
 		return acronyms;
 	}
 
+	public boolean overlaps(Mention mention) {
+		Base a = mention.getAnnotation();
+		Base b = mention.getAnnotation();
+		return !(a.getEnd() < b.getBegin() || b.getEnd() < a.getBegin());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *

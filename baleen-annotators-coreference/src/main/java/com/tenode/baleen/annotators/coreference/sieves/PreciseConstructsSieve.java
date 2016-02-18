@@ -110,6 +110,12 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 
 			}
 		}
+
+		// Denoymns: Nationality - Country
+		// We are fortunate that we have Nationality and Location entities, and we alredy have the
+		// existing
+		// NationalityToLocation annotator, so this is not required.
+
 	}
 
 }

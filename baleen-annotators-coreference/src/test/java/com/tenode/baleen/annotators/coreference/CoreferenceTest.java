@@ -221,6 +221,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
+	@Ignore
 	public void testPreciseConstructAcronym()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The British Broadcasting Corporation or the BBC if you prefer shows television programmes.";
@@ -238,6 +239,32 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 		bbc.setBegin(text.indexOf("BBC"));
 		bbc.setEnd(bbc.getBegin() + "BBC".length());
 		bbc.addToIndexes();
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(1, targets.size());
+	}
+
+	@Test
+	public void testStrictHeadPass()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "The Florida Supreme Court sat today, and the Florida Court made a decision.";
+		jCas.setDocumentText(text);
+
+		// TODO: This is just one of the three phases!
+
+		// We need these in otherwise we just get one long setence from the mention detector
+
+		Organisation fsc = new Organisation(jCas);
+		fsc.setBegin(text.indexOf("Florida Supreme Court"));
+		fsc.setEnd(fsc.getBegin() + "Florida Supreme Court".length());
+		fsc.addToIndexes();
+
+		Organisation fc = new Organisation(jCas);
+		fc.setBegin(text.indexOf("Florida Court"));
+		fc.setEnd(fc.getBegin() + "Florida Court".length());
+		fc.addToIndexes();
 
 		processJCas();
 
