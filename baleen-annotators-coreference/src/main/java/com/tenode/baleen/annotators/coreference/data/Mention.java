@@ -127,7 +127,7 @@ public class Mention {
 	}
 
 	public String getHead() {
-		return getHeadWordToken().getCoveredText();
+		return getHeadWordToken() != null ? getHeadWordToken().getCoveredText() : null;
 	}
 
 	public boolean isAcronym() {

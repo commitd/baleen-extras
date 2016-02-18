@@ -1,6 +1,5 @@
 package com.tenode.baleen.annotators.coreference.utils;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Splitter;
@@ -21,14 +20,15 @@ public final class StopWordExtractor {
 		List<String> aNonStop = getNonStopWords(a);
 		List<String> bNonStop = getNonStopWords(b);
 
+		// TODO: This should not include the head word? See the paper for clarification.
+
 		// NOTE: This is ordered, a is earlier than b and it is unusal to introduce more information
 		// to an entity later in the document
-		return !(aNonStop.isEmpty() && bNonStop.isEmpty())
-				|| !Arrays.asList(aNonStop).containsAll(Arrays.asList(b));
+		return aNonStop.containsAll(bNonStop);
 	}
 
 	public static List<String> getNonStopWords(Mention a) {
-		return WHITESPACE_SPLITTER.splitToList(stopWordRemover.clean(a.getText()));
+		return WHITESPACE_SPLITTER.splitToList(stopWordRemover.clean(a.getText().toLowerCase()));
 	}
 
 }

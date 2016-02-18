@@ -6,14 +6,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
-import uk.gov.dstl.baleen.types.language.WordToken;
 
 public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
@@ -27,15 +25,15 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 		this.mentions = mentions;
 	}
 
-	public List<Cluster> getClusters() {
+	protected List<Cluster> getClusters() {
 		return clusters;
 	}
 
-	public List<Mention> getMentions() {
+	protected List<Mention> getMentions() {
 		return mentions;
 	}
 
-	public JCas getJCas() {
+	protected JCas getJCas() {
 		return jCas;
 	}
 
@@ -88,8 +86,12 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 	}
 
 	protected Set<String> getModifiers(Mention a) {
-		return JCasUtil.selectCovered(WordToken.class, a.getAnnotation()).stream()
-				.filter(w -> w.getPartOfSpeech().startsWith("N") || w.getPartOfSpeech().startsWith("J"))
+		// In the paper they say N and J (adjective) but we need cardinal too otherwise "200 people"
+		// discards the 200
+		// TODO: Modifiers up to head word? See paper
+		return a.getWords().stream()
+				.filter(w -> w.getPartOfSpeech().startsWith("N") || w.getPartOfSpeech().startsWith("J")
+						|| w.getPartOfSpeech().startsWith("CD"))
 				.map(w -> w.getCoveredText().toLowerCase())
 				.collect(Collectors.toSet());
 	}

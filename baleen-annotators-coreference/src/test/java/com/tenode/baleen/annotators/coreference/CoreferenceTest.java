@@ -158,10 +158,20 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 		chris.setEnd(chris.getBegin() + "Chris".length());
 		chris.addToIndexes();
 
+		Organisation uow = new Organisation(jCas);
+		uow.setBegin(text.indexOf("University of Warwick"));
+		uow.setEnd(uow.getBegin() + "University of Warwick".length());
+		uow.addToIndexes();
+
+		Organisation u = new Organisation(jCas);
+		u.setBegin(text.indexOf("University", uow.getEnd()));
+		u.setEnd(u.getBegin() + "University".length());
+		u.addToIndexes();
+
 		processJCas();
 
 		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
-		List<Location> location = new ArrayList<>(JCasUtil.select(jCas, Location.class));
+		List<Organisation> location = new ArrayList<>(JCasUtil.select(jCas, Organisation.class));
 		assertEquals(1, targets.size());
 		assertSame(targets.get(0), location.get(0).getReferent());
 		assertSame(targets.get(0), location.get(1).getReferent());

@@ -58,33 +58,34 @@ public class WordEnhancer implements MentionEnhancer {
 		// TODO: Investigate other approachces Collin 1999, etc. Do they give the same/better
 		// results?
 
-		List<WordToken> candidates = new LinkedList<WordToken>();
-		for (WordToken word : words) {
-			if (word.getPartOfSpeech().startsWith("N")) {
-				Set<Dependency> governors = dependencyGraph.getGovernors(word);
-				if (!words.containsAll(governors)) {
-					candidates.add(word);
+		if (words.size() == 1) {
+			mention.setHeadWordToken(words.get(0));
+		} else {
+
+			List<WordToken> candidates = new LinkedList<WordToken>();
+			for (WordToken word : words) {
+				if (word.getPartOfSpeech().startsWith("N")) {
+					Set<Dependency> governors = dependencyGraph.getGovernors(word);
+					if (!words.containsAll(governors)) {
+						candidates.add(word);
+					}
 				}
 			}
+
+			if (candidates.isEmpty()) {
+				return;
+			}
+
+			// TODO: No idea if its it possible to get more than one if all things work.
+			// I think this would be a case of marking an entity which cross the NP boundary and is
+			// likely wrong.
+			WordToken head = candidates.get(0);
+
+			// TODO: Not sure if we should pull out compound words here. ie the head word Bill
+			// Clinton or Clinton
+
+			mention.setHeadWordToken(head);
 		}
-
-		if (candidates.isEmpty()) {
-			return;
-		}
-
-		// TODO: No idea if its it possible to get more than one if all things work.
-		// I think this would be a case of marking an entity which cross the NP boundary and is
-		// likely wrong.
-		WordToken head = candidates.get(0);
-
-		// TODO: Not sure if we should pull out compound words here. ie the head word Bill Clinton
-		// or Clinton
-		// Set<WordToken> compoundWords = dependencyGraph.nearestWords(1,
-		// d -> d.getDependencyType().equalsIgnoreCase("compound"), candidates);
-		// words.removeIf(w -> !compoundWords.contains(w));
-		// return words.stream().map(WordToken::getCoveredText).collect(Collectors.joining(" "));
-
-		mention.setHeadWordToken(head);
 	}
 
 }

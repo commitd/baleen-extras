@@ -10,14 +10,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.google.common.primitives.Doubles;
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
-
-import uk.gov.dstl.baleen.types.language.WordToken;
 
 public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 
@@ -89,7 +86,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 	}
 
 	private Set<String> getSpatialAndPNModifier(Mention a) {
-		return JCasUtil.selectCovered(WordToken.class, a.getAnnotation()).stream()
+		return a.getWords().stream()
 				.filter(w -> w.getPartOfSpeech().startsWith("NP") || spatialModifiers.contains(w.getCoveredText()))
 				.map(w -> w.getCoveredText().toLowerCase())
 				.collect(Collectors.toSet());
