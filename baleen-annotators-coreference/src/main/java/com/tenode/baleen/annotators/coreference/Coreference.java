@@ -24,12 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.sieves.CoreferenceSieve;
-import com.tenode.baleen.annotators.coreference.sieves.ExactStringMatchSieve;
-import com.tenode.baleen.annotators.coreference.sieves.ExtractReferenceTargets;
-import com.tenode.baleen.annotators.coreference.sieves.PreciseConstructsSieve;
-import com.tenode.baleen.annotators.coreference.sieves.ProperHeadMatchSieve;
-import com.tenode.baleen.annotators.coreference.sieves.RelaxedStringMatchSieve;
-import com.tenode.baleen.annotators.coreference.sieves.StrictHeadMatchSieve;
+import com.tenode.baleen.annotators.coreference.sieves.RelaxedHeadMatchSieve;
 import com.tenode.baleen.extras.common.grammar.DependencyGraph;
 import com.tenode.baleen.extras.common.grammar.ParseTree;
 
@@ -348,16 +343,16 @@ public class Coreference extends BaleenAnnotator {
 		List<Cluster> clusters = new ArrayList<>();
 
 		CoreferenceSieve[] sieves = new CoreferenceSieve[] {
-				new ExtractReferenceTargets(jCas, clusters, mentions),
+				// new ExtractReferenceTargets(jCas, clusters, mentions),
 				// new SpeakerIdentificationSieve(jCas, clusters, mentions),
-				new ExactStringMatchSieve(jCas, clusters, mentions),
-				new RelaxedStringMatchSieve(jCas, clusters, mentions),
-				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions),
+				// new ExactStringMatchSieve(jCas, clusters, mentions),
+				// new RelaxedStringMatchSieve(jCas, clusters, mentions),
+				// new PreciseConstructsSieve(jCas, parseTree, clusters, mentions),
 				// Pass A-C are all strict head with different params
-				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true),
-				new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
-				new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
-				new ProperHeadMatchSieve(jCas, clusters, mentions),
+				// new StrictHeadMatchSieve(jCas, clusters, mentions, true, true),
+				// new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
+				// new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
+				// new ProperHeadMatchSieve(jCas, clusters, mentions),
 				new RelaxedHeadMatchSieve(jCas, clusters, mentions),
 				new PronounResolutionSieve(jCas, clusters, mentions)
 		};

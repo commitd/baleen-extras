@@ -1,6 +1,5 @@
 package com.tenode.baleen.annotators.coreference.sieves;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -8,11 +7,9 @@ import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
-import com.tenode.baleen.extras.common.language.StopWordRemover;
+import com.tenode.baleen.annotators.coreference.utils.StopWordExtractor;
 
 public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
-
-	private static final StopWordRemover stopWordRemover = new StopWordRemover();
 
 	private final boolean compatibleModifiers;
 	private final boolean wordInclusion;
@@ -52,13 +49,13 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 				}
 
 				// Word inclusion - stop words of the mention are in the cluster
-				if (wordInclusion && !hasSameNonStopWords(a, b)) {
+				if (wordInclusion && !StopWordExtractor.hasSubsetOfNonStopWords(a, b)) {
 					continue;
 				}
 
 				// Compatible modifiers only - do the two candidate mentions have the same adject /
 				// nouns
-				if (compatibleModifiers && !haveSameModifier(a, b)) {
+				if (compatibleModifiers && !haveSubsetOfSameModifier(a, b)) {
 					continue;
 				}
 
@@ -77,22 +74,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 		}
 	}
 
-	// TODO: This should at a cluster level
-	private boolean hasSameNonStopWords(Mention a, Mention b) {
-		String[] aNonStop = getNonStopWords(a);
-		String[] bNonStop = getNonStopWords(b);
-
-		// NOTE: This is ordered, a is earlier than b and it is unusal to introduce more information
-		// to an entity later in the document
-		return !(aNonStop.length == 0 && bNonStop.length == 0)
-				|| !Arrays.asList(aNonStop).containsAll(Arrays.asList(b));
-	}
-
-	protected String[] getNonStopWords(Mention a) {
-		return stopWordRemover.clean(a.getText()).split("\\s+");
-	}
-
-	private boolean haveSameModifier(Mention a, Mention b) {
+	private boolean haveSubsetOfSameModifier(Mention a, Mention b) {
 		Set<String> aModifiers = getModifiers(a);
 		Set<String> bModifiers = getModifiers(b);
 
