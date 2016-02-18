@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import com.tenode.baleen.annotators.maltparser.MaltParser;
 import com.tenode.baleen.annotators.opennlp.OpenNLPParser;
+import com.tenode.baleen.resources.coreference.GenderMultiplicityResource;
 import com.tenode.baleen.wordnet.annotators.WordNetLemmatizer;
 import com.tenode.baleen.wordnet.resources.WordNetResource;
 
@@ -49,6 +50,10 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 		ExternalResourceDescription chunksDesc = ExternalResourceFactory
 				.createExternalResourceDescription("phraseChunks", SharedOpenNLPModel.class);
 
+		ExternalResourceDescription gMDesc = ExternalResourceFactory
+				.createExternalResourceDescription(Coreference.PARAM_GENDER_MULTIPLICITY,
+						GenderMultiplicityResource.class);
+
 		return asArray(
 				createAnalysisEngine(OpenNLP.class, "tokens",
 						tokensDesc, "sentences", sentencesDesc, "posTags", posDesc, "phraseChunks", chunksDesc),
@@ -56,11 +61,10 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 				createAnalysisEngine(OpenNLPParser.class, "parserChunking",
 						parserChunkingDesc),
 				createAnalysisEngine(MaltParser.class),
-				createAnalysisEngine(Coreference.class));
+				createAnalysisEngine(Coreference.class, Coreference.PARAM_GENDER_MULTIPLICITY, gMDesc));
 	}
 
 	@Test
-	@Ignore
 	public void test() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "Chris went to London and he saw Big Ben there.";
 		jCas.setDocumentText(text);
@@ -79,7 +83,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testExistingRefTargets() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "Chris went to London and he saw Big Ben there.";
 		// there - london
@@ -115,7 +118,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testExactStringMatch() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "Chris went to London and in London he saw Big Ben.";
 		// london - london
@@ -146,7 +148,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testRelaxStringMatch() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The University of Warwick is near Coventry and that was the University at which Chris studied.";
 		// university of warwick - university
@@ -167,7 +168,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testPreciseConstructApositive() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The prime minister, David Cameron explained on Tuesday.";
 		// david camera - prime minister
@@ -180,7 +180,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testPreciseConstructPredicate() throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The David Cameron is the prime minister.";
 		// david camera - prime minister
@@ -207,7 +206,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testPreciseConstructRelativePronoun()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The police want to catch a man who ran away.";
@@ -221,7 +219,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testPreciseConstructAcronym()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The British Broadcasting Corporation or the BBC if you prefer shows television programmes.";
@@ -247,7 +244,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testStrictHeadPass()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The Florida Supreme Court sat today, and the Florida Court made a decision.";
@@ -274,7 +270,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testProperPassSameNumbers()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The 200 people visited and then the people left.";
@@ -287,7 +282,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testProperPassDifferentNumbers()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The 200 people visited and 100 people left.";
@@ -300,7 +294,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testProperPassSameLocation()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "We visited the south of Amercia and travelled to the deep south of America.";
@@ -313,7 +306,6 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testProperPassDifferentLocations()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "We visited the south of Amercia and went to the north of America.";

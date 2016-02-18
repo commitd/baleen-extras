@@ -1,6 +1,7 @@
 package com.tenode.baleen.annotators.coreference.data;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.util.StringUtils;
@@ -25,9 +26,19 @@ public class Mention {
 	/** The clusters. */
 	private final Set<Cluster> clusters = new HashSet<>();
 
-	private String head;
-
 	private Set<String> acronyms;
+
+	private WordToken headWordToken;
+
+	private List<WordToken> words;
+
+	private Person person = Person.UNKNOWN;
+
+	private Animacy animacy = Animacy.UNKNOWN;
+
+	private Gender gender = Gender.UNKNOWN;
+
+	private Multiplicity multiplicity = Multiplicity.UNKNOWN;
 
 	private Mention(Base annotation, MentionType type) {
 		this.annotation = annotation;
@@ -107,12 +118,16 @@ public class Mention {
 		return annotation.getCoveredText();
 	}
 
-	public String getHead() {
-		return head;
+	public void setHeadWordToken(WordToken headWordToken) {
+		this.headWordToken = headWordToken;
 	}
 
-	public void setHead(String head) {
-		this.head = head;
+	public WordToken getHeadWordToken() {
+		return headWordToken;
+	}
+
+	public String getHead() {
+		return getHeadWordToken().getCoveredText();
 	}
 
 	public boolean isAcronym() {
@@ -144,4 +159,43 @@ public class Mention {
 		return getText() + "[" + type + "]";
 	}
 
+	public void setMultiplicity(Multiplicity multiplicity) {
+		this.multiplicity = multiplicity;
+	}
+
+	public Multiplicity getMultiplicity() {
+		return multiplicity;
+	}
+
+	public void setWords(List<WordToken> words) {
+		this.words = words;
+	}
+
+	public List<WordToken> getWords() {
+		return words;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setAnimacy(Animacy animacy) {
+		this.animacy = animacy;
+	}
+
+	public Animacy getAnimacy() {
+		return animacy;
+	}
+
+	public Gender getGender() {
+		return gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
+	}
 }

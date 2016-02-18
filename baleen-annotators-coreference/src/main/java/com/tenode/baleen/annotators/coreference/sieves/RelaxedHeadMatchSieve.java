@@ -13,7 +13,7 @@ import uk.gov.dstl.baleen.types.Base;
 
 public class RelaxedHeadMatchSieve extends AbstractCoreferenceSieve {
 
-	protected RelaxedHeadMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
+	public RelaxedHeadMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
 		super(jCas, clusters, mentions);
 	}
 

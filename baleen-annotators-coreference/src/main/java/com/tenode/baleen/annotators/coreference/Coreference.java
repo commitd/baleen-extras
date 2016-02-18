@@ -3,33 +3,35 @@ package com.tenode.baleen.annotators.coreference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
+import com.tenode.baleen.annotators.coreference.enhancers.AcronymEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.AnimacyEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.GenderEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.MentionEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.MultiplicityEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.PersonEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.WordEnhancer;
 import com.tenode.baleen.annotators.coreference.sieves.CoreferenceSieve;
-import com.tenode.baleen.annotators.coreference.sieves.RelaxedHeadMatchSieve;
+import com.tenode.baleen.annotators.coreference.sieves.PronounResolutionSieve;
 import com.tenode.baleen.extras.common.grammar.DependencyGraph;
 import com.tenode.baleen.extras.common.grammar.ParseTree;
+import com.tenode.baleen.resources.coreference.GenderMultiplicityResource;
 
 import uk.gov.dstl.baleen.types.Base;
-import uk.gov.dstl.baleen.types.language.Dependency;
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
@@ -60,12 +62,16 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * - role appositive (since Baleen doens't have a role entity to mark up). Done elsewhere - demonym
  * are covered in the NationalityToLocation annotator.
  * <li>Pass 5-7 Strict Head Match: Done
- * <li>Pass 8 Proper Head Noun Match: TODO
- * <li>Pass 9 Relaxed Head Match: TODO
- * <li>Pass 10 Pronoun Resolution: TODO
+ * <li>Pass 8 Proper Head Noun Match: Done
+ * <li>Pass 9 Relaxed Head Match: Done
+ * <li>Pass 10 Pronoun Resolution: TODO.
  * <li>Post process: Done
  * <li>Output: Done
  * </ul>
+ *
+ * Attributes of mentions (gender, animacy, number) are included, but for animacy we could not get
+ * the data (Ji and Lin, 2009) and it says for research use only anyway. As such we ignore the
+ * dictionary lookup.
  *
  * We discard any the algorithm which are for a specific corpus (eg OntoNotes).
  *
@@ -87,7 +93,15 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 public class Coreference extends BaleenAnnotator {
 	private static final Predicate<String> NP_FILTER = s -> s.startsWith("N");
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Coreference.class);
+	/**
+	 * GenderMultiplicityResource to provide information on gender and multiplicity from a
+	 * dictionary.
+	 *
+	 * @baleen.resource com.tenode.baleen.resources.coreference.GenderMultiplicityResource
+	 */
+	public static final String PARAM_GENDER_MULTIPLICITY = "genderMultiplicity";
+	@ExternalResource(key = PARAM_GENDER_MULTIPLICITY)
+	private GenderMultiplicityResource genderMultiplicityResource;
 
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
@@ -176,166 +190,22 @@ public class Coreference extends BaleenAnnotator {
 
 	private void enhanceMention(JCas jCas, DependencyGraph dependencyGraph, ParseTree parseTree,
 			List<Mention> mentions) {
+
+		MentionEnhancer[] enhancers = new MentionEnhancer[] {
+				new WordEnhancer(jCas, dependencyGraph, parseTree),
+				new AcronymEnhancer(),
+				new PersonEnhancer(),
+				new MultiplicityEnhancer(genderMultiplicityResource),
+				new GenderEnhancer(genderMultiplicityResource),
+				new AnimacyEnhancer()
+		};
+
 		for (Mention mention : mentions) {
-
-			String head = getHeadWords(jCas, dependencyGraph, parseTree, mention);
-			if (head != null && !head.isEmpty()) {
-				mention.setHead(head);
+			for (MentionEnhancer enhancer : enhancers) {
+				enhancer.enhance(mention);
 			}
 
-			Set<String> acronyms = getAcronyms(jCas, parseTree, mention);
-			if (acronyms != null) {
-				mention.setAcronym(acronyms);
-			}
 		}
-	}
-
-	private String getHeadWords(JCas jCas, DependencyGraph dependencyGraph, ParseTree parseTree, Mention mention) {
-		Collection<WordToken> words;
-		switch (mention.getType()) {
-		default:
-		case PRONOUN:
-			return null;
-		case ENTITY:
-			words = JCasUtil.selectCovered(jCas, WordToken.class, mention.getAnnotation());
-			break;
-		case NP:
-			PhraseChunk chunk = (PhraseChunk) mention.getAnnotation();
-			words = parseTree.getChildWords(chunk, p -> true).collect(Collectors.toList());
-			break;
-		}
-
-		// A dependency grammar approach to head word extraction
-		// - find the Noun in the noun phrase which is the link out of the words
-		// - this seems to be the head word
-		// TODO: Investigate other approachces Collin 1999, etc. Do they give the same/better
-		// results?
-
-		List<WordToken> candidates = new LinkedList<WordToken>();
-		for (WordToken word : words) {
-			if (word.getPartOfSpeech().startsWith("N")) {
-				Set<Dependency> governors = dependencyGraph.getGovernors(word);
-				if (!words.containsAll(governors)) {
-					candidates.add(word);
-				}
-			}
-		}
-
-		if (candidates.isEmpty()) {
-			return null;
-		}
-
-		// TODO: No idea if its it possible to get more than one if all things work.
-		// I think this would be a case of marking an entity which cross the NP boundary and is
-		// likely wrong.
-		WordToken head = candidates.get(0);
-
-		// TODO: Not sure if we should pull out compound words here. ie the head word Bill Clinton
-		// or Clinton
-		// Set<WordToken> compoundWords = dependencyGraph.nearestWords(1,
-		// d -> d.getDependencyType().equalsIgnoreCase("compound"), candidates);
-		// words.removeIf(w -> !compoundWords.contains(w));
-		// return words.stream().map(WordToken::getCoveredText).collect(Collectors.joining(" "));
-
-		return head.getCoveredText();
-
-		//
-		// boolean foundNN = false;
-		// StringBuilder sb = new StringBuilder();
-		// for (WordToken w : words) {
-		// if (w.getPartOfSpeech().startsWith("N")) {
-		// foundNN = true;
-		// sb.append(w.getCoveredText());
-		// sb.append(" ");
-		// } else if (foundNN) {
-		// // Left our head words
-		// break;
-		// } else {
-		// // Not found a NN yet, so... carry on
-		// }
-		// }
-		//
-		// return sb.toString().trim();
-	}
-
-	public Set<String> getAcronyms(JCas jCas, ParseTree parseTree, Mention mention) {
-		// Stanford just use the uppercases but only on the NNP parts,
-		// We are looking at everything in the next
-		// If we have more than two upper cases, we do the lower case
-
-		if (mention.isAcronym()) {
-			return Collections.singleton(mention.getText().toUpperCase());
-		}
-
-		Collection<WordToken> words;
-		switch (mention.getType()) {
-		default:
-		case PRONOUN:
-			return null;
-		case ENTITY:
-			words = JCasUtil.selectCovered(jCas, WordToken.class, mention.getAnnotation());
-			break;
-		case NP:
-			PhraseChunk chunk = (PhraseChunk) mention.getAnnotation();
-			words = parseTree.getChildWords(chunk, x -> true).collect(Collectors.toList());
-			break;
-		}
-
-		Set<String> acronyms = new HashSet<>();
-
-		// Generate acrynoms based on the covered text
-
-		String text = mention.getText();
-
-		StringBuilder upperCase = new StringBuilder();
-		StringBuilder upperAndLowerCase = new StringBuilder();
-
-		boolean considerNext = true;
-		for (int i = 0; i < text.length(); i++) {
-			char c = text.charAt(i);
-			if (considerNext == true) {
-				if (Character.isUpperCase(c)) {
-					upperCase.append(c);
-					upperAndLowerCase.append(c);
-				} else {
-					upperAndLowerCase.append(c);
-				}
-			}
-
-			if (Character.isWhitespace(c)) {
-				considerNext = true;
-			}
-		}
-
-		// We require two upper case to avoid obvious captialisation (start of sentences)
-		if (upperCase.length() > 2) {
-			acronyms.add(upperCase.toString());
-		} else if (upperCase.length() > 2 && upperAndLowerCase.length() != upperCase.length()) {
-			acronyms.add(upperAndLowerCase.toString().toUpperCase());
-		}
-
-		// Now create acronym based on just the NNS,
-		// but unlike stanford use lower and upper case again
-
-		StringBuilder upperCaseNNP = new StringBuilder();
-		StringBuilder upperAndLowerCaseNNP = new StringBuilder();
-		words.stream().filter(p -> p.getPartOfSpeech().equals("NNP")).map(w -> w.getCoveredText().charAt(0))
-				.forEach(c -> {
-					if (Character.isUpperCase(c)) {
-						upperCaseNNP.append(c);
-						upperAndLowerCaseNNP.append(c);
-					} else {
-						upperAndLowerCaseNNP.append(c);
-					}
-				});
-
-		if (upperCaseNNP.length() > 2) {
-			acronyms.add(upperCaseNNP.toString());
-		} else if (upperCaseNNP.length() > 2 && upperAndLowerCase.length() != upperCaseNNP.length()) {
-			acronyms.add(upperAndLowerCaseNNP.toString().toUpperCase());
-		}
-
-		return acronyms;
 	}
 
 	private List<Cluster> sieve(JCas jCas, ParseTree parseTree, List<Mention> mentions) {
@@ -353,7 +223,7 @@ public class Coreference extends BaleenAnnotator {
 				// new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
 				// new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
 				// new ProperHeadMatchSieve(jCas, clusters, mentions),
-				new RelaxedHeadMatchSieve(jCas, clusters, mentions),
+				// new RelaxedHeadMatchSieve(jCas, clusters, mentions),
 				new PronounResolutionSieve(jCas, clusters, mentions)
 		};
 
@@ -397,7 +267,7 @@ public class Coreference extends BaleenAnnotator {
 		merged.forEach(c -> {
 			ReferenceTarget target = new ReferenceTarget(jCas);
 
-			LOGGER.debug("Cluster:\n");
+			getMonitor().debug("Cluster:\n");
 
 			for (Mention m : c.getMentions()) {
 				// TODO: We overwrite the referent target here, not sure what we'd do if there was
@@ -409,7 +279,7 @@ public class Coreference extends BaleenAnnotator {
 				annotation.setReferent(target);
 				addToJCasIndex(annotation);
 
-				LOGGER.debug("\t{}\n", m.getAnnotation().getCoveredText());
+				getMonitor().debug("\t{}\n", m.getAnnotation().getCoveredText());
 			}
 
 			addToJCasIndex(target);
