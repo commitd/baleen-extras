@@ -27,6 +27,7 @@ import com.tenode.baleen.annotators.coreference.sieves.CoreferenceSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExactStringMatchSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExtractReferenceTargets;
 import com.tenode.baleen.annotators.coreference.sieves.PreciseConstructsSieve;
+import com.tenode.baleen.annotators.coreference.sieves.ProperHeadMatchSieve;
 import com.tenode.baleen.annotators.coreference.sieves.RelaxedStringMatchSieve;
 import com.tenode.baleen.annotators.coreference.sieves.StrictHeadMatchSieve;
 import com.tenode.baleen.extras.common.grammar.DependencyGraph;
@@ -63,7 +64,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * <li>Pass 4 Precise Constructs: Done - appositive, predicate. relative pronoun, acronym. Not done
  * - role appositive (since Baleen doens't have a role entity to mark up). Done elsewhere - demonym
  * are covered in the NationalityToLocation annotator.
- * <li>Pass 5-7 Strict Head Match: TODO
+ * <li>Pass 5-7 Strict Head Match: Done
  * <li>Pass 8 Proper Head Noun Match: TODO
  * <li>Pass 9 Relaxed Head Match: TODO
  * <li>Pass 10 Pronoun Resolution: TODO
@@ -74,7 +75,8 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * We discard any the algorithm which are for a specific corpus (eg OntoNotes).
  *
  * This is very much unoptimised. Each sieve will calculate over all entities, even though many will
- * already in the same cluster.
+ * already in the same cluster. TODO: At the moment we don't do the clustering properly. We need
+ * just perform pairwise operations repeated.
  *
  * For more information see the various supporting papers.
  * <ul>
@@ -353,10 +355,11 @@ public class Coreference extends BaleenAnnotator {
 				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions),
 				// Pass A-C are all strict head with different params
 				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true),
-				// new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
-				// new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
-				// new RelaxedHeadMatchSieve(jCas, clusters, mentions),
-				// new PronounResolutionSieve(jCas, clusters, mentions)
+				new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
+				new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
+				new ProperHeadMatchSieve(jCas, clusters, mentions),
+				new RelaxedHeadMatchSieve(jCas, clusters, mentions),
+				new PronounResolutionSieve(jCas, clusters, mentions)
 		};
 
 		Arrays.stream(sieves).forEach(s -> {

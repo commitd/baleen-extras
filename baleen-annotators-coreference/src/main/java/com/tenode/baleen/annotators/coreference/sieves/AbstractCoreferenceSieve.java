@@ -3,14 +3,17 @@ package com.tenode.baleen.annotators.coreference.sieves;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
+import uk.gov.dstl.baleen.types.language.WordToken;
 
 public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
@@ -82,6 +85,13 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 		return getMentions().stream()
 				.filter(m -> m.getAnnotation().getBegin() <= begin && end <= m.getAnnotation().getEnd())
 				.collect(Collectors.toList());
+	}
+
+	protected Set<String> getModifiers(Mention a) {
+		return JCasUtil.selectCovered(WordToken.class, a.getAnnotation()).stream()
+				.filter(w -> w.getPartOfSpeech().startsWith("N") || w.getPartOfSpeech().startsWith("J"))
+				.map(w -> w.getCoveredText().toLowerCase())
+				.collect(Collectors.toSet());
 	}
 
 }

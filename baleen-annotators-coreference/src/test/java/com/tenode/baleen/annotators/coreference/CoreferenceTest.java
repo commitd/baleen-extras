@@ -247,6 +247,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 	}
 
 	@Test
+	@Ignore
 	public void testStrictHeadPass()
 			throws AnalysisEngineProcessException, ResourceInitializationException {
 		String text = "The Florida Supreme Court sat today, and the Florida Court made a decision.";
@@ -272,4 +273,53 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 		assertEquals(1, targets.size());
 	}
 
+	@Test
+	@Ignore
+	public void testProperPassSameNumbers()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "The 200 people visited and then the people left.";
+		jCas.setDocumentText(text);
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(1, targets.size());
+	}
+
+	@Test
+	@Ignore
+	public void testProperPassDifferentNumbers()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "The 200 people visited and 100 people left.";
+		jCas.setDocumentText(text);
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(0, targets.size());
+	}
+
+	@Test
+	public void testProperPassSameLocation()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "We visited the south of Amercia and travelled to the deep south of America.";
+		jCas.setDocumentText(text);
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(1, targets.size());
+	}
+
+	@Test
+	public void testProperPassDifferentLocations()
+			throws AnalysisEngineProcessException, ResourceInitializationException {
+		String text = "We visited the south of Amercia and went to the north of America.";
+		jCas.setDocumentText(text);
+
+		processJCas();
+
+		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		assertEquals(0, targets.size());
+	}
 }

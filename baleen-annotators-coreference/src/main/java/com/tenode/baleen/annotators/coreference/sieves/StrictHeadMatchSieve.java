@@ -3,16 +3,12 @@ package com.tenode.baleen.annotators.coreference.sieves;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.extras.common.language.StopWordRemover;
-
-import uk.gov.dstl.baleen.types.language.WordToken;
 
 public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 
@@ -40,7 +36,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 			if (aHead == null || aHead.isEmpty()) {
 				continue;
 			}
-			aHead.toLowerCase();
+			aHead = aHead.toLowerCase();
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
 				Mention b = getMentions().get(j);
@@ -48,7 +44,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 				if (bHead == null || bHead.isEmpty()) {
 					continue;
 				}
-				bHead.toLowerCase();
+				bHead = bHead.toLowerCase();
 
 				// Entity head match - does one head contain the others
 				if (!aHead.contains(bHead) && !bHead.contains(aHead)) {
@@ -92,7 +88,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 				|| !Arrays.asList(aNonStop).containsAll(Arrays.asList(b));
 	}
 
-	private String[] getNonStopWords(Mention a) {
+	protected String[] getNonStopWords(Mention a) {
 		return stopWordRemover.clean(a.getText()).split("\\s+");
 	}
 
@@ -105,10 +101,4 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 		return aModifiers.containsAll(bModifiers);
 	}
 
-	private Set<String> getModifiers(Mention a) {
-		return JCasUtil.selectCovered(WordToken.class, a.getAnnotation()).stream()
-				.filter(w -> w.getPartOfSpeech().startsWith("N") || w.getPartOfSpeech().startsWith("J"))
-				.map(w -> w.getCoveredText().toLowerCase())
-				.collect(Collectors.toSet());
-	}
 }
