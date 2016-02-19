@@ -92,6 +92,15 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 					}
 				}
 
+				// Similarly to avoid if we have a neutral we can't link to a person
+				if (pronoun.getGender() == Gender.N
+						&& other.getAnnotation() instanceof uk.gov.dstl.baleen.types.common.Person) {
+					continue;
+				}
+
+				// TODO: There might be many more of these simple constraints on our semantic
+				// types...
+
 				potential.put(pronoun, other);
 
 			}
