@@ -15,6 +15,7 @@ import com.tenode.baleen.extras.common.grammar.ParseTree;
 import com.tenode.baleen.extras.common.grammar.ParseTree.TreeNode;
 
 import uk.gov.dstl.baleen.types.language.WordToken;
+import uk.gov.dstl.baleen.types.semantic.Location;
 
 /**
  *
@@ -49,10 +50,19 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("NP")) {
 
 					// Is there a comma between them, without AND/BUT/ETC
+					// Not in paper: Need to see if there's an AND in the larger noun phrase, eg
+					// Police, Fire and Ambulance (will get police-fire at the moment)
 					String between = getJCas().getDocumentText().substring(a.getChunk().getEnd(),
 							b.getChunk().getBegin());
-					if (COMMA.matcher(between).matches() && !a.containsWord(CONJUNCTION_FILTER)
-							&& !b.containsWord(CONJUNCTION_FILTER)) {
+					TreeNode parent = a.getParent();
+
+					// Special case there if there's its a location "London, UK" will match
+					// but we don't want it too. Probabl need both the a and b to have a location
+					// before its wrong. Of course these depedends on the quality of the entity
+					// extraction.
+
+					if (COMMA.matcher(between).matches() && !parent.containsWord(CONJUNCTION_FILTER)
+							&& (!coversLocation(a) || !coversLocation(b))) {
 						addCoveredToCluster(a.getChunk(), b.getChunk());
 					}
 
@@ -80,8 +90,8 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("WHNP")) {
 					// The NP could be something that interests us, or it could a subpart of a large
 					// NP.
-					List<Mention> mention = findMentionAbove(a.getChunk().getBegin(), b.getChunk().getEnd());
-					List<Mention> pronoun = findMentionsBetween(b.getChunk().getBegin(), b.getChunk().getEnd());
+					List<Mention> mention = findMentionsExactly(a.getChunk().getBegin(), a.getChunk().getEnd());
+					List<Mention> pronoun = findMentionsExactly(b.getChunk().getBegin(), b.getChunk().getEnd());
 					addPairwiseToCluster(mention, pronoun);
 				}
 			}
@@ -116,6 +126,12 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 		// existing
 		// NationalityToLocation annotator, so this is not required.
 
+	}
+
+	private boolean coversLocation(TreeNode a) {
+		return findMentionsUnder(a.getChunk().getBegin(), a.getChunk().getEnd())
+				.stream()
+				.anyMatch(m -> m.getAnnotation() instanceof Location);
 	}
 
 }

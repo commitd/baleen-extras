@@ -164,7 +164,8 @@ public class ParseTree {
 
 		public TreeNode(List<TreeNode> children) {
 			this.chunk = null;
-			this.children.addAll(children);
+			addAllChildren(children);
+
 		}
 
 		public boolean isRoot() {
@@ -193,6 +194,11 @@ public class ParseTree {
 
 		public void addChild(TreeNode child) {
 			children.add(child);
+			child.setParent(this);
+		}
+
+		private void addAllChildren(List<TreeNode> children) {
+			children.forEach(this::addChild);
 		}
 
 		public void addWords(Collection<WordToken> word) {
@@ -221,7 +227,7 @@ public class ParseTree {
 			}
 
 			if (children != null) {
-				return children.stream().map(c -> c.containsWord(filter)).anyMatch(r -> r);
+				return children.stream().anyMatch(c -> c.containsWord(filter));
 			}
 			return false;
 		}

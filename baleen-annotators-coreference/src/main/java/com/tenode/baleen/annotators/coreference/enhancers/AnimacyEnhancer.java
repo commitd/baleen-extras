@@ -31,7 +31,7 @@ public class AnimacyEnhancer implements MentionEnhancer {
 	static {
 		Arrays.asList("i", "me", "mine", "my", "myself", "we", "us", "our", "ours", "ourselves", "yourself",
 				"yourselves", "you", "your", "yours", "he", "him", "his", "she", "her", "hers", "himself", "herself",
-				"one", "one's", "they", "them", "their", "theirs", "themselves")
+				"one", "one's", "they", "them", "their", "theirs", "themselves", "who", "whose")
 				.stream().forEach(s -> pronounMap.put(s, Animacy.ANIMATE));
 		Arrays.asList("it", "its", "itself", "when", "where", "there", "here")
 				.stream().forEach(s -> pronounMap.put(s, Animacy.INANIMATE));

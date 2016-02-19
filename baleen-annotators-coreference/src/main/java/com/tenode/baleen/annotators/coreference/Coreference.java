@@ -94,6 +94,10 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * <li>http://nlp.stanford.edu/pubs/coreference-emnlp10.pdf
  * </ul>
  *
+ * TODO: To really improve further needs an analysis of what is missing higher up baleen. For
+ * example we don't have roles or the animacy information so "a doctor" is just a noun phrase and
+ * hence could be mapped to it. If we had "person role" entity marker we would mark this an ANIMATE.
+ *
  * @baleen.javadoc
  */
 public class Coreference extends BaleenAnnotator {
@@ -165,26 +169,25 @@ public class Coreference extends BaleenAnnotator {
 		}
 	}
 
-	// NOTE: This is unused because the IDE doesn't know that singlePass will be injected.
-	@SuppressWarnings("unused")
 	private List<Cluster> sieve(JCas jCas, ParseTree parseTree, List<Mention> mentions) {
 
 		List<Cluster> clusters = new ArrayList<>();
 
 		CoreferenceSieve[] sieves = new CoreferenceSieve[] {
-				new ExtractReferenceTargets(jCas, clusters, mentions),
+				new ExtractReferenceTargets(jCas, clusters, mentions), // Good
 				// TODO: new SpeakerIdentificationSieve(jCas, clusters, mentions),
-				new ExactStringMatchSieve(jCas, clusters, mentions),
-				new RelaxedStringMatchSieve(jCas, clusters, mentions),
-				new InSentencePronounSieve(jCas, clusters, mentions),
-				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions),
+				new ExactStringMatchSieve(jCas, clusters, mentions), // Good
+				new RelaxedStringMatchSieve(jCas, clusters, mentions), // Good
+				new InSentencePronounSieve(jCas, clusters, mentions), // Good
+				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions), // Bad
 				// Pass A-C are all strict head with different params
-				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true),
-				new StrictHeadMatchSieve(jCas, clusters, mentions, true, false),
-				new StrictHeadMatchSieve(jCas, clusters, mentions, false, true),
-				new ProperHeadMatchSieve(jCas, clusters, mentions),
-				new RelaxedHeadMatchSieve(jCas, clusters, mentions),
-				new PronounResolutionSieve(jCas, clusters, mentions)
+				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true), // Good
+				new StrictHeadMatchSieve(jCas, clusters, mentions, true, false), // Good
+				new StrictHeadMatchSieve(jCas, clusters, mentions, false, true), // Good
+				new ProperHeadMatchSieve(jCas, clusters, mentions), // Good
+				new RelaxedHeadMatchSieve(jCas, clusters, mentions), // Good
+				new PronounResolutionSieve(jCas, clusters, mentions) // Ok - Needs more help from
+				// Baleen entities yet and more data from animacy if its to work well.
 		};
 
 		if (singlePass >= 0 && sieves.length > singlePass) {
@@ -264,6 +267,10 @@ public class Coreference extends BaleenAnnotator {
 		List<Cluster> merged = new ArrayList<>(clusters.size());
 
 		for (Cluster cluster : clusters) {
+
+			System.err.println("Raw Cluster:");
+			cluster.getMentions().stream()
+					.forEach(a -> System.err.println("\t" + a.getAnnotation().getCoveredText()));
 
 			boolean overlap = false;
 			for (Cluster mergedCluster : merged) {

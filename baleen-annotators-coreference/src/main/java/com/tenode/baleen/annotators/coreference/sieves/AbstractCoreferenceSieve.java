@@ -63,19 +63,24 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
 		cluster.addAll(a);
 		cluster.addAll(b);
-
 	}
 
 	protected void addCoveredToCluster(PhraseChunk a, PhraseChunk b) {
-		List<Mention> aMentions = findMentionsBetween(a.getBegin(), a.getEnd());
-		List<Mention> bMentions = findMentionsBetween(b.getBegin(), b.getEnd());
+		List<Mention> aMentions = findMentionsExactly(a.getBegin(), a.getEnd());
+		List<Mention> bMentions = findMentionsExactly(b.getBegin(), b.getEnd());
 
 		addPairwiseToCluster(aMentions, bMentions);
 	}
 
-	protected List<Mention> findMentionsBetween(int begin, int end) {
+	protected List<Mention> findMentionsExactly(int begin, int end) {
 		return getMentions().stream()
-				.filter(m -> begin <= m.getAnnotation().getBegin() && m.getAnnotation().getEnd() <= end)
+				.filter(m -> begin == m.getAnnotation().getBegin() && m.getAnnotation().getEnd() == end)
+				.collect(Collectors.toList());
+	}
+
+	protected List<Mention> findMentionsUnder(int begin, int end) {
+		return getMentions().stream()
+				.filter(m -> begin >= m.getAnnotation().getBegin() && m.getAnnotation().getEnd() <= end)
 				.collect(Collectors.toList());
 	}
 

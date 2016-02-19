@@ -9,6 +9,7 @@ import org.apache.uima.jcas.JCas;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.tenode.baleen.annotators.coreference.data.Animacy;
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Gender;
 import com.tenode.baleen.annotators.coreference.data.Mention;
@@ -34,12 +35,16 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 			for (int j = i + 1; j < getMentions().size(); j++) {
 				Mention b = getMentions().get(j);
 
-				// We are coreferencing pronouns only, and not between themselves
+				// We are coreferencing pronouns only
 				if (a.getType() != MentionType.PRONOUN && b.getType() != MentionType.PRONOUN) {
 					continue;
 				}
 
-				if (a.getSentenceIndex() < 0 && b.getSentenceIndex() < 0) {
+				if (a.getType() == MentionType.PRONOUN && b.getType() == MentionType.PRONOUN) {
+					continue;
+				}
+
+				if (a.getSentenceIndex() < 0 || b.getSentenceIndex() < 0) {
 					continue;
 				}
 
@@ -82,12 +87,14 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 
 				if (pronoun.getPerson() == Person.FIRST || pronoun.getPerson() == Person.SECOND
 						|| pronoun.getPerson() == Person.THIRD && (pronoun.getGender() == Gender.M
-								|| pronoun.getGender() == Gender.F)) {
-					// This pronoun is for a person,
+								|| pronoun.getGender() == Gender.F)
+						|| pronoun.getAnimacy() == Animacy.ANIMATE) {
+					// This pronoun is for a person (in all likelihood)
 					// we trust in Baleen NER and must have a person entity at the other
 					// TODO: Or nationality?
 
-					if (!(other.getAnnotation() instanceof uk.gov.dstl.baleen.types.common.Person)) {
+					if (!(other.getAnnotation() instanceof uk.gov.dstl.baleen.types.common.Person
+							|| other.getAnnotation() instanceof uk.gov.dstl.baleen.types.common.Nationality)) {
 						continue;
 					}
 				}
