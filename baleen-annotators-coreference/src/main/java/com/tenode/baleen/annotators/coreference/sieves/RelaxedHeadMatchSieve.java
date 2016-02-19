@@ -37,7 +37,7 @@ public class RelaxedHeadMatchSieve extends AbstractCoreferenceSieve {
 				Class<? extends Base> bClazz = b.getAnnotation().getClass();
 
 				// Not i-within-i
-				if (!a.overlaps(b)) {
+				if (a.overlaps(b)) {
 					continue;
 				}
 

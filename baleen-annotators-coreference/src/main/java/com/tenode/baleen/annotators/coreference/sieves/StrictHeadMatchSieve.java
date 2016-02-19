@@ -63,7 +63,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 				// NOTE: We just check for overlap here, not if a sub-NP, which is a cheap test and
 				// can come first (but not in the cluster based case since, then we need to find the
 				// mentions to test first.
-				if (!a.overlaps(b)) {
+				if (a.overlaps(b)) {
 					continue;
 				}
 

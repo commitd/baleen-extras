@@ -47,7 +47,7 @@ public class MentionDetector {
 
 		detectEntities(mentions);
 
-		new WordEnhancer(jCas, dependencyGraph, parseTree);
+		detectPhrases(mentions);
 
 		new SentenceEnhancer().enhance(jCas, mentions);
 
@@ -124,7 +124,7 @@ public class MentionDetector {
 		}
 	}
 
-	private void detectMentions(List<Mention> mentions) {
+	private void detectPhrases(List<Mention> mentions) {
 
 		// Limit to noun phrases
 		List<PhraseChunk> phrases = JCasUtil.select(jCas, PhraseChunk.class).stream()
@@ -137,18 +137,8 @@ public class MentionDetector {
 				.flatMap(e -> e.stream())
 				.forEach(phrases::remove);
 
-		// Map<PhraseChunk, Collection<PhraseChunk>> npCoveringNp = new HashMap<>(
-		// JCasUtil.indexCovering(jCas, PhraseChunk.class,
-		// PhraseChunk.class));
-		//
-		// // In the map only keep in the collection the values in phrases list
-		// npCoveringNp.keySet().retainAll(phrases);
-		// Iterator<Entry<PhraseChunk, Collection<PhraseChunk>>> npIterator =
-		// npCoveringNp.entrySet().iterator();
-		// while (npIterator.hasNext()) {
-		// Entry<PhraseChunk, Collection<PhraseChunk>> e = npIterator.next();
-		// e.getValue().retainAll(phrases);
-		// }
+		// System.out.println("After remove covered");
+		// phrases.forEach(p -> System.out.println(p.getCoveredText()));
 
 		Map<PhraseChunk, Collection<WordToken>> phraseToWord = JCasUtil.indexCovered(jCas, PhraseChunk.class,
 				WordToken.class);
@@ -164,17 +154,10 @@ public class MentionDetector {
 					} // else what should we do to those without heads?
 				});
 
-		// Paper: Remove all phrases which are covered by another phrase
-		// phrases.removeIf(p -> {
-		// Collection<PhraseChunk> covered = npCoveringNp.get(p);
-		// return covered != null && !covered.isEmpty();
-		// });
-
 		// Paper: keep the largest noun phrase which has the same head word.
 		headToChunk.asMap().entrySet().stream()
-				.filter(e -> e.getValue().size() > 1)
+				.filter(e -> e.getValue().size() == 1)
 				.forEach(e -> {
-
 					PhraseChunk largest = null;
 					int largestSize = 0;
 
@@ -187,12 +170,16 @@ public class MentionDetector {
 						}
 					}
 
-					// Remove the largest (so we can delete the rest below)
-					e.getValue().remove(largest);
+					// Remove all the small ones
+					for (PhraseChunk p : e.getValue()) {
+						if (p != largest) {
+							phrases.remove(headToChunk.values());
+						}
+					}
 				});
 
-		// Remove all those left
-		phrases.removeAll(headToChunk.values());
+		// System.out.println("After remove larger head");
+		// phrases.forEach(p -> System.out.println(p.getCoveredText()));
 
 		// Remove all phrases based on their single content
 		JCasUtil.indexCovering(jCas, PhraseChunk.class,
@@ -215,13 +202,26 @@ public class MentionDetector {
 				.map(Entry::getKey)
 				.forEach(phrases::remove);
 
+		// System.out.println("After remove singles");
+		// phrases.forEach(p -> System.out.println(p.getCoveredText()));
+
 		// TODO: Remove all pronouns which are covered by the phrases? I think not...
 
 		// TODO: Paper removes It is possible (see Appendix B for tregex)
 		// TODO: Paper removes static list of stop words (but we should determine that outselves)
 		// TODO: Paper removes withs with partivit or quanitifer (millions of people). Unsure why
+
 		// though
 
-		phrases.forEach(e -> mentions.add(new Mention(e)));
+		phrases.stream()
+				.map(Mention::new)
+				.map(m -> {
+					List<WordToken> words = new ArrayList<>(phraseToWord.get(m.getAnnotation()));
+					// TODO: We already calcualted this early (for headToWord), but we just redo
+					// again here. Would be nice to reuse
+					m.setWords(words);
+					m.setHeadWordToken(determineHead(words));
+					return m;
+				}).forEach(mentions::add);
 	}
 }

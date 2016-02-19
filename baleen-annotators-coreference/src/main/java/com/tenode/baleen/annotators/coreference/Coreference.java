@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -108,6 +109,19 @@ public class Coreference extends BaleenAnnotator {
 	@ExternalResource(key = PARAM_GENDER_MULTIPLICITY)
 	private GenderMultiplicityResource genderMultiplicityResource;
 
+	/**
+	 * Perform only a single pass (of the provided index)
+	 *
+	 * Only useful for unit testing.
+	 *
+	 * -1 means all
+	 *
+	 * @baleen.resource -1
+	 */
+	public static final String PARAM_SINGLE_PASS = "pass";
+	@ConfigurationParameter(name = PARAM_SINGLE_PASS, defaultValue = "-1")
+	private int singlePass;
+
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 
@@ -116,6 +130,8 @@ public class Coreference extends BaleenAnnotator {
 
 		// Detect mentions
 		List<Mention> mentions = new MentionDetector(jCas, dependencyGraph, parseTree).detect();
+
+		mentions.forEach(System.out::println);
 
 		// Extract head words and other aspects needed for later, determine acronyms, denonym,
 		// gender, etc
@@ -149,6 +165,8 @@ public class Coreference extends BaleenAnnotator {
 		}
 	}
 
+	// NOTE: This is unused because the IDE doesn't know that singlePass will be injected.
+	@SuppressWarnings("unused")
 	private List<Cluster> sieve(JCas jCas, ParseTree parseTree, List<Mention> mentions) {
 
 		List<Cluster> clusters = new ArrayList<>();
@@ -168,6 +186,13 @@ public class Coreference extends BaleenAnnotator {
 				new RelaxedHeadMatchSieve(jCas, clusters, mentions),
 				new PronounResolutionSieve(jCas, clusters, mentions)
 		};
+
+		if (singlePass >= 0 && sieves.length > singlePass) {
+			sieves = new CoreferenceSieve[] {
+					sieves[singlePass]
+			};
+			getMonitor().info("Single pass mode {}: {}", singlePass, sieves[0].getClass().getSimpleName());
+		}
 
 		Arrays.stream(sieves).forEach(s -> {
 			s.sieve();

@@ -15,6 +15,7 @@ import org.apache.uima.jcas.JCas;
 import com.google.common.primitives.Doubles;
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
+import com.tenode.baleen.annotators.coreference.data.MentionType;
 
 public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 
@@ -30,7 +31,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 			Mention a = getMentions().get(i);
 
 			String aHead = a.getHead();
-			if (aHead == null || aHead.isEmpty()) {
+			if (aHead == null || aHead.isEmpty() || a.getType() == MentionType.PRONOUN) {
 				continue;
 			}
 			aHead = aHead.toLowerCase();
@@ -38,7 +39,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 			for (int j = i + 1; j < getMentions().size(); j++) {
 				Mention b = getMentions().get(j);
 				String bHead = b.getHead();
-				if (bHead == null || bHead.isEmpty()) {
+				if (bHead == null || bHead.isEmpty() || b.getType() == MentionType.PRONOUN) {
 					continue;
 				}
 				bHead = bHead.toLowerCase();
@@ -46,7 +47,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 				if (aHead.equals(bHead)) {
 
 					// Not i-within-i
-					if (!a.overlaps(b)) {
+					if (a.overlaps(b)) {
 						continue;
 					}
 

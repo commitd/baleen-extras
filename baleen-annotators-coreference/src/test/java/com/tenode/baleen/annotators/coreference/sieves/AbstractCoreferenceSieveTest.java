@@ -1,13 +1,11 @@
-package com.tenode.baleen.annotators.coreference;
+package com.tenode.baleen.annotators.coreference.sieves;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
-import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.resource.ExternalResourceDescription;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.junit.Ignore;
-import org.junit.Test;
 
+import com.tenode.baleen.annotators.coreference.Coreference;
 import com.tenode.baleen.annotators.maltparser.MaltParser;
 import com.tenode.baleen.annotators.opennlp.OpenNLPParser;
 import com.tenode.baleen.resources.coreference.GenderMultiplicityResource;
@@ -17,10 +15,14 @@ import com.tenode.baleen.wordnet.resources.WordNetResource;
 import uk.gov.dstl.baleen.annotators.language.OpenNLP;
 import uk.gov.dstl.baleen.annotators.testing.AbstractMultiAnnotatorTest;
 import uk.gov.dstl.baleen.resources.SharedOpenNLPModel;
-import uk.gov.dstl.baleen.types.common.Person;
-import uk.gov.dstl.baleen.types.semantic.Location;
 
-public class CoreferenceTest extends AbstractMultiAnnotatorTest {
+public class AbstractCoreferenceSieveTest extends AbstractMultiAnnotatorTest {
+
+	private final int singlePass;
+
+	public AbstractCoreferenceSieveTest(int singlePass) {
+		this.singlePass = singlePass;
+	}
 
 	@Override
 	protected AnalysisEngine[] createAnalysisEngines() throws ResourceInitializationException {
@@ -50,26 +52,7 @@ public class CoreferenceTest extends AbstractMultiAnnotatorTest {
 				createAnalysisEngine(OpenNLPParser.class, "parserChunking",
 						parserChunkingDesc),
 				createAnalysisEngine(MaltParser.class),
-				createAnalysisEngine(Coreference.class, Coreference.PARAM_GENDER_MULTIPLICITY, gMDesc));
+				createAnalysisEngine(Coreference.class, Coreference.PARAM_GENDER_MULTIPLICITY, gMDesc, "pass",
+						singlePass));
 	}
-
-	@Test
-	@Ignore
-	public void test() throws AnalysisEngineProcessException, ResourceInitializationException {
-		String text = "Chris went to London and he saw Big Ben there.";
-		jCas.setDocumentText(text);
-
-		Person chris = new Person(jCas);
-		chris.setBegin(text.indexOf("Chris"));
-		chris.setEnd(chris.getBegin() + "Chris".length());
-		chris.addToIndexes();
-
-		Location london = new Location(jCas);
-		london.setBegin(text.indexOf("London"));
-		london.setEnd(london.getBegin() + "London".length());
-		london.addToIndexes();
-
-		processJCas();
-	}
-
 }
