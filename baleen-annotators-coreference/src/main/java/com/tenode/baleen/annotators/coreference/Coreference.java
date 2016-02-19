@@ -24,10 +24,12 @@ import com.tenode.baleen.annotators.coreference.enhancers.GenderEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.MentionEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.MultiplicityEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.PersonEnhancer;
+import com.tenode.baleen.annotators.coreference.enhancers.SentenceEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.WordEnhancer;
 import com.tenode.baleen.annotators.coreference.sieves.CoreferenceSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExactStringMatchSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExtractReferenceTargets;
+import com.tenode.baleen.annotators.coreference.sieves.InSentencePronounSieve;
 import com.tenode.baleen.annotators.coreference.sieves.PreciseConstructsSieve;
 import com.tenode.baleen.annotators.coreference.sieves.PronounResolutionSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ProperHeadMatchSieve;
@@ -65,13 +67,14 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * <li>Pass 1 Speaker Identification: TODO
  * <li>Pass 2 Exact String Match: Done
  * <li>Pass 3 Relaxed String Match: Done
+ * <li>Pass X: We added a pronoun match within the same sentence.
  * <li>Pass 4 Precise Constructs: Done - appositive, predicate. relative pronoun, acronym. Not done
  * - role appositive (since Baleen doens't have a role entity to mark up). Done elsewhere - demonym
  * are covered in the NationalityToLocation annotator.
  * <li>Pass 5-7 Strict Head Match: Done
  * <li>Pass 8 Proper Head Noun Match: Done
  * <li>Pass 9 Relaxed Head Match: Done
- * <li>Pass 10 Pronoun Resolution: TODO.
+ * <li>Pass 10 Pronoun Resolution: Done
  * <li>Post process: Done
  * <li>Output: Done
  * </ul>
@@ -139,7 +142,8 @@ public class Coreference extends BaleenAnnotator {
 		// TODO: We could use parsetree rather than npCoveringNp
 
 		List<WordToken> pronouns = JCasUtil.select(jCas, WordToken.class).stream()
-				.filter(w -> w.getPartOfSpeech().startsWith("PP") || w.getPartOfSpeech().startsWith("WP"))
+				.filter(w -> w.getPartOfSpeech().startsWith("PP") || w.getPartOfSpeech().startsWith("WP")
+						|| w.getPartOfSpeech().startsWith("PRP"))
 				.collect(Collectors.toList());
 		Collection<Entity> entities = JCasUtil.select(jCas, Entity.class);
 		List<PhraseChunk> phrases = new ArrayList<>(JCasUtil.select(jCas, PhraseChunk.class));
@@ -182,7 +186,16 @@ public class Coreference extends BaleenAnnotator {
 			return covered != null && !covered.isEmpty();
 		});
 
-		// TODO: Remove all pronouns which are covered by the phrases?
+		// Remove all phrases which are just pronouns
+		JCasUtil.indexCovering(jCas, PhraseChunk.class,
+				WordToken.class)
+				.entrySet()
+				.stream()
+				.filter(e -> e.getValue().size() == 1 && pronouns.contains(e.getValue().iterator().next()))
+				.map(Entry::getKey)
+				.forEach(phrases::remove);
+
+		// TODO: Remove all pronouns which are covered by the phrases? I think not...
 
 		// Do we have all the noun phrases, or just the ones which cover another noun phrase
 
@@ -207,11 +220,12 @@ public class Coreference extends BaleenAnnotator {
 				new AnimacyEnhancer()
 		};
 
+		new SentenceEnhancer().enhance(jCas, mentions);
+
 		for (Mention mention : mentions) {
 			for (MentionEnhancer enhancer : enhancers) {
 				enhancer.enhance(mention);
 			}
-
 		}
 	}
 
@@ -221,9 +235,10 @@ public class Coreference extends BaleenAnnotator {
 
 		CoreferenceSieve[] sieves = new CoreferenceSieve[] {
 				new ExtractReferenceTargets(jCas, clusters, mentions),
-				// new SpeakerIdentificationSieve(jCas, clusters, mentions),
+				// TODO: new SpeakerIdentificationSieve(jCas, clusters, mentions),
 				new ExactStringMatchSieve(jCas, clusters, mentions),
 				new RelaxedStringMatchSieve(jCas, clusters, mentions),
+				new InSentencePronounSieve(jCas, clusters, mentions),
 				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions),
 				// Pass A-C are all strict head with different params
 				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true),

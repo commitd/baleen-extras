@@ -103,7 +103,7 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				Mention b = getMentions().get(j);
 				Set<String> bAcronyms = b.getAcronyms();
 
-				if (b.isAcronym() != a.isAcronym()
+				if (aAcronyms != null && bAcronyms != null && b.isAcronym() != a.isAcronym()
 						&& !Sets.intersection(aAcronyms, bAcronyms).isEmpty()) {
 					addToCluster(a, b);
 				}

@@ -73,12 +73,12 @@ public class GenderMultiplicityResource extends BaleenResource {
 					}
 
 				})
-				.filter(s -> !s.contains("\t"))
+				.filter(s -> s.contains("\t"))
 				// TODO; Currently ignore any of the numerical stuff its too tedious to work with
 				.filter(s -> !s.contains("#"))
 				.forEach(s -> {
 					try {
-						String[] line = s.split("\t", 1);
+						String[] line = s.split("\t", 2);
 						String np = line[0].trim().toLowerCase();
 						Iterable<String> counts = LINE_SPLITTER.split(line[1]);
 						Iterator<String> iterator = counts.iterator();
@@ -134,6 +134,11 @@ public class GenderMultiplicityResource extends BaleenResource {
 
 	private void saveGender(String np, Gender gender) {
 		String key = np.replaceAll("!", "").trim();
+
+		if (key == "john") {
+			System.out.println(key);
+		}
+
 		if (np.startsWith("!")) {
 			endsWithGender.put(key, gender);
 		} else if (np.endsWith("!")) {

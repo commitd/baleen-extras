@@ -4,6 +4,10 @@ public enum Person {
 
 	FIRST, SECOND, THIRD, UNKNOWN;
 
+	public static boolean isCompatible(Person a, Person b) {
+		return a == Person.UNKNOWN || b == Person.UNKNOWN || a == b;
+	}
+
 	// FIRST Singular i, me, mine, my, myself
 	// FIRST Plural we, us, our, ours, ourselves
 	// Second singular yourself

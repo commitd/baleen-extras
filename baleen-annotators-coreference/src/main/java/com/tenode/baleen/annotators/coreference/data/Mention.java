@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import uk.gov.dstl.baleen.types.Base;
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
+import uk.gov.dstl.baleen.types.language.Sentence;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
@@ -39,6 +40,10 @@ public class Mention {
 	private Gender gender = Gender.UNKNOWN;
 
 	private Multiplicity multiplicity = Multiplicity.UNKNOWN;
+
+	private int sentenceIndex = Integer.MIN_VALUE;
+
+	private Sentence sentence = null;
 
 	private Mention(Base annotation, MentionType type) {
 		this.annotation = annotation;
@@ -144,7 +149,7 @@ public class Mention {
 	}
 
 	public boolean overlaps(Mention mention) {
-		Base a = mention.getAnnotation();
+		Base a = getAnnotation();
 		Base b = mention.getAnnotation();
 		return !(a.getEnd() < b.getBegin() || b.getEnd() < a.getBegin());
 	}
@@ -198,4 +203,31 @@ public class Mention {
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
+
+	public void setSentenceIndex(int index) {
+		this.sentenceIndex = index;
+	}
+
+	public int getSentenceIndex() {
+		return sentenceIndex;
+	}
+
+	public void setSentence(Sentence sentence) {
+		this.sentence = sentence;
+	}
+
+	public Sentence getSentence() {
+		return sentence;
+	}
+
+	public boolean isAttributeCompatible(Mention b) {
+		// The paper also mentions NER labels, but I can't see how they could be (other than what is
+		// down in people)
+		// eg is Person entity we have already have it as a Animate so it won't match "it".
+		return Gender.isCompatible(getGender(), b.getGender())
+				&& Animacy.isCompatible(getAnimacy(), b.getAnimacy())
+				&& Multiplicity.isCompatible(getMultiplicity(), b.getMultiplicity())
+				&& Person.isCompatible(getPerson(), b.getPerson());
+	}
+
 }

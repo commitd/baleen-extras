@@ -41,7 +41,7 @@ public class AnimacyEnhancer implements MentionEnhancer {
 				.stream().forEach(s -> semanticMap.put(s, Animacy.INANIMATE));
 
 		Arrays.asList(Person.class, Nationality.class)
-				.stream().forEach(s -> semanticMap.put(s, Animacy.INANIMATE));
+				.stream().forEach(s -> semanticMap.put(s, Animacy.ANIMATE));
 
 		// Organisation.class could be either?
 	}
