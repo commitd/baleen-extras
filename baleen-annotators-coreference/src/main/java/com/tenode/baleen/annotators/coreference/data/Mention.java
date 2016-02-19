@@ -220,6 +220,36 @@ public class Mention {
 		return sentence;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (annotation == null ? 0 : annotation.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Mention other = (Mention) obj;
+		if (annotation == null) {
+			if (other.annotation != null) {
+				return false;
+			}
+		} else if (!annotation.equals(other.annotation)) {
+			return false;
+		}
+		return true;
+	}
+
 	public boolean isAttributeCompatible(Mention b) {
 		// The paper also mentions NER labels, but I can't see how they could be (other than what is
 		// down in people)
