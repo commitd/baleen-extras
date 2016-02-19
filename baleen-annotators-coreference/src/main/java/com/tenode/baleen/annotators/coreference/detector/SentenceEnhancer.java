@@ -1,4 +1,4 @@
-package com.tenode.baleen.annotators.coreference.enhancers;
+package com.tenode.baleen.annotators.coreference.detector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,26 +28,25 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 public class SentenceEnhancer {
 
 	public void enhance(JCas jCas, List<Mention> mentions) {
-		List<Mention> pronouns = mentions.stream().filter(p -> p.getType() == MentionType.PRONOUN)
-				.collect(Collectors.toList());
-		List<Mention> entities = mentions.stream().filter(p -> p.getType() == MentionType.ENTITY)
-				.collect(Collectors.toList());
-		List<Mention> nps = mentions.stream().filter(p -> p.getType() == MentionType.NP)
-				.collect(Collectors.toList());
-
 		// Create a map (mention annotation) to sentence
 
-		Set<WordToken> pronounAnnotation = pronouns.stream().map(p -> {
-			return (WordToken) p.getAnnotation();
-		}).collect(Collectors.toSet());
+		Set<WordToken> pronounAnnotation = mentions.stream()
+				.filter(p -> p.getType() == MentionType.PRONOUN)
+				.map(p -> {
+					return (WordToken) p.getAnnotation();
+				}).collect(Collectors.toSet());
 
-		Set<Entity> entityAnnotation = entities.stream().map(p -> {
-			return (Entity) p.getAnnotation();
-		}).collect(Collectors.toSet());
+		Set<Entity> entityAnnotation = mentions.stream()
+				.filter(p -> p.getType() == MentionType.ENTITY)
+				.map(p -> {
+					return (Entity) p.getAnnotation();
+				}).collect(Collectors.toSet());
 
-		Set<PhraseChunk> npAnnotation = nps.stream().map(p -> {
-			return (PhraseChunk) p.getAnnotation();
-		}).collect(Collectors.toSet());
+		Set<PhraseChunk> npAnnotation = mentions.stream()
+				.filter(p -> p.getType() == MentionType.NP)
+				.map(p -> {
+					return (PhraseChunk) p.getAnnotation();
+				}).collect(Collectors.toSet());
 
 		Map<WordToken, Collection<Sentence>> wordToSentence = JCasUtil.indexCovering(jCas, WordToken.class,
 				Sentence.class).entrySet().stream()

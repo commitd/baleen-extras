@@ -20,7 +20,7 @@ public class Cluster {
 	}
 
 	public Cluster(Mention... array) {
-		mentions.addAll(Arrays.asList(array));
+		addAll(Arrays.asList(array));
 	}
 
 	public boolean contains(Mention mention) {

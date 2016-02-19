@@ -30,7 +30,7 @@ public class RelaxedStringMatchSieve extends AbstractCoreferenceSieve {
 			for (int j = i + 1; j < getMentions().size(); j++) {
 				Mention b = getMentions().get(j);
 				String bHead = b.getHead();
-				if (bHead == null || bHead.isEmpty() || a.getType() != MentionType.ENTITY) {
+				if (bHead == null || bHead.isEmpty() || b.getType() != MentionType.ENTITY) {
 					continue;
 				}
 

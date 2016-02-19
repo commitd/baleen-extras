@@ -2,14 +2,9 @@ package com.tenode.baleen.annotators.coreference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.ExternalResource;
@@ -18,14 +13,13 @@ import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
+import com.tenode.baleen.annotators.coreference.detector.MentionDetector;
 import com.tenode.baleen.annotators.coreference.enhancers.AcronymEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.AnimacyEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.GenderEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.MentionEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.MultiplicityEnhancer;
 import com.tenode.baleen.annotators.coreference.enhancers.PersonEnhancer;
-import com.tenode.baleen.annotators.coreference.enhancers.SentenceEnhancer;
-import com.tenode.baleen.annotators.coreference.enhancers.WordEnhancer;
 import com.tenode.baleen.annotators.coreference.sieves.CoreferenceSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExactStringMatchSieve;
 import com.tenode.baleen.annotators.coreference.sieves.ExtractReferenceTargets;
@@ -41,9 +35,6 @@ import com.tenode.baleen.extras.common.grammar.ParseTree;
 import com.tenode.baleen.resources.coreference.GenderMultiplicityResource;
 
 import uk.gov.dstl.baleen.types.Base;
-import uk.gov.dstl.baleen.types.language.PhraseChunk;
-import uk.gov.dstl.baleen.types.language.WordToken;
-import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
@@ -58,8 +49,10 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * A mention is a NP, entity or pronoun. In Standford the largest NP is taken, within Baleen we felt
  * that entities are more important, therefore we take the largest NP which does not contain a NP.
  *
+ * TODO; Review the mention extraction its not quite right
+ *
  * This is a partial implementation at present, and so will not perform as well as the
- * StandfordCoreNlp coreference. It is partial due to time constraints.
+ * StandfordCoreNlp coreference. It is partial due to time constraints, and largely unavailabled
  *
  * The following details implementation to date:
  * <ul>
@@ -86,8 +79,10 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * We discard any the algorithm which are for a specific corpus (eg OntoNotes).
  *
  * This is very much unoptimised. Each sieve will calculate over all entities, even though many will
- * already in the same cluster. TODO: At the moment we don't do the clustering properly. We need
- * just perform pairwise operations repeated.
+ * already in the same cluster.
+ *
+ * TODO: At the moment we don't do the clustering properly. We need just perform pairwise operations
+ * repeated.
  *
  * For more information see the various supporting papers.
  * <ul>
@@ -120,15 +115,12 @@ public class Coreference extends BaleenAnnotator {
 		ParseTree parseTree = ParseTree.build(jCas);
 
 		// Detect mentions
-		List<Mention> mentions = detectMentions(jCas);
+		List<Mention> mentions = new MentionDetector(jCas, dependencyGraph, parseTree).detect();
 
 		// Extract head words and other aspects needed for later, determine acronyms, denonym,
 		// gender, etc
 		enhanceMention(jCas, dependencyGraph, parseTree, mentions);
 
-		mentions.forEach(System.out::println);
-
-		// Perform the sieve
 		List<Cluster> clusters = sieve(jCas, parseTree, mentions);
 
 		// Post processing
@@ -138,81 +130,10 @@ public class Coreference extends BaleenAnnotator {
 		outputReferenceTargets(jCas, clusters);
 	}
 
-	private List<Mention> detectMentions(JCas jCas) {
-		// TODO: We could use parsetree rather than npCoveringNp
-
-		List<WordToken> pronouns = JCasUtil.select(jCas, WordToken.class).stream()
-				.filter(w -> w.getPartOfSpeech().startsWith("PP") || w.getPartOfSpeech().startsWith("WP")
-						|| w.getPartOfSpeech().startsWith("PRP"))
-				.collect(Collectors.toList());
-		Collection<Entity> entities = JCasUtil.select(jCas, Entity.class);
-		List<PhraseChunk> phrases = new ArrayList<>(JCasUtil.select(jCas, PhraseChunk.class));
-
-		// Remove any noun phrases which cover entities
-		List<PhraseChunk> npCoveringEntities = JCasUtil.indexCovering(jCas, Entity.class, PhraseChunk.class).values()
-				.stream()
-				.flatMap(e -> e.stream())
-				.collect(Collectors.toList());
-
-		Map<PhraseChunk, Collection<PhraseChunk>> npCoveringNp = new HashMap<>(
-				JCasUtil.indexCovering(jCas, PhraseChunk.class,
-						PhraseChunk.class));
-
-		phrases.removeAll(npCoveringEntities);
-
-		// Get all noun phrases (discarding other phrase types)
-		Iterator<PhraseChunk> phraseIterator = phrases.iterator();
-		while (phraseIterator.hasNext()) {
-			PhraseChunk phraseChunk = phraseIterator.next();
-			if (!phraseChunk.getChunkType().startsWith("N")) {
-				phraseIterator.remove();
-				npCoveringNp.remove(phraseChunk);
-			}
-		}
-
-		// Now repeat for the collection removing from the values of the collect
-		Iterator<Entry<PhraseChunk, Collection<PhraseChunk>>> npIterator = npCoveringNp.entrySet().iterator();
-		while (npIterator.hasNext()) {
-			Entry<PhraseChunk, Collection<PhraseChunk>> e = npIterator.next();
-
-			e.getValue().removeAll(npCoveringEntities);
-			e.getValue().removeIf(p -> !p.getChunkType().startsWith("N"));
-		}
-
-		// Remove all phrases which are covered by another phrase
-
-		phrases.removeIf(p -> {
-			Collection<PhraseChunk> covered = npCoveringNp.get(p);
-			return covered != null && !covered.isEmpty();
-		});
-
-		// Remove all phrases which are just pronouns
-		JCasUtil.indexCovering(jCas, PhraseChunk.class,
-				WordToken.class)
-				.entrySet()
-				.stream()
-				.filter(e -> e.getValue().size() == 1 && pronouns.contains(e.getValue().iterator().next()))
-				.map(Entry::getKey)
-				.forEach(phrases::remove);
-
-		// TODO: Remove all pronouns which are covered by the phrases? I think not...
-
-		// Do we have all the noun phrases, or just the ones which cover another noun phrase
-
-		List<Mention> mentions = new ArrayList<>();
-
-		entities.forEach(e -> mentions.add(new Mention(e)));
-		phrases.forEach(e -> mentions.add(new Mention(e)));
-		pronouns.forEach(e -> mentions.add(new Mention(e)));
-
-		return mentions;
-	}
-
 	private void enhanceMention(JCas jCas, DependencyGraph dependencyGraph, ParseTree parseTree,
 			List<Mention> mentions) {
 
 		MentionEnhancer[] enhancers = new MentionEnhancer[] {
-				new WordEnhancer(jCas, dependencyGraph, parseTree),
 				new AcronymEnhancer(),
 				new PersonEnhancer(),
 				new MultiplicityEnhancer(genderMultiplicityResource),
@@ -220,9 +141,8 @@ public class Coreference extends BaleenAnnotator {
 				new AnimacyEnhancer()
 		};
 
-		new SentenceEnhancer().enhance(jCas, mentions);
-
 		for (Mention mention : mentions) {
+
 			for (MentionEnhancer enhancer : enhancers) {
 				enhancer.enhance(mention);
 			}
@@ -290,7 +210,7 @@ public class Coreference extends BaleenAnnotator {
 		merged.forEach(c -> {
 			ReferenceTarget target = new ReferenceTarget(jCas);
 
-			getMonitor().debug("Cluster:\n");
+			getMonitor().info("Cluster:\n");
 
 			for (Mention m : c.getMentions()) {
 				// TODO: We overwrite the referent target here, not sure what we'd do if there was
@@ -302,7 +222,7 @@ public class Coreference extends BaleenAnnotator {
 				annotation.setReferent(target);
 				addToJCasIndex(annotation);
 
-				getMonitor().debug("\t{}\n", m.getAnnotation().getCoveredText());
+				getMonitor().info("\t{}\n", m.getAnnotation().getCoveredText());
 			}
 
 			addToJCasIndex(target);
