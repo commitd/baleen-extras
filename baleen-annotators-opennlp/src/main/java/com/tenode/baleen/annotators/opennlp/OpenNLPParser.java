@@ -122,7 +122,7 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 			addToJCasIndex(phraseChunk);
 
-			LOGGER.debug("{} [{}]", phraseChunk.getCoveredText(), phraseChunk.getChunkType());
+			// LOGGER.debug("{} [{}]", phraseChunk.getCoveredText(), phraseChunk.getChunkType());
 		}
 
 		Arrays.stream(parsed.getChildren()).forEach(p -> addParsedAsAnnotations(jCas, offset, p));

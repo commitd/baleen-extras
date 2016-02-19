@@ -199,7 +199,8 @@ public class Coreference extends BaleenAnnotator {
 
 		Arrays.stream(sieves).forEach(s -> {
 			s.sieve();
-			getMonitor().debug("Cluster size after {} is {}", s.getClass().getSimpleName(), clusters.size());
+			// getMonitor().debug("Cluster size after {} is {}", s.getClass().getSimpleName(),
+			// clusters.size());
 		});
 
 		return clusters;
@@ -238,7 +239,7 @@ public class Coreference extends BaleenAnnotator {
 		merged.forEach(c -> {
 			ReferenceTarget target = new ReferenceTarget(jCas);
 
-			getMonitor().info("Cluster:\n");
+			// getMonitor().info("Cluster:\n");
 
 			for (Mention m : c.getMentions()) {
 				// TODO: We overwrite the referent target here, not sure what we'd do if there was
@@ -250,7 +251,7 @@ public class Coreference extends BaleenAnnotator {
 				annotation.setReferent(target);
 				addToJCasIndex(annotation);
 
-				getMonitor().info("\t{}\n", m.getAnnotation().getCoveredText());
+				// getMonitor().info("\t{}\n", m.getAnnotation().getCoveredText());
 			}
 
 			addToJCasIndex(target);
@@ -268,9 +269,9 @@ public class Coreference extends BaleenAnnotator {
 
 		for (Cluster cluster : clusters) {
 
-			System.err.println("Raw Cluster:");
-			cluster.getMentions().stream()
-					.forEach(a -> System.err.println("\t" + a.getAnnotation().getCoveredText()));
+			// System.err.println("Raw Cluster:");
+			// cluster.getMentions().stream()
+			// .forEach(a -> System.err.println("\t" + a.getAnnotation().getCoveredText()));
 
 			boolean overlap = false;
 			for (Cluster mergedCluster : merged) {
