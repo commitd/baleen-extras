@@ -50,5 +50,6 @@
 		<module>baleen-annotators-basic-relations</module>
 		<module>baleen-resources-wordnet</module>
 		<module>baleen-extras-readers</module>
+		<module>baleen-annotators-coreference</module>
 	</modules>
 </project>

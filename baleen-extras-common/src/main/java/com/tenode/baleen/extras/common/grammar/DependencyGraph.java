@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.fit.util.JCasUtil;
@@ -58,11 +59,15 @@ public class DependencyGraph {
 	}
 
 	public Set<Dependency> getDependents(WordToken word) {
-		return dependents.get(word);
+		return Collections.unmodifiableSet(dependents.get(word));
 	}
 
 	public Set<Dependency> getGovernors(WordToken word) {
-		return governors.get(word);
+		return Collections.unmodifiableSet(governors.get(word));
+	}
+
+	public Stream<WordToken> getEdges(WordToken word) {
+		return edges.get(word).stream().map(e -> e.getOther(word));
 	}
 
 	private void addEdge(final Dependency dependency) {

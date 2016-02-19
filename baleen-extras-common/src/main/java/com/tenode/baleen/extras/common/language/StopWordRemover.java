@@ -3,6 +3,7 @@ package com.tenode.baleen.extras.common.language;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -97,7 +98,7 @@ public class StopWordRemover {
 		// words and do it once here
 		String clean = text;
 		for (final String s : stopWords) {
-			clean = clean.replaceAll("\\b" + s + "\\b", "");
+			clean = clean.replaceAll("\\b" + Pattern.quote(s) + "\\b", "");
 		}
 		return clean;
 	}
