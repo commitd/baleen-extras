@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.google.common.base.Objects;
+import com.tenode.baleen.extras.common.annotators.SpanUtils;
 
 import uk.gov.dstl.baleen.types.language.Interaction;
 import uk.gov.dstl.baleen.types.language.Sentence;
@@ -34,15 +36,25 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 					final Stream<Relation> relations = extract(jCas, sentence, interactions, entities);
 
 					if (relations != null) {
-						relations.forEach(r -> {
-							addToJCasIndex(r);
-						});
+						relations
+								// Only add events aren't in the same
+								// Prevents overlapping spans since that makes no sense
+								.filter(r -> r.getSource().getInternalId() != r.getTarget().getInternalId()
+										&& !SpanUtils.overlaps(r.getSource(), r.getTarget()))
+								// Discard anything which has no relationship type
+								// TODO: Is this sensible, these are direct connection between A and
+								// B for the dependency graph (you can't be more connected than
+								// that) but then you have no relationship text to work with.
+								.filter(r -> r.getRelationshipType() != null
+										|| !StringUtils.isBlank(r.getRelationshipType()))
+								.forEach(this::addToJCasIndex);
 					}
 				}
 			}
 		} finally {
 			postExtract(jCas);
 		}
+
 	}
 
 	protected void preExtract(final JCas jCas) {
