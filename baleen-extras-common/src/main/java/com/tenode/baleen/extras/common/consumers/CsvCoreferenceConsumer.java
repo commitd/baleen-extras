@@ -63,7 +63,7 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 			list.add(e.getExternalId());
 
 			if (e.getReferent() != null) {
-				list.add(e.getReferent().getExternalId());
+				list.add(Long.toString(e.getReferent().getInternalId()));
 			} else {
 				list.add("");
 			}

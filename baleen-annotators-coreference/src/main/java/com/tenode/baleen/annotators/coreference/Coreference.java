@@ -87,7 +87,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  *
  * For more information see the various supporting papers.
  * <ul>
- * <li>http://nlp.stanford.edu/software/dcoref.shtm
+ * <li>http://nlp.stanford.edu/software/dcoref.shtml
  * <li>http://www.mitpressjournals.org/doi/pdf/10.1162/COLI_a_00152
  * <li>http://nlp.stanford.edu/pubs/discourse-referent-lifespans.pdf
  * <li>http://nlp.stanford.edu/pubs/conllst2011-coref.pdf
@@ -179,7 +179,11 @@ public class Coreference extends BaleenAnnotator {
 				new ExactStringMatchSieve(jCas, clusters, mentions), // Good
 				new RelaxedStringMatchSieve(jCas, clusters, mentions), // Good
 				new InSentencePronounSieve(jCas, clusters, mentions), // Good
-				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions), // Bad
+				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions), // Good
+				// - TODO:
+				// Produces
+				// Singleton
+				// clusters?
 				// Pass A-C are all strict head with different params
 				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true), // Good
 				new StrictHeadMatchSieve(jCas, clusters, mentions, true, false), // Good
@@ -199,11 +203,22 @@ public class Coreference extends BaleenAnnotator {
 
 		Arrays.stream(sieves).forEach(s -> {
 			s.sieve();
-			// getMonitor().debug("Cluster size after {} is {}", s.getClass().getSimpleName(),
+			// getMonitor().info("Cluster size after {} is {}", s.getClass().getSimpleName(),
 			// clusters.size());
+			// logClusters(clusters);
 		});
 
 		return clusters;
+	}
+
+	private void logClusters(List<Cluster> clusters) {
+
+		clusters.forEach(c -> {
+			getMonitor().info("Cluster:\n");
+			c.getMentions().stream()
+					.forEach(a -> getMonitor().info("\t" + a.getAnnotation().getCoveredText() + " : " + a.getType()));
+		});
+
 	}
 
 	private void postProcess(List<Cluster> clusters) {
@@ -240,8 +255,6 @@ public class Coreference extends BaleenAnnotator {
 		merged.forEach(c -> {
 			ReferenceTarget target = new ReferenceTarget(jCas);
 
-			// getMonitor().info("Cluster:\n");
-
 			for (Mention m : c.getMentions()) {
 				// We overwrite the referent target here, given that we used the initial target to
 				// bootstrap our work
@@ -249,8 +262,6 @@ public class Coreference extends BaleenAnnotator {
 
 				Base annotation = m.getAnnotation();
 				annotation.setReferent(target);
-
-				// getMonitor().info("\t{}\n", m.getAnnotation().getCoveredText());
 			}
 
 			addToJCasIndex(target);

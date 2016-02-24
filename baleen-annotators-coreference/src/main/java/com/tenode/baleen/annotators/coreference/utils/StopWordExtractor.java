@@ -24,7 +24,9 @@ public final class StopWordExtractor {
 
 		// NOTE: This is ordered, a is earlier than b and it is unusal to introduce more information
 		// to an entity later in the document
-		return aNonStop.containsAll(bNonStop);
+
+		// NOTE: We enforce that the set isn't empty otherwise we aren't really testing anything
+		return !aNonStop.isEmpty() && !bNonStop.isEmpty() && aNonStop.containsAll(bNonStop);
 	}
 
 	public static List<String> getNonStopWords(Mention a) {

@@ -80,7 +80,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 
 		// NOTE: This is ordered, a is earlier than b and it is unusal to introduce more information
 		// to an entity later in the document
-		return aModifiers.containsAll(bModifiers);
+		return !aModifiers.isEmpty() && !bModifiers.isEmpty() && aModifiers.containsAll(bModifiers);
 	}
 
 }

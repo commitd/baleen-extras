@@ -1,6 +1,9 @@
 package com.tenode.baleen.annotators.coreference.sieves;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.uima.jcas.JCas;
 
@@ -14,6 +17,7 @@ import com.tenode.baleen.annotators.coreference.data.MentionType;
  * See 3.3.3 Pass 3.
  */
 public class ExactStringMatchSieve extends AbstractCoreferenceSieve {
+	private static final Set<String> EXCLUDED = new HashSet<>(Arrays.asList("that", "there"));
 
 	/**
 	 * Instantiates a new insatnce
@@ -31,7 +35,7 @@ public class ExactStringMatchSieve extends AbstractCoreferenceSieve {
 			Mention a = getMentions().get(i);
 			String aText = a.getText();
 
-			if (a.getType() == MentionType.PRONOUN) {
+			if (a.getType() == MentionType.PRONOUN || EXCLUDED.contains(aText.toLowerCase())) {
 				continue;
 			}
 
@@ -39,7 +43,7 @@ public class ExactStringMatchSieve extends AbstractCoreferenceSieve {
 				Mention b = getMentions().get(j);
 				String bText = b.getText();
 
-				if (b.getType() == MentionType.PRONOUN) {
+				if (b.getType() == MentionType.PRONOUN || EXCLUDED.contains(bText.toLowerCase())) {
 					continue;
 				}
 

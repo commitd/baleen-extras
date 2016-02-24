@@ -57,15 +57,23 @@ public class InSentencePronounSieve extends AbstractCoreferenceSieve {
 
 				// Ok if both from FIRST single: {i, me, mine, my, myself}
 				// Ok if both from FIRST plural: {we, us, our, ours, ourselves}
-				if ((a.getPerson() == Person.FIRST || b.getPerson() == Person.FIRST)
-						&& a.getGender() == b.getGender()) {
+				if (a.getPerson() == Person.FIRST && b.getPerson() == Person.FIRST) {
 					addToCluster(a, b);
 					continue;
 				}
 
 				// Ok if from second {yourself, yourselves, you your yours} not mixing plural and
 				// singular here
-				if (a.getPerson() == Person.SECOND || b.getPerson() == Person.SECOND) {
+				if (a.getPerson() == Person.SECOND && b.getPerson() == Person.SECOND
+						&& a.getMultiplicity() == b.getMultiplicity()) {
+					addToCluster(a, b);
+					continue;
+				}
+
+				// Ok if from third, if you match on everything
+				if (a.getPerson() == Person.THIRD && b.getPerson() == Person.THIRD
+						&& a.getMultiplicity() == b.getMultiplicity()
+						&& a.getGender() == b.getGender()) {
 					addToCluster(a, b);
 					continue;
 				}
