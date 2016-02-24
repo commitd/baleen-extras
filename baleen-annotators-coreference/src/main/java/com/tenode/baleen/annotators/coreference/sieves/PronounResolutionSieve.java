@@ -127,17 +127,24 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 					if (sentenceIndex != 0) {
 						return sentenceIndex;
 					} else {
+						// NOTE: WE'd like to find the minimum distance here
+
+						if (a.overlaps(b)) {
+							return 0;
+						}
+
 						// Use in-sentence word distance
 						if (a.getAnnotation().getEnd() <= b.getAnnotation().getBegin()) {
 							return b.getAnnotation().getBegin() - a.getAnnotation().getEnd();
 						} else {
-							return a.getAnnotation().getBegin() - b.getAnnotation().getEnd();
+							return b.getAnnotation().getEnd() - a.getAnnotation().getBegin();
 						}
 
 					}
 				});
 
 				// Take the closest match
+				// TODO: Need more heuristics about this to determine if its the best!
 				match = list.get(0);
 			} else {
 				match = collection.iterator().next();
