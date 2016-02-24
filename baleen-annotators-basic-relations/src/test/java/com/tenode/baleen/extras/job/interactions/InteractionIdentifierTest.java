@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
@@ -21,9 +22,13 @@ import com.tenode.baleen.extras.jobs.interactions.data.Word;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
+import uk.gov.dstl.baleen.uima.UimaMonitor;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InteractionIdentifierTest {
+
+	@Mock
+	UimaMonitor monitor;
 
 	private InteractionIdentifier identifier;
 	private Dictionary dictionary;;
@@ -31,7 +36,7 @@ public class InteractionIdentifierTest {
 	@Before
 	public void before() throws JWNLException {
 		dictionary = Dictionary.getDefaultResourceInstance();
-		identifier = new InteractionIdentifier(1, 0.2);
+		identifier = new InteractionIdentifier(monitor, 1, 0.2);
 	}
 
 	@Test

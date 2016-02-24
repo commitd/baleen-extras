@@ -17,13 +17,16 @@ import com.tenode.baleen.extras.jobs.interactions.data.RelationPair;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
 
 import net.sf.extjwnl.data.POS;
+import uk.gov.dstl.baleen.uima.UimaMonitor;
 
 public class InteractionIdentifier {
 
 	private final int minPatternsInCluster;
 	private final double threshold;
+	private final UimaMonitor monitor;
 
-	public InteractionIdentifier(int minPatternsInCluster, double threshold) {
+	public InteractionIdentifier(UimaMonitor monitor, int minPatternsInCluster, double threshold) {
+		this.monitor = monitor;
 		this.minPatternsInCluster = minPatternsInCluster;
 		this.threshold = threshold;
 	}
@@ -32,22 +35,34 @@ public class InteractionIdentifier {
 
 		Set<Word> terms = gatherTerms(patterns);
 
+		monitor.info("Gathered {} terms", terms.size());
+
 		calculateTermFrequencies(patterns, terms);
+
+		monitor.info("Calculated frequencies");
 
 		// Sort by number of times seen
 		sort(patterns);
 
+		monitor.info("Sorted patterns by frequency");
+
 		// Cluster
 		List<ClusteredPatterns> clusters = cluster(patterns);
 
+		monitor.info("Patterns clustered into {} clusters", clusters.size());
+
 		// Remove small clusters
 		filterClusters(clusters);
+
+		monitor.info("Patterns filtered to {} clusters", clusters.size());
 
 		// For debugging:
 		// clusters.forEach(c -> {
 		// System.out.println("-----------------");
 		// c.getPatterns().forEach(p -> System.out.println(p));
 		// });
+
+		monitor.info("Finding interaction words");
 
 		// Find interaction words
 		return extractInteractionWords(clusters);

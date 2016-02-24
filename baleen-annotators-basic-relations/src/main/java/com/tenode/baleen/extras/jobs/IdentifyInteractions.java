@@ -98,20 +98,35 @@ public class IdentifyInteractions extends BaleenTask {
 	@ConfigurationParameter(name = KEY_THRESHOLD, defaultValue = "0.2")
 	private double threshold;
 
+	/**
+	 * Log the information on completion
+	 *
+	 * @baleen.config patterns false
+	 */
+	public static final String KEY_OUTPUT = "output";
+	@ConfigurationParameter(name = KEY_OUTPUT, defaultValue = "false")
+	private boolean output;
+
 	private Dictionary dictionary;
 
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
 		dictionary = wordnet.getDictionary();
-		InteractionIdentifier identifier = new InteractionIdentifier(minPatternsInCluster, threshold);
+		InteractionIdentifier identifier = new InteractionIdentifier(getMonitor(), minPatternsInCluster, threshold);
+		getMonitor().info("Loading patterns from Mongo");
 		List<PatternReference> patterns = readPatternsFromMongo();
+		getMonitor().info("Found {} patterns", patterns.size());
+		getMonitor().info("Extracting interaction words...");
 		Stream<InteractionWord> words = identifier.process(patterns);
+		getMonitor().info("Writing interaction words to Mongo...");
 		writeToMongo(words);
+		getMonitor().info("Interaction identification complete");
+
 	}
 
 	private List<PatternReference> readPatternsFromMongo() {
 		// TODO: Ideally this would do something in a more streaming manner, as there are likely to
-		// be lots of examples
+		// be lots of examples. Loading all patterns into memory might be prohibitive.
 
 		DBCollection collection = mongo.getDB().getCollection(patternCollection);
 
@@ -120,8 +135,6 @@ public class IdentifyInteractions extends BaleenTask {
 		DBCursor cursor = collection.find();
 		while (cursor.hasNext()) {
 			DBObject o = cursor.next();
-			// TODO: We don't currently use types (entity source target) but we could do
-			// at least to output something to the relationship type filter
 
 			BasicDBList list = (BasicDBList) o.get("words");
 			List<Word> tokens = list.stream().map(l -> {
@@ -149,6 +162,7 @@ public class IdentifyInteractions extends BaleenTask {
 	}
 
 	private void writeToMongo(Stream<InteractionWord> words) {
+
 		DBCollection interactions = mongo.getDB().getCollection(interactionCollection);
 		DBCollection relationTypes = mongo.getDB().getCollection(relationTypesCollection);
 
@@ -159,23 +173,36 @@ public class IdentifyInteractions extends BaleenTask {
 					.collect(Collectors.toList());
 			String lemma = interaction.getWord().getLemma();
 
-			if (!alternatives.isEmpty()) {
+			// TODO: Find the best
+			String relationshipType = wordnet.getSuperSenses(interaction.getWord().getPos(), lemma).findAny()
+					.orElse(lemma);
 
+			if (!alternatives.isEmpty()) {
 				// Write to the interactions collection
 				// ADd in relationshiptype and subtype (which can be manually changed later)
 				BasicDBObject interactionObject = new BasicDBObject("value", alternatives);
-				interactionObject.put("relationshipType", lemma);
+				interactionObject.put("relationshipType", relationshipType);
 				interactionObject.put("relationSubType", lemma);
 				interactions.save(interactionObject);
+
+				if (output) {
+					getMonitor().info("Interaction {} {}", relationshipType,
+							alternatives.stream().collect(Collectors.joining(";")));
+				}
 
 				// Write out to the relationship constraints
 				interaction.getPairs().stream().forEach(p -> {
 					BasicDBObject relationTypeObject = new BasicDBObject()
 							.append("source", p.getSource())
 							.append("target", p.getTarget())
-							.append("type", lemma);
+							.append("type", relationshipType);
 					relationTypes.save(relationTypeObject);
+
+					if (output) {
+						getMonitor().info("Interaction constraints {} {}", p.getSource(), p.getTarget());
+					}
 				});
+
 			}
 
 		});
