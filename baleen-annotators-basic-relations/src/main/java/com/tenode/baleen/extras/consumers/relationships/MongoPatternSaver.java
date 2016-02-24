@@ -27,7 +27,7 @@ import uk.gov.dstl.baleen.uima.BaleenConsumer;
  * set in Mongo for offlne analysis. In other words this annotator will save UIMA Pattern types to
  * Mongo.
  *
- * This will NOT clear the existing collection, so that should be done manually between runs.
+ * This will clear the existing collection, unless clear = false is set as configuration parameter.
  *
  * Note this is BaleenConsumer but, like all consumers, it can be used as annotator. So if you wish
  * to save midway through a pipeline, clear the result and then create more patterns that is
@@ -43,7 +43,7 @@ public class MongoPatternSaver extends BaleenConsumer {
 	 * @baleen.resource uk.gov.dstl.baleen.resources.SharedMongoResource
 	 */
 	public static final String KEY_MONGO = "mongo";
-	@ExternalResource(key = MongoPatternSaver.KEY_MONGO)
+	@ExternalResource(key = KEY_MONGO)
 	private SharedMongoResource mongo;
 
 	/**
@@ -52,8 +52,17 @@ public class MongoPatternSaver extends BaleenConsumer {
 	 * @baleen.config patterns
 	 */
 	public static final String KEY_COLLECTION = "collection";
-	@ConfigurationParameter(name = MongoPatternSaver.KEY_COLLECTION, defaultValue = "patterns")
+	@ConfigurationParameter(name = KEY_COLLECTION, defaultValue = "patterns")
 	private String collection;
+
+	/**
+	 * Clears the output pattern collection before saving.
+	 *
+	 * @baleen.config true
+	 */
+	public static final String KEY_CLEAR = "clear";
+	@ConfigurationParameter(name = KEY_CLEAR, defaultValue = "true")
+	private Boolean clear;
 
 	private DBCollection dbCollection;
 
@@ -62,6 +71,12 @@ public class MongoPatternSaver extends BaleenConsumer {
 		super.doInitialize(aContext);
 
 		dbCollection = mongo.getDB().getCollection(collection);
+
+		// Delete the whole database
+		if (clear) {
+			dbCollection.remove(new BasicDBObject());
+		}
+
 	}
 
 	@Override
