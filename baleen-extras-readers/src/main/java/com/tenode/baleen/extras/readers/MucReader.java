@@ -4,19 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UimaContext;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.DocumentAnnotation;
 import org.elasticsearch.common.base.Splitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.dstl.baleen.exceptions.BaleenException;
 
-public class MucReader extends AbstractStreamCollectionReader<String> {
+public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MucReader.class);
 
@@ -34,7 +37,7 @@ public class MucReader extends AbstractStreamCollectionReader<String> {
 	private String mucPath;
 
 	@Override
-	protected Stream<String> initializeStream(UimaContext context) throws BaleenException {
+	protected Stream<MucEntry> initializeStream(UimaContext context) throws BaleenException {
 		final File[] files = new File(mucPath)
 				.listFiles(f -> !f.getName().startsWith("key-") && f.isFile());
 
@@ -49,23 +52,37 @@ public class MucReader extends AbstractStreamCollectionReader<String> {
 						return Stream.empty();
 					}
 				}).map(text -> {
+
+					int nlIndex = text.indexOf("\n", 1);
 					// Strip the first lines up to a the article start (signified by a --)
-					int index = text.indexOf("--");
-					if (index != -1) {
-						return text.substring(index + 2).trim();
+					int textIndex = text.indexOf("--");
+					if (nlIndex != -1 && textIndex != -1) {
+						String id = text.substring(0, nlIndex);
+						String content = text.substring(textIndex + 2).trim();
+						return new MucEntry(id, content);
 					} else {
-						return text;
+						return null;
 					}
-				}).map(text -> {
+				}).filter(Objects::nonNull)
+				.map(e -> {
+					String text = e.getText();
 					// Strip out the clarification tags []
-					return text.replaceAll("\\[.*?\\]", "");
+					text = text.replaceAll("\\[.*?\\]", "");
+					// Make the paragraphs and text nicer
+					text = text.replaceAll("\n", " ").replaceAll("\\s{3,}", "\n\n").toLowerCase();
+					text = StringUtils.capitalize(text);
+					e.setText(text);
+					return e;
 				});
 	}
 
 	@Override
-	protected void apply(String text, JCas jCas) {
+	protected void apply(MucEntry entry, JCas jCas) {
 		jCas.setDocumentLanguage("en");
-		jCas.setDocumentText(text);
+		jCas.setDocumentText(entry.getText());
+
+		DocumentAnnotation documentAnnotation = getSupport().getDocumentAnnotation(jCas);
+		documentAnnotation.setSourceUri(entry.getId());
 	}
 
 	@Override
