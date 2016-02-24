@@ -135,7 +135,7 @@ public class Coreference extends BaleenAnnotator {
 		// Detect mentions
 		List<Mention> mentions = new MentionDetector(jCas, dependencyGraph, parseTree).detect();
 
-		mentions.forEach(System.out::println);
+		// mentions.forEach(System.out::println);
 
 		// Extract head words and other aspects needed for later, determine acronyms, denonym,
 		// gender, etc
@@ -232,7 +232,8 @@ public class Coreference extends BaleenAnnotator {
 
 		// Remove all the previous reference targets as we've included them in our process
 
-		removeFromJCasIndex(JCasUtil.select(jCas, ReferenceTarget.class));
+		ArrayList<ReferenceTarget> toRemove = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
+		removeFromJCasIndex(toRemove);
 
 		// Save clusters a referent targets
 
@@ -242,14 +243,12 @@ public class Coreference extends BaleenAnnotator {
 			// getMonitor().info("Cluster:\n");
 
 			for (Mention m : c.getMentions()) {
-				// TODO: We overwrite the referent target here, not sure what we'd do if there was
-				// already one.
-				// (since it would need to be consistent over the whole cluster)
-				// Perhaps we should build initial clusters from the existing RTs?
+				// We overwrite the referent target here, given that we used the initial target to
+				// bootstrap our work
+				// TODO: Could add an option not to override here.
 
 				Base annotation = m.getAnnotation();
 				annotation.setReferent(target);
-				addToJCasIndex(annotation);
 
 				// getMonitor().info("\t{}\n", m.getAnnotation().getCoveredText());
 			}
