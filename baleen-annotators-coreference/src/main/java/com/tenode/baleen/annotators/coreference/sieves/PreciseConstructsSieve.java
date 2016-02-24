@@ -12,7 +12,7 @@ import com.google.common.collect.Sets;
 import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.extras.common.grammar.ParseTree;
-import com.tenode.baleen.extras.common.grammar.ParseTree.TreeNode;
+import com.tenode.baleen.extras.common.grammar.data.ParseTreeNode;
 
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Location;
@@ -41,8 +41,8 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 
 		parseTree.traverseChildren(children -> {
 			for (int i = 0; i < children.size() - 1; i++) {
-				TreeNode a = children.get(i);
-				TreeNode b = children.get(i + 1);
+				ParseTreeNode a = children.get(i);
+				ParseTreeNode b = children.get(i + 1);
 
 				// Appositive
 				// Look for (NP , NP)
@@ -54,7 +54,7 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 					// Police, Fire and Ambulance (will get police-fire at the moment)
 					String between = getJCas().getDocumentText().substring(a.getChunk().getEnd(),
 							b.getChunk().getBegin());
-					TreeNode parent = a.getParent();
+					ParseTreeNode parent = a.getParent();
 
 					// Special case there if there's its a location "London, UK" will match
 					// but we don't want it too. Probabl need both the a and b to have a location
@@ -72,7 +72,7 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				// (NP VP(is / was) ) then take the NP under VP as
 
 				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("VP")) {
-					Optional<TreeNode> np = b.getChildren().stream()
+					Optional<ParseTreeNode> np = b.getChildren().stream()
 							.filter(n -> n.getChunk().getChunkType().equals("NP"))
 							.findFirst();
 					Optional<WordToken> is = b.getWords().stream()
@@ -128,7 +128,7 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 
 	}
 
-	private boolean coversLocation(TreeNode a) {
+	private boolean coversLocation(ParseTreeNode a) {
 		return findMentionsUnder(a.getChunk().getBegin(), a.getChunk().getEnd())
 				.stream()
 				.anyMatch(m -> m.getAnnotation() instanceof Location);

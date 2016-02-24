@@ -1,6 +1,5 @@
 package com.tenode.baleen.extras.common.grammar;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import com.tenode.baleen.extras.common.grammar.data.Edge;
+import com.tenode.baleen.extras.common.grammar.data.WordDistance;
 
 import uk.gov.dstl.baleen.types.language.Dependency;
 import uk.gov.dstl.baleen.types.language.WordToken;
@@ -271,7 +272,6 @@ public class DependencyGraph {
 
 		edges.asMap().entrySet().stream()
 				.filter(w -> {
-					System.out.println(w.getKey().getPartOfSpeech() + " " + w.getKey().getCoveredText());
 					return predicate.test(w.getKey());
 				}).forEach(e -> {
 					WordToken key = e.getKey();
@@ -377,99 +377,40 @@ public class DependencyGraph {
 		return graph;
 	}
 
-	private static class Edge {
-		private final WordToken from;
-		private final Dependency dependency;
-		private final WordToken to;
-
-		public Edge(WordToken from, Dependency dependency, WordToken to) {
-			this.from = from;
-			this.dependency = dependency;
-			this.to = to;
+	public void traverse(int distance, List<Dependency> start,
+			TraversePredicate predicate) {
+		if (distance <= 0) {
+			return;
 		}
 
-		public WordToken getFrom() {
-			return from;
-		}
-
-		public Dependency getDependency() {
-			return dependency;
-		}
-
-		public WordToken getTo() {
-			return to;
-		}
-
-		public WordToken getOther(WordToken token) {
-			return token.equals(to) ? from : to;
-		}
-
-		public boolean isTo(WordToken token) {
-			return token.equals(to);
-		}
-
-		public boolean isFrom(WordToken token) {
-			return token.equals(from);
+		final int governorDistance = distance - 1;
+		for (final Dependency d : start) {
+			if (governorDistance > 0) {
+				if (predicate.test(d, d.getDependent(), d.getGovernor())) {
+					traverse(governorDistance, d.getGovernor(), predicate);
+				}
+			}
+			if (predicate.test(d, d.getGovernor(), d.getDependent())) {
+				traverse(distance, d.getDependent(), predicate);
+			}
 		}
 	}
 
-	private static class WordDistance implements Comparable<WordDistance> {
+	private void traverse(int distance, WordToken token, TraversePredicate predicate) {
+		final int newDistance = distance - 1;
 
-		private final WordToken word;
-
-		private final WordDistance wordDistance;
-
-		private final int distance;
-
-		public WordDistance(WordToken word) {
-			this.word = word;
-			this.wordDistance = null;
-			this.distance = 0;
-		}
-
-		public WordDistance(WordToken word, WordDistance wordDistance) {
-			this.word = word;
-			this.wordDistance = wordDistance;
-			this.distance = wordDistance.getDistance() + 1;
-		}
-
-		public WordToken getWord() {
-			return word;
-		}
-
-		public int getDistance() {
-			return distance;
-		}
-
-		public WordDistance getWordDistance() {
-			return wordDistance;
-		}
-
-		public List<WordToken> getWords() {
-			if (wordDistance == null) {
-				return Collections.singletonList(word);
-			} else {
-				return collate(new ArrayList<>(distance));
+		for (Edge e : edges.get(token)) {
+			WordToken other = e.getOther(token);
+			if (predicate.test(e.getDependency(), token, other) && newDistance > 0) {
+				traverse(newDistance, other, predicate);
 			}
 		}
+	}
 
-		protected List<WordToken> collate(List<WordToken> list) {
-			if (wordDistance != null) {
-				list = wordDistance.collate(list);
-			}
-			list.add(word);
-			return list;
-		}
+	@FunctionalInterface
+	public interface TraversePredicate {
 
-		@Override
-		public int compareTo(WordDistance o) {
-			return Integer.compare(getDistance(), o.getDistance());
-		}
-
-		@Override
-		public String toString() {
-			return word.getCoveredText() + " " + distance;
-		}
+		boolean test(Dependency dependency, WordToken from, WordToken to);
 
 	}
 
