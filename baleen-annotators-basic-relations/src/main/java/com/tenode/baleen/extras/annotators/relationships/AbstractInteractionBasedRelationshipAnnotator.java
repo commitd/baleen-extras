@@ -1,19 +1,20 @@
 package com.tenode.baleen.extras.annotators.relationships;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.google.common.base.Objects;
 import com.tenode.baleen.extras.common.annotators.SpanUtils;
 
 import uk.gov.dstl.baleen.types.language.Interaction;
-import uk.gov.dstl.baleen.types.language.Sentence;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
@@ -26,36 +27,15 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		try {
 			preExtract(jCas);
 
-			for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
+			extract(jCas);
 
-				final List<Interaction> interactions = JCasUtil.selectCovered(jCas, Interaction.class, sentence);
-				final List<Entity> entities = JCasUtil.selectCovered(jCas, Entity.class, sentence);
-
-				// Check we have enough in the sentence to warrant further work
-				if (!interactions.isEmpty() && entities.size() >= 2) {
-					final Stream<Relation> relations = extract(jCas, sentence, interactions, entities);
-
-					if (relations != null) {
-						relations
-								// Only add events aren't in the same
-								// Prevents overlapping spans since that makes no sense
-								.filter(r -> r.getSource().getInternalId() != r.getTarget().getInternalId()
-										&& !SpanUtils.overlaps(r.getSource(), r.getTarget()))
-								// Discard anything which has no relationship type
-								// TODO: Is this sensible, these are direct connection between A and
-								// B for the dependency graph (you can't be more connected than
-								// that) but then you have no relationship text to work with.
-								.filter(r -> r.getRelationshipType() != null
-										|| !StringUtils.isBlank(r.getRelationshipType()))
-								.forEach(this::addToJCasIndex);
-					}
-				}
-			}
 		} finally {
 			postExtract(jCas);
 		}
 
 	}
+
+	protected abstract void extract(JCas jCas);
 
 	protected void preExtract(final JCas jCas) {
 		// Do nothing
@@ -63,6 +43,23 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 
 	protected void postExtract(final JCas jCas) {
 		// Do nothing
+	}
+
+	protected void addRelationsToIndex(final Stream<Relation> relations) {
+		if (relations != null) {
+			relations
+					// Only add events aren't in the same
+					// Prevents overlapping spans since that makes no sense
+					.filter(r -> r.getSource().getInternalId() != r.getTarget().getInternalId()
+							&& !SpanUtils.overlaps(r.getSource(), r.getTarget()))
+					// Discard anything which has no relationship type
+					// TODO: Is this sensible, these are direct connection between A and
+					// B for the dependency graph (you can't be more connected than
+					// that) but then you have no relationship text to work with.
+					.filter(r -> r.getRelationshipType() != null
+							|| !StringUtils.isBlank(r.getRelationshipType()))
+					.forEach(this::addToJCasIndex);
+		}
 	}
 
 	protected Relation createRelation(final JCas jCas, final Interaction interaction, final Entity source,
@@ -89,15 +86,24 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	}
 
 	protected Stream<Relation> createMeshedRelations(final JCas jCas, final Interaction interaction,
-			final List<Entity> entities) {
+			final Collection<Entity> collection) {
 
 		final List<Relation> relations = new LinkedList<>();
 
-		for (int i = 0; i < entities.size(); i++) {
-			for (int j = i + 1; j < entities.size(); j++) {
+		List<Entity> entities;
+		if (collection instanceof List) {
+			entities = (List<Entity>) collection;
+		} else {
+			entities = new ArrayList<>(collection);
+		}
 
-				final Entity source = entities.get(i);
-				final Entity target = entities.get(j);
+		ListIterator<Entity> outer = entities.listIterator();
+		while (outer.hasNext()) {
+			final Entity source = outer.next();
+
+			ListIterator<Entity> inner = entities.listIterator(outer.nextIndex());
+			while (inner.hasNext()) {
+				final Entity target = inner.next();
 
 				relations.add(createRelation(jCas, interaction, source, target));
 			}
@@ -105,9 +111,6 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 
 		return relations.stream();
 	}
-
-	protected abstract Stream<Relation> extract(JCas jCas, Sentence sentence, List<Interaction> interactions,
-			List<Entity> entities);
 
 	protected Stream<Relation> distinct(final Stream<Relation> stream) {
 		return stream.map(RelationWrapper::new)

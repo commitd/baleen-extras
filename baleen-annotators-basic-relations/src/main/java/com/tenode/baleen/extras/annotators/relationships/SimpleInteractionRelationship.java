@@ -1,5 +1,6 @@
 package com.tenode.baleen.extras.annotators.relationships;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,11 +36,12 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
  * You can clean up some of these if your relations have source-target type information. See
  * RelationTypeFilter.
  */
-public class SimpleInteractionRelationship extends AbstractInteractionBasedRelationshipAnnotator {
+public class SimpleInteractionRelationship extends AbstractInteractionBasedSentenceRelationshipAnnotator {
 
 	@Override
-	protected Stream<Relation> extract(final JCas jCas, final Sentence sentence, final List<Interaction> interactions,
-			final List<Entity> entities) {
+	protected Stream<Relation> extract(final JCas jCas, final Sentence sentence,
+			final Collection<Interaction> interactions,
+			final Collection<Entity> entities) {
 
 		return interactions.stream().flatMap(i -> {
 
