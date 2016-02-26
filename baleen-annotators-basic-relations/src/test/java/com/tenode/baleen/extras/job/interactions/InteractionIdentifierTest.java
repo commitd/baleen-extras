@@ -21,7 +21,6 @@ import com.tenode.baleen.extras.jobs.interactions.data.Word;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;
-import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.uima.UimaMonitor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,11 +30,9 @@ public class InteractionIdentifierTest {
 	UimaMonitor monitor;
 
 	private InteractionIdentifier identifier;
-	private Dictionary dictionary;;
 
 	@Before
 	public void before() throws JWNLException {
-		dictionary = Dictionary.getDefaultResourceInstance();
 		identifier = new InteractionIdentifier(monitor, 1, 0.2);
 	}
 
@@ -63,8 +60,7 @@ public class InteractionIdentifierTest {
 		Stream<InteractionWord> words = identifier.process(patterns);
 
 		List<String> list = words
-				.flatMap(w -> w.getAlternativeWords(dictionary))
-				.distinct()
+				.map(w -> w.getWord().getLemma())
 				.collect(Collectors.toList());
 		// Only mother, brother and law appear often enough to be consider interaction words
 		assertTrue(list.contains("mother"));

@@ -1,5 +1,6 @@
 package com.tenode.baleen.extras.jobs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,14 +22,12 @@ import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
 import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
 import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
-import com.tenode.baleen.extras.jobs.writers.CsvInteractionWriter;
-import com.tenode.baleen.extras.jobs.writers.InteractionWordWriter;
-import com.tenode.baleen.extras.jobs.writers.MongoInteractionWriter;
-import com.tenode.baleen.extras.jobs.writers.MonitorInteractionWriter;
+import com.tenode.baleen.extras.jobs.io.CsvInteractionWriter;
+import com.tenode.baleen.extras.jobs.io.InteractionWriter;
+import com.tenode.baleen.extras.jobs.io.MonitorInteractionWriter;
 import com.tenode.baleen.wordnet.WordNetUtils;
 import com.tenode.baleen.wordnet.resources.WordNetResource;
 
-import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.resources.SharedMongoResource;
 import uk.gov.dstl.baleen.uima.jobs.BaleenTask;
 import uk.gov.dstl.baleen.uima.jobs.JobSettings;
@@ -42,15 +41,6 @@ import uk.gov.dstl.baleen.uima.jobs.JobSettings;
 public class IdentifyInteractions extends BaleenTask {
 
 	/**
-	 * Connection to Wordnet
-	 *
-	 * @baleen.resource com.tenode.baleen.resources.wordnet.WordNetResource}
-	 */
-	public static final String KEY_WORDNET = "wordnet";
-	@ExternalResource(key = KEY_WORDNET)
-	private WordNetResource wordnet;
-
-	/**
 	 * Connection to Mongo
 	 *
 	 * @baleen.resource uk.gov.dstl.baleen.resources.SharedMongoResource
@@ -58,6 +48,15 @@ public class IdentifyInteractions extends BaleenTask {
 	public static final String KEY_MONGO = "mongo";
 	@ExternalResource(key = KEY_MONGO)
 	private SharedMongoResource mongo;
+
+	/**
+	 * Connection to Wordnet
+	 *
+	 * @baleen.resource com.tenode.baleen.resources.wordnet.WordNetResource}
+	 */
+	public static final String KEY_WORDNET = "wordnet";
+	@ExternalResource(key = KEY_WORDNET)
+	private WordNetResource wordnet;
 
 	/**
 	 *
@@ -68,24 +67,6 @@ public class IdentifyInteractions extends BaleenTask {
 	public static final String KEY_PATTERN_COLLECTION = "patternCollection";
 	@ConfigurationParameter(name = KEY_PATTERN_COLLECTION, defaultValue = "patterns")
 	private String patternCollection;
-
-	/**
-	 * The name of the Mongo collection to outputs type (source, target, type) constraints too
-	 *
-	 * @baleen.config patterns
-	 */
-	public static final String KEY_RELATIONSHIP_COLLECTION = "relationTypesCollection";
-	@ConfigurationParameter(name = KEY_RELATIONSHIP_COLLECTION, defaultValue = "relationTypes")
-	private String relationTypesCollection;
-
-	/**
-	 * The name of the Mongo collection to output the words to
-	 *
-	 * @baleen.config patterns
-	 */
-	public static final String KEY_INTERACTION_COLLECTION = "interactionCollection";
-	@ConfigurationParameter(name = KEY_INTERACTION_COLLECTION, defaultValue = "interactions")
-	private String interactionCollection;
 
 	/**
 	 * The name of the Mongo collection to hold the patterns
@@ -121,13 +102,11 @@ public class IdentifyInteractions extends BaleenTask {
 	 *
 	 * @baleen.config csv interactions-
 	 */
-	public static final String KEY_CSV_FILENAME = "csv";
+	public static final String KEY_CSV_FILENAME = "filename";
 	@ConfigurationParameter(name = KEY_CSV_FILENAME, defaultValue = "interactions.csv")
 	private String csvFilename;
 
-	private Dictionary dictionary;
-
-	private final List<InteractionWordWriter> interactionWriters = new ArrayList<>();
+	private final List<InteractionWriter> interactionWriters = new ArrayList<>();
 
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
@@ -137,19 +116,13 @@ public class IdentifyInteractions extends BaleenTask {
 			interactionWriters.add(new MonitorInteractionWriter(getMonitor()));
 		}
 
-		if (StringUtils.isNotEmpty(interactionCollection) && StringUtils.isNotEmpty(relationTypesCollection)) {
-			interactionWriters
-					.add(new MongoInteractionWriter(mongo.getDB(), relationTypesCollection, interactionCollection));
-		}
-
 		if (StringUtils.isNotEmpty(csvFilename)) {
-			interactionWriters.add(new CsvInteractionWriter(getMonitor(), csvFilename));
+			interactionWriters.add(new CsvInteractionWriter(csvFilename));
 		}
 	}
 
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
-		dictionary = wordnet.getDictionary();
 		InteractionIdentifier identifier = new InteractionIdentifier(getMonitor(), minPatternsInCluster, threshold);
 		getMonitor().info("Loading patterns from Mongo");
 		List<PatternReference> patterns = readPatternsFromMongo();
@@ -201,22 +174,32 @@ public class IdentifyInteractions extends BaleenTask {
 
 	private void write(Stream<InteractionWord> words) {
 
-		interactionWriters.forEach(w -> w.initialise());
+		interactionWriters.forEach(w -> {
+			try {
+				w.initialise();
+			} catch (IOException e) {
+				getMonitor().error("Unable to initialise writer", e);
+			}
+		});
 
 		words.forEach(interaction -> {
-			List<String> alternatives = interaction.getAlternativeWords(dictionary)
-					.map(s -> s.trim().toLowerCase())
-					.filter(s -> s.length() > 2)
-					.collect(Collectors.toList());
 			String lemma = interaction.getWord().getLemma();
 
 			// TODO: Find the best
 			String relationshipType = wordnet.getSuperSenses(interaction.getWord().getPos(), lemma).findAny()
 					.orElse(lemma);
 
-			if (!alternatives.isEmpty()) {
-				interactionWriters.forEach(writer -> writer.write(interaction, relationshipType, lemma, alternatives));
-			}
+			interaction.toRelations(relationshipType, lemma)
+					.forEach(r -> {
+				interactionWriters.forEach(w -> {
+
+					try {
+						w.write(r);
+					} catch (IOException e) {
+						getMonitor().warn("Unable to initialise writer", e);
+					}
+				});
+			});
 
 		});
 

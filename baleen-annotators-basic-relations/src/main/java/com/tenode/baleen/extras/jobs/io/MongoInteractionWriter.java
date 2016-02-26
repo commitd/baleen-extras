@@ -1,13 +1,13 @@
-package com.tenode.baleen.extras.jobs.writers;
+package com.tenode.baleen.extras.jobs.io;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
+import com.tenode.baleen.extras.jobs.interactions.data.InteractionRelation;
 
-public class MongoInteractionWriter implements InteractionWordWriter {
+public class MongoInteractionWriter implements InteractionWriter {
 
 	private final DBCollection relationTypes;
 	private final DBCollection interactions;
@@ -18,22 +18,22 @@ public class MongoInteractionWriter implements InteractionWordWriter {
 	}
 
 	@Override
-	public void write(InteractionWord interaction, String relationshipType, String lemma, List<String> alternatives) {
+	public void write(InteractionRelation interaction,
+			Collection<String> alternatives) {
 		// Write to the interactions collection
 		// ADd in relationshiptype and subtype (which can be manually changed later)
 		BasicDBObject interactionObject = new BasicDBObject("value", alternatives);
-		interactionObject.put("relationshipType", relationshipType);
-		interactionObject.put("relationSubType", lemma);
+		interactionObject.put("relationshipType", interaction.getType());
+		interactionObject.put("relationSubType", interaction.getSubType());
 		interactions.save(interactionObject);
 
 		// Write out to the relationship constraints
-		interaction.getPairs().stream().forEach(p -> {
-			BasicDBObject relationTypeObject = new BasicDBObject()
-					.append("source", p.getSource())
-					.append("target", p.getTarget())
-					.append("type", relationshipType);
-			relationTypes.save(relationTypeObject);
-		});
+		BasicDBObject relationTypeObject = new BasicDBObject()
+				.append("source", interaction.getSource())
+				.append("target", interaction.getTarget())
+				.append("type", interaction.getType());
+		relationTypes.save(relationTypeObject);
+
 	}
 
 }

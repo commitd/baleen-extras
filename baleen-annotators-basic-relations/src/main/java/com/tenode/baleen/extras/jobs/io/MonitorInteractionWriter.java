@@ -1,13 +1,13 @@
-package com.tenode.baleen.extras.jobs.writers;
+package com.tenode.baleen.extras.jobs.io;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
-import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
+import com.tenode.baleen.extras.jobs.interactions.data.InteractionRelation;
 
 import uk.gov.dstl.baleen.uima.UimaMonitor;
 
-public class MonitorInteractionWriter implements InteractionWordWriter {
+public class MonitorInteractionWriter implements InteractionWriter {
 
 	private final UimaMonitor monitor;
 
@@ -16,13 +16,10 @@ public class MonitorInteractionWriter implements InteractionWordWriter {
 	}
 
 	@Override
-	public void write(InteractionWord word, String relationshipType, String lemma, List<String> alternatives) {
-		monitor.info("Interaction {} {}", relationshipType,
+	public void write(InteractionRelation interaction, Collection<String> alternatives) {
+		monitor.info("Interaction {} {} {} {} {}", interaction.getType(), interaction.getSubType(),
+				interaction.getSource(), interaction.getTarget(),
 				alternatives.stream().collect(Collectors.joining(";")));
-
-		word.getPairs().stream().forEach(p -> {
-			monitor.info("Interaction constraints {} {}", p.getSource(), p.getTarget());
-		});
 	}
 
 }
