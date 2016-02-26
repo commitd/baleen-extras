@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
+import org.apache.uima.resource.ResourceInitializationException;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -18,6 +21,10 @@ import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
 import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
 import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
+import com.tenode.baleen.extras.jobs.writers.CsvInteractionWriter;
+import com.tenode.baleen.extras.jobs.writers.InteractionWordWriter;
+import com.tenode.baleen.extras.jobs.writers.MongoInteractionWriter;
+import com.tenode.baleen.extras.jobs.writers.MonitorInteractionWriter;
 import com.tenode.baleen.wordnet.WordNetUtils;
 import com.tenode.baleen.wordnet.resources.WordNetResource;
 
@@ -54,9 +61,9 @@ public class IdentifyInteractions extends BaleenTask {
 
 	/**
 	 *
-	 * The name of the Mongo collection to output the words to
+	 * The name of the Mongo collection to read
 	 *
-	 * @baleen.config relationTypes
+	 * @baleen.config patterns
 	 */
 	public static final String KEY_PATTERN_COLLECTION = "patternCollection";
 	@ConfigurationParameter(name = KEY_PATTERN_COLLECTION, defaultValue = "patterns")
@@ -103,11 +110,42 @@ public class IdentifyInteractions extends BaleenTask {
 	 *
 	 * @baleen.config patterns false
 	 */
-	public static final String KEY_OUTPUT = "output";
+	public static final String KEY_OUTPUT = "log";
 	@ConfigurationParameter(name = KEY_OUTPUT, defaultValue = "false")
-	private boolean output;
+	private boolean outputToLog;
+
+	/**
+	 * Save the data to csv, with filename prefixed by tje value.
+	 *
+	 * Leave this blank for no output.
+	 *
+	 * @baleen.config csv interactions-
+	 */
+	public static final String KEY_CSV_FILENAME = "csv";
+	@ConfigurationParameter(name = KEY_CSV_FILENAME, defaultValue = "interactions.csv")
+	private String csvFilename;
 
 	private Dictionary dictionary;
+
+	private final List<InteractionWordWriter> interactionWriters = new ArrayList<>();
+
+	@Override
+	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
+		super.doInitialize(aContext);
+
+		if (outputToLog) {
+			interactionWriters.add(new MonitorInteractionWriter(getMonitor()));
+		}
+
+		if (StringUtils.isNotEmpty(interactionCollection) && StringUtils.isNotEmpty(relationTypesCollection)) {
+			interactionWriters
+					.add(new MongoInteractionWriter(mongo.getDB(), relationTypesCollection, interactionCollection));
+		}
+
+		if (StringUtils.isNotEmpty(csvFilename)) {
+			interactionWriters.add(new CsvInteractionWriter(getMonitor(), csvFilename));
+		}
+	}
 
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
@@ -118,8 +156,8 @@ public class IdentifyInteractions extends BaleenTask {
 		getMonitor().info("Found {} patterns", patterns.size());
 		getMonitor().info("Extracting interaction words...");
 		Stream<InteractionWord> words = identifier.process(patterns);
-		getMonitor().info("Writing interaction words to Mongo...");
-		writeToMongo(words);
+		getMonitor().info("Writing interaction words...");
+		write(words);
 		getMonitor().info("Interaction identification complete");
 
 	}
@@ -161,10 +199,9 @@ public class IdentifyInteractions extends BaleenTask {
 
 	}
 
-	private void writeToMongo(Stream<InteractionWord> words) {
+	private void write(Stream<InteractionWord> words) {
 
-		DBCollection interactions = mongo.getDB().getCollection(interactionCollection);
-		DBCollection relationTypes = mongo.getDB().getCollection(relationTypesCollection);
+		interactionWriters.forEach(w -> w.initialise());
 
 		words.forEach(interaction -> {
 			List<String> alternatives = interaction.getAlternativeWords(dictionary)
@@ -178,34 +215,12 @@ public class IdentifyInteractions extends BaleenTask {
 					.orElse(lemma);
 
 			if (!alternatives.isEmpty()) {
-				// Write to the interactions collection
-				// ADd in relationshiptype and subtype (which can be manually changed later)
-				BasicDBObject interactionObject = new BasicDBObject("value", alternatives);
-				interactionObject.put("relationshipType", relationshipType);
-				interactionObject.put("relationSubType", lemma);
-				interactions.save(interactionObject);
-
-				if (output) {
-					getMonitor().info("Interaction {} {}", relationshipType,
-							alternatives.stream().collect(Collectors.joining(";")));
-				}
-
-				// Write out to the relationship constraints
-				interaction.getPairs().stream().forEach(p -> {
-					BasicDBObject relationTypeObject = new BasicDBObject()
-							.append("source", p.getSource())
-							.append("target", p.getTarget())
-							.append("type", relationshipType);
-					relationTypes.save(relationTypeObject);
-
-					if (output) {
-						getMonitor().info("Interaction constraints {} {}", p.getSource(), p.getTarget());
-					}
-				});
-
+				interactionWriters.forEach(writer -> writer.write(interaction, relationshipType, lemma, alternatives));
 			}
 
 		});
+
+		interactionWriters.forEach(w -> w.destroy());
 	}
 
 }
