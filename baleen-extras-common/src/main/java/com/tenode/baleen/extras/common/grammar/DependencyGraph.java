@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.tenode.baleen.extras.common.grammar.data.Edge;
+import com.tenode.baleen.extras.common.grammar.data.ImmutableStack;
 import com.tenode.baleen.extras.common.grammar.data.WordDistance;
 
 import uk.gov.dstl.baleen.types.language.Dependency;
@@ -377,32 +378,37 @@ public class DependencyGraph {
 		return graph;
 	}
 
-	public void traverse(int distance, List<Dependency> start,
+	public void traverse(int distance, Collection<Dependency> start,
 			TraversePredicate predicate) {
 		if (distance <= 0) {
 			return;
 		}
 
+		ImmutableStack<WordToken> history = new ImmutableStack<WordToken>();
+
 		final int governorDistance = distance - 1;
 		for (final Dependency d : start) {
 			if (governorDistance > 0) {
-				if (predicate.test(d, d.getDependent(), d.getGovernor())) {
-					traverse(governorDistance, d.getGovernor(), predicate);
+				if (predicate.test(d, d.getDependent(), d.getGovernor(), history)) {
+					ImmutableStack<WordToken> stack = history.push(d.getDependent());
+					traverse(governorDistance, d.getGovernor(), stack, predicate);
 				}
 			}
-			if (predicate.test(d, d.getGovernor(), d.getDependent())) {
-				traverse(distance, d.getDependent(), predicate);
+			if (predicate.test(d, d.getGovernor(), d.getDependent(), history)) {
+				traverse(distance, d.getDependent(), history, predicate);
 			}
 		}
 	}
 
-	private void traverse(int distance, WordToken token, TraversePredicate predicate) {
+	private void traverse(int distance, WordToken token, ImmutableStack<WordToken> history,
+			TraversePredicate predicate) {
 		final int newDistance = distance - 1;
 
 		for (Edge e : edges.get(token)) {
 			WordToken other = e.getOther(token);
-			if (predicate.test(e.getDependency(), token, other) && newDistance > 0) {
-				traverse(newDistance, other, predicate);
+			if (predicate.test(e.getDependency(), token, other, history) && newDistance > 0) {
+				ImmutableStack<WordToken> stack = history.push(other);
+				traverse(newDistance, other, stack, predicate);
 			}
 		}
 	}
@@ -410,7 +416,7 @@ public class DependencyGraph {
 	@FunctionalInterface
 	public interface TraversePredicate {
 
-		boolean test(Dependency dependency, WordToken from, WordToken to);
+		boolean test(Dependency dependency, WordToken from, WordToken to, ImmutableStack<WordToken> history);
 
 	}
 
