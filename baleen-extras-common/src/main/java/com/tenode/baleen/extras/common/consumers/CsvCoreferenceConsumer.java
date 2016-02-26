@@ -25,7 +25,7 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 		write("source", "id", "reference", "type", "text", "value",
-				"EntityCount then Entities... then WordCount then words...");
+				"EntityCount then Entities... then nonEntityNonStopWords (format word then pos) then NonStopWordsNotCoveredByEntitiesCount then (format word then pos)...");
 	}
 
 	@Override
@@ -74,11 +74,11 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 
 			Collection<Entity> entities = coveredEntities.get(sentence);
 
+			// Entities
 			int entityCountIndex = list.size();
 			int entityCount = 0;
 			list.add("0");
 
-			// Entities
 			for (Entity x : entities) {
 				if (x.getInternalId() != e.getInternalId()) {
 					list.add(normalize(x.getValue()));
@@ -88,29 +88,45 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 			}
 			list.set(entityCountIndex, Integer.toString(entityCount));
 
-			// Add words which aren't entities
+			// Add (non-stop) words - separate out the entities from the other words
 
-			// Add a placeholder for the word count
-			int wordCountIndex = list.size();
-			list.add("0");
+			List<WordToken> entityNonStopWords = new ArrayList<>();
+			List<WordToken> nonEntityNonStopWords = new ArrayList<>();
 
-			int wordCount = 0;
 			for (WordToken t : coveredTokens.get(sentence)) {
 				// Filter out entities
-				Collection<Entity> collection = coveringEntity.get(t);
 				String word = t.getCoveredText();
-				if ((collection == null || collection.isEmpty()) && !stopWordRemover.isStopWord(word)) {
-					list.add(normalize(word));
-					wordCount++;
+				if (!stopWordRemover.isStopWord(word)) {
+
+					Collection<Entity> collection = coveringEntity.get(t);
+					if (collection == null || collection.isEmpty()) {
+						nonEntityNonStopWords.add(t);
+					} else if (!collection.stream().anyMatch(x -> e.getInternalId() == x.getInternalId())) {
+						// Output any entity other than the one we are processing
+						entityNonStopWords.add(t);
+					}
 				}
 			}
-			list.set(wordCountIndex, Integer.toString(wordCount));
 
-			// TODO: Add related entities too? they'd likely just be in the same sentence though
+			// We output
+
+			list.add(Integer.toString(entityNonStopWords.size()));
+			entityNonStopWords.forEach(t -> {
+				list.add(normalize(t.getCoveredText()));
+				list.add(t.getPartOfSpeech());
+			});
+
+			list.add(Integer.toString(nonEntityNonStopWords.size()));
+			nonEntityNonStopWords.forEach(t -> {
+				list.add(normalize(t.getCoveredText()));
+				list.add(t.getPartOfSpeech());
+			});
+
+			// TODO: Add related entities too? they'd likely just be in the same sentence and hence
+			// are already included. They could at least be given a higher priority when clustering.
 
 			return list.toArray(new String[list.size()]);
-		}).filter(Objects::nonNull)
-				.forEach(this::write);
+		}).filter(Objects::nonNull).forEach(this::write);
 	}
 
 }

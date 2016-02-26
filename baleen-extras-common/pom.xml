@@ -22,6 +22,11 @@
 			<groupId>uk.gov.dstl.baleen</groupId>
 			<artifactId>baleen-annotators</artifactId>
 			<version>${baleen.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.2</version>
+		</dependency>
 	</dependencies>
 </project>
