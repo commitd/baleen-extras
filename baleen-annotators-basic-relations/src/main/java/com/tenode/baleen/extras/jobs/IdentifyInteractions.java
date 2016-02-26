@@ -182,26 +182,25 @@ public class IdentifyInteractions extends BaleenTask {
 			}
 		});
 
-		words.forEach(interaction -> {
+		words.flatMap(interaction -> {
 			String lemma = interaction.getWord().getLemma();
 
 			// TODO: Find the best
 			String relationshipType = wordnet.getSuperSenses(interaction.getWord().getPos(), lemma).findAny()
 					.orElse(lemma);
 
-			interaction.toRelations(relationshipType, lemma)
-					.forEach(r -> {
-				interactionWriters.forEach(w -> {
+			return interaction.toRelations(relationshipType, lemma);
+		}).distinct()
+				.forEach(r -> {
+					interactionWriters.forEach(w -> {
 
-					try {
-						w.write(r);
-					} catch (IOException e) {
-						getMonitor().warn("Unable to initialise writer", e);
-					}
+						try {
+							w.write(r);
+						} catch (IOException e) {
+							getMonitor().warn("Unable to initialise writer", e);
+						}
+					});
 				});
-			});
-
-		});
 
 		interactionWriters.forEach(w -> w.destroy());
 	}
