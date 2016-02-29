@@ -20,6 +20,24 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.uima.jobs.BaleenTask;
 import uk.gov.dstl.baleen.uima.jobs.JobSettings;
 
+/**
+ * Enhance and extend the list of interaction words through WordNet.
+ *
+ * This is useful for increasing the range of a words which are considered for interaction gazetteer
+ * matching without increasing the manual effort. It is likely that the user will will to review the
+ * words after running this, to ensure the words truely have the same meaning at the relationship
+ * requires.
+ *
+ * The CSV file, see {@link CsvInteractionReader} and {@link CsvInteractionWriter} for format
+ * information, is read. This lemma and POS are used to find additional dictionary words which have
+ * the same meaning.
+ *
+ * The output is saved back in the same format.
+ *
+ *
+ * @baleen.javadoc
+ *
+ */
 public class EnhanceInteractions extends BaleenTask {
 
 	/**
@@ -86,7 +104,14 @@ public class EnhanceInteractions extends BaleenTask {
 
 	}
 
-	public Stream<String> getAlternativeWords(Word word) {
+	/**
+	 * Gets the alternative words from the dictionary.
+	 *
+	 * @param word
+	 *            the word
+	 * @return the alternative words (non null and always contains the word itself)
+	 */
+	private Stream<String> getAlternativeWords(Word word) {
 		IndexWord indexWord = null;
 		try {
 			indexWord = dictionary.lookupIndexWord(word.getPos(), word.getLemma());

@@ -3,6 +3,10 @@ package com.tenode.baleen.extras.jobs.interactions.data;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * A word which represents an interaction trigger (ie relation of interest) between two types of
+ * entities.
+ */
 public class InteractionWord {
 
 	private final Word word;
@@ -21,8 +25,8 @@ public class InteractionWord {
 		return pairs;
 	}
 
-	public Stream<InteractionRelation> toRelations(String type, String subType) {
-		return pairs.stream().map(p -> new InteractionRelation(type, subType, word, p.getSource(), p.getTarget()));
+	public Stream<InteractionDefinition> toRelations(String type, String subType) {
+		return pairs.stream().map(p -> new InteractionDefinition(type, subType, word, p.getSource(), p.getTarget()));
 	}
 
 	@Override

@@ -1,3 +1,4 @@
+
 package com.tenode.baleen.extras.jobs.io;
 
 import java.io.FileReader;
@@ -11,20 +12,41 @@ import java.util.stream.StreamSupport;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 
-import com.tenode.baleen.extras.jobs.interactions.data.InteractionRelation;
+import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
 import com.tenode.baleen.extras.jobs.interactions.data.Word;
 
 import net.sf.extjwnl.data.POS;
 
+/**
+ * Read interactions from CSV.
+ *
+ * This reads interaction data as written by the {@link CsvInteractionWriter}.
+ *
+ */
 public class CsvInteractionReader {
 
 	private final String inputFilename;
 
+	/**
+	 * Instantiates a new CSV interaction reader.
+	 *
+	 * @param inputFilename
+	 *            the input filename
+	 */
 	public CsvInteractionReader(String inputFilename) {
 		this.inputFilename = inputFilename;
 	}
 
-	public void read(BiConsumer<InteractionRelation, Collection<String>> consumer) throws IOException {
+	/**
+	 * Read the CSV file and send interactions to the consumer
+	 *
+	 * @param consumer
+	 *            the consumer (first param is the InteractionRelation and the second the list of
+	 *            alternative words)
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public void read(BiConsumer<InteractionDefinition, Collection<String>> consumer) throws IOException {
 
 		try (CSVParser parser = new CSVParser(new FileReader(inputFilename), CSVFormat.RFC4180)) {
 			StreamSupport.stream(parser.spliterator(), false)
@@ -36,7 +58,7 @@ public class CsvInteractionReader {
 						String lemma = r.get(4);
 						POS pos = POS.getPOSForLabel(r.get(5));
 
-						InteractionRelation i = new InteractionRelation(type, subType, new Word(lemma, pos), source,
+						InteractionDefinition i = new InteractionDefinition(type, subType, new Word(lemma, pos), source,
 								target);
 
 						List<String> alternatives = new ArrayList<>(r.size() - 6);

@@ -19,10 +19,19 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * A base class for relationship extractors which use interaction words as a trigger.
+ *
+ * Implementations should override extract, and potentially preExtract and postExtract. These latter
+ * functions allow for creation and tidying up of objects related to extraction.
+ *
+ * There are numerous helper methods which support relations.
+ *
+ */
 public abstract class AbstractInteractionBasedRelationshipAnnotator extends BaleenAnnotator {
 
 	@Override
-	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
+	protected final void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
 		try {
 			preExtract(jCas);
@@ -35,16 +44,42 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 
 	}
 
+	/**
+	 * Extract relations from the jCas.
+	 *
+	 * It is the overridders repsonisbility to add these to the jCas Index (addRelationsToIndex)
+	 *
+	 * @param jCas
+	 *            the j cas
+	 */
 	protected abstract void extract(JCas jCas);
 
+	/**
+	 * Called before extract()
+	 *
+	 * @param jCas
+	 *            the jcas
+	 */
 	protected void preExtract(final JCas jCas) {
 		// Do nothing
 	}
 
+	/**
+	 * Called after extract (including on exception)
+	 *
+	 * @param jCas
+	 *            the jcas
+	 */
 	protected void postExtract(final JCas jCas) {
 		// Do nothing
 	}
 
+	/**
+	 * Adds a stream of relations to index.
+	 *
+	 * @param relations
+	 *            the relations
+	 */
 	protected void addRelationsToIndex(final Stream<Relation> relations) {
 		if (relations != null) {
 			relations
@@ -62,6 +97,19 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		}
 	}
 
+	/**
+	 * Creates the relation.
+	 *
+	 * @param jCas
+	 *            the jcas
+	 * @param interaction
+	 *            the interaction
+	 * @param source
+	 *            the source the source entity
+	 * @param target
+	 *            the target the target entity
+	 * @return the relation
+	 */
 	protected Relation createRelation(final JCas jCas, final Interaction interaction, final Entity source,
 			final Entity target) {
 		final Relation r = new Relation(jCas);
@@ -75,6 +123,20 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		return r;
 	}
 
+	/**
+	 * Creates the relations of the same type between from all the entities on the source list to
+	 * all the entities on the target list.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param interaction
+	 *            the interaction
+	 * @param sources
+	 *            the sources
+	 * @param targets
+	 *            the targets
+	 * @return the stream of relations
+	 */
 	protected Stream<Relation> createPairwiseRelations(final JCas jCas, final Interaction interaction,
 			final List<Entity> sources,
 			final List<Entity> targets) {
@@ -85,6 +147,18 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		});
 	}
 
+	/**
+	 * Creates the relations between all the entities provided (but not between an entity adn
+	 * itself)
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param interaction
+	 *            the interaction
+	 * @param collection
+	 *            the collection of entities to related
+	 * @return the stream of relations
+	 */
 	protected Stream<Relation> createMeshedRelations(final JCas jCas, final Interaction interaction,
 			final Collection<Entity> collection) {
 
@@ -112,6 +186,13 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 		return relations.stream();
 	}
 
+	/**
+	 * Make the stream distinct (no relations of the same type, between the same entities)
+	 *
+	 * @param stream
+	 *            the stream
+	 * @return the stream
+	 */
 	protected Stream<Relation> distinct(final Stream<Relation> stream) {
 		return stream.map(RelationWrapper::new)
 				.distinct()

@@ -19,18 +19,47 @@ import com.tenode.baleen.extras.jobs.interactions.data.Word;
 import net.sf.extjwnl.data.POS;
 import uk.gov.dstl.baleen.uima.UimaMonitor;
 
+/**
+ * Identify interaction words based on the patterns.
+ *
+ * This algorithm is based on the paper
+ * http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0102039.
+ *
+ * In effect having found all the patterns (word strings) which sit between two entities we look for
+ * common trigger/interaction words The patterns are clustered by similarity (based ont he words
+ * they contain). Then the content of the clusters is and common words extracted
+ */
 public class InteractionIdentifier {
 
 	private final int minPatternsInCluster;
+
 	private final double threshold;
+
 	private final UimaMonitor monitor;
 
+	/**
+	 * Instantiates a new interaction identifier.
+	 *
+	 * @param monitor
+	 *            the monitor to log to
+	 * @param minPatternsInCluster
+	 *            the minimum number of patterns in cluster (before its considered valid)
+	 * @param threshold
+	 *            the threshold for cluster (lower number more clusters)
+	 */
 	public InteractionIdentifier(UimaMonitor monitor, int minPatternsInCluster, double threshold) {
 		this.monitor = monitor;
 		this.minPatternsInCluster = minPatternsInCluster;
 		this.threshold = threshold;
 	}
 
+	/**
+	 * Process the pattern references and extract the list of distinct interaction words
+	 *
+	 * @param patterns
+	 *            the patterns
+	 * @return the stream
+	 */
 	public Stream<InteractionWord> process(List<PatternReference> patterns) {
 
 		Set<Word> terms = gatherTerms(patterns);
@@ -69,6 +98,13 @@ public class InteractionIdentifier {
 
 	}
 
+	/**
+	 * Extract interaction words from the clustered patterns
+	 *
+	 * @param clusters
+	 *            the clusters
+	 * @return the stream of interaction words
+	 */
 	private Stream<InteractionWord> extractInteractionWords(List<ClusteredPatterns> clusters) {
 		Stream<InteractionWord> distinctWords = clusters.stream().flatMap(cluster -> {
 			// TODO: Should we use token or terms here?
@@ -91,20 +127,48 @@ public class InteractionIdentifier {
 
 	}
 
+	/**
+	 * Gather the list of distinct terms.
+	 *
+	 * @param patterns
+	 *            the patterns
+	 * @return the set of words
+	 */
 	private Set<Word> gatherTerms(List<PatternReference> patterns) {
 		return patterns.stream()
 				.flatMap(p -> p.getTokens().stream())
 				.collect(Collectors.toSet());
 	}
 
+	/**
+	 * Calculate term frequencies for each pattern
+	 *
+	 * @param patterns
+	 *            the patterns
+	 * @param terms
+	 *            the terms
+	 */
 	private void calculateTermFrequencies(List<PatternReference> patterns, Set<Word> terms) {
 		patterns.forEach(p -> p.calculateTermFrequency(terms));
 	}
 
+	/**
+	 * Sort the patterns by term frequency
+	 *
+	 * @param patterns
+	 *            the patterns
+	 */
 	private void sort(List<PatternReference> patterns) {
 		Collections.sort(patterns, (a, b) -> b.getTFMagnitude() - a.getTFMagnitude());
 	}
 
+	/**
+	 * Cluster the patterns together based on similarity
+	 *
+	 * @param patterns
+	 *            the patterns
+	 * @return the list of clusters
+	 */
 	private List<ClusteredPatterns> cluster(List<PatternReference> patterns) {
 		final List<ClusteredPatterns> clusters = new ArrayList<>();
 
@@ -135,6 +199,13 @@ public class InteractionIdentifier {
 		return clusters;
 	}
 
+	/**
+	 * Calculate threshold for a set of patterns
+	 *
+	 * @param patterns
+	 *            the patterns
+	 * @return the double
+	 */
 	private double calculateThreshold(List<PatternReference> patterns) {
 		// TODO:
 		// Paper uses an algorithm which O(number of patterns * 2)
@@ -146,6 +217,12 @@ public class InteractionIdentifier {
 		return threshold;
 	}
 
+	/**
+	 * Filter clusters based on the min cluster size.
+	 *
+	 * @param clusters
+	 *            the clusters
+	 */
 	private void filterClusters(List<ClusteredPatterns> clusters) {
 		if (minPatternsInCluster != 0) {
 			Iterator<ClusteredPatterns> iterator = clusters.iterator();

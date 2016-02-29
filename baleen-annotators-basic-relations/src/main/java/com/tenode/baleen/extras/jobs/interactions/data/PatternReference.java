@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Holds information relating to a word pattern (set of words).
+ *
+ * Use to hold intermediate cluster calculations.
+ *
+ */
 public final class PatternReference {
 
 	private final String id;
@@ -13,54 +19,121 @@ public final class PatternReference {
 
 	private String targetType;
 
+	/** The tokens which form the pattern */
 	private final List<Word> tokens;
 
+	/** The term frequency against the global vector. */
 	private int[] termFrequency;
 
+	/** The term magnitude - sum of the termFrequencies. */
 	private int termMagnitude;
 
+	/**
+	 * Instantiates a new pattern reference.
+	 *
+	 * @param id
+	 *            the id
+	 * @param tokens
+	 *            the tokens
+	 */
 	public PatternReference(String id, List<Word> tokens) {
 		this.id = id;
 		this.tokens = tokens;
 	}
 
+	/**
+	 * Instantiates a new pattern reference.
+	 *
+	 * @param id
+	 *            the id
+	 * @param tokens
+	 *            the tokens
+	 */
 	public PatternReference(String id, Word... tokens) {
 		this.id = id;
 		this.tokens = Arrays.asList(tokens);
 	}
 
+	/**
+	 * Gets the source type.
+	 *
+	 * @return the source type
+	 */
 	public String getSourceType() {
 		return sourceType;
 	}
 
+	/**
+	 * Sets the source type.
+	 *
+	 * @param sourceType
+	 *            the new source type
+	 */
 	public void setSourceType(String sourceType) {
 		this.sourceType = sourceType;
 	}
 
+	/**
+	 * Gets the target type.
+	 *
+	 * @return the target type
+	 */
 	public String getTargetType() {
 		return targetType;
 	}
 
+	/**
+	 * Sets the target type.
+	 *
+	 * @param targetType
+	 *            the new target type
+	 */
 	public void setTargetType(String targetType) {
 		this.targetType = targetType;
 	}
 
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * Gets the tokens.
+	 *
+	 * @return the tokens
+	 */
 	public List<Word> getTokens() {
 		return tokens;
 	}
 
+	/**
+	 * Gets the TF magnitude.
+	 *
+	 * @return the TF magnitude
+	 */
 	public int getTFMagnitude() {
 		return termMagnitude;
 	}
 
+	/**
+	 * Gets the term frequency.
+	 *
+	 * @return the term frequency
+	 */
 	public int[] getTermFrequency() {
 		return termFrequency;
 	}
 
+	/**
+	 * Calculate term frequency given a set of words.
+	 *
+	 * @param terms
+	 *            the terms
+	 */
 	public void calculateTermFrequency(Set<Word> terms) {
 		termFrequency = new int[terms.size()];
 		termMagnitude = 0;
@@ -81,6 +154,15 @@ public final class PatternReference {
 
 	}
 
+	/**
+	 * Calculate similarity between this and another pattern,
+	 *
+	 * Uses the cosine distance.
+	 *
+	 * @param pattern
+	 *            the pattern
+	 * @return the double
+	 */
 	public double calculateSimilarity(PatternReference pattern) {
 		int[] otherTF = pattern.getTermFrequency();
 

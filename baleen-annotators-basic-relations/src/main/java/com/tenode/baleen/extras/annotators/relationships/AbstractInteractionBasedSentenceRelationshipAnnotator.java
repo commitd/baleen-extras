@@ -12,6 +12,14 @@ import uk.gov.dstl.baleen.types.language.Sentence;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;
 
+/**
+ * A base class for building relationship extractors which work at a sentence level.
+ *
+ * Override the extract method which provides sentence, interaction and entities within that
+ * sentence.
+ *
+ * See {@link AbstractInteractionBasedRelationshipAnnotator} for further information on options.
+ */
 public abstract class AbstractInteractionBasedSentenceRelationshipAnnotator
 		extends AbstractInteractionBasedRelationshipAnnotator {
 
@@ -36,6 +44,19 @@ public abstract class AbstractInteractionBasedSentenceRelationshipAnnotator
 		}
 	}
 
+	/**
+	 * Extract the relations from this sentence.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param sentence
+	 *            the sentence
+	 * @param interactions
+	 *            the interactions in the sentence
+	 * @param entities
+	 *            the entities in the sentence
+	 * @return the stream of relations (return nul or empty for none)
+	 */
 	protected abstract Stream<Relation> extract(JCas jCas, Sentence sentence, Collection<Interaction> interactions,
 			Collection<Entity> entities);
 

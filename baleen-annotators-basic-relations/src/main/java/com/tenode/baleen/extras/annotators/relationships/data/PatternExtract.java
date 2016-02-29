@@ -7,16 +7,10 @@ import java.util.stream.Collectors;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
-// TODO: Auto-generated Javadoc
 /**
  * A java bean corresponding to an extracted Pattern.
  *
  * A pattern is a range of text which it between two entities.
- */
-
-/**
- * @author chrisflatley
- *
  */
 public final class PatternExtract {
 

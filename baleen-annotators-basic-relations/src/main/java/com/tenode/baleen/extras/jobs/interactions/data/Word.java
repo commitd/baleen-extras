@@ -2,20 +2,44 @@ package com.tenode.baleen.extras.jobs.interactions.data;
 
 import net.sf.extjwnl.data.POS;
 
+/**
+ * A simple representation of a word (as Lemma and Part of Speech).
+ *
+ * Has sensible hashcode, equals and toString.
+ */
 public class Word {
 
 	private final String lemma;
+
 	private final POS pos;
 
+	/**
+	 * Instantiates a new word.
+	 *
+	 * @param lemma
+	 *            the lemma
+	 * @param pos
+	 *            the pos
+	 */
 	public Word(String lemma, POS pos) {
 		this.lemma = lemma;
 		this.pos = pos;
 	}
 
+	/**
+	 * Gets the lemma.
+	 *
+	 * @return the lemma
+	 */
 	public String getLemma() {
 		return lemma;
 	}
 
+	/**
+	 * Gets the pos.
+	 *
+	 * @return the pos
+	 */
 	public POS getPos() {
 		return pos;
 	}
@@ -56,7 +80,7 @@ public class Word {
 
 	@Override
 	public String toString() {
-		return pos + ":" + lemma;
+		return String.format("%s [%s]", lemma, pos);
 	}
 
 }

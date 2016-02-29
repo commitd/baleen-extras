@@ -15,12 +15,40 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import com.google.common.base.Strings;
 import com.mongodb.DBCollection;
+import com.tenode.baleen.extras.jobs.UploadInteractionsToMongo;
+import com.tenode.baleen.extras.jobs.io.MongoInteractionWriter;
 
 import uk.gov.dstl.baleen.resources.SharedMongoResource;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * Removes relationships which don't match UIMA type constraints.
+ *
+ * Many relationships will only make sense between specific entity tpes. For example (Person, went
+ * to, Location) not (DateTime, went to, Location). This filter allows the type constraints of
+ * relations to be defined.
+ *
+ * Since relatioship extractors may have different capabilities (eg find direction of relationship,
+ * discover new unknown relationships ) there are several configuration parameters which relax the
+ * strictness of filtering.
+ *
+ * Mongo constraint documents are formed as:
+ *
+ * <pre>
+ *    {
+ *    	source: 'type of source',
+ *    	target: 'type of source',
+ *    	type: 'relation type',
+ *    }
+ * </pre>
+ *
+ * See {@link UploadInteractionsToMongo} and {@link MongoInteractionWriter} for information how to
+ * create this collection.
+ *
+ * @baleen.javadoc
+ */
 public class RelationTypeFilter extends BaleenAnnotator {
 
 	/**

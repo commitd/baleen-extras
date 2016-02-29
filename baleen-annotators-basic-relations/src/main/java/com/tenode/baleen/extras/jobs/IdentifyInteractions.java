@@ -33,10 +33,33 @@ import uk.gov.dstl.baleen.uima.jobs.BaleenTask;
 import uk.gov.dstl.baleen.uima.jobs.JobSettings;
 
 /**
- * Identifity Interaction words based on a mongo collection of patterns.
+ * Identify interaction words based on a Mongo collection of patterns.
  *
- * This requires a wordnet dictionary and a mongo resource. The mongo collection should hold
- * patterns which have been extracted by a pipeline @see MongoPatternSaver containing.
+ * This requires a wordnet dictionary and a mongo resource (to read from). The mongo collection
+ * should hold patterns which have been extracted by a pipeline containing {@Link MongoPatternSaver}
+ *
+ * See {@link InteractionIdentifier} for more details of the implemntation.
+ *
+ * The relationship types are based on Wordnet supersenses (meaning the original file in which the
+ * word is defined). The provided a group of around 40 definitions.
+ *
+ * The output of this process is a CSV (format defined by {@link CsvInteractionWriter}.
+ *
+ * <pre>
+ * mongo:
+ *   db: baleen
+ *   host: localhost
+ *
+ * job:
+ *   tasks:
+ *   - class: com.tenode.baleen.extras.jobs.IdentifyInteractions
+ *     filename: output/interactions.csv
+ * </pre>
+ *
+ * Typically you will want to edit / review the CSV file, then run {@link EnhanceInteractions} and
+ * then {@link UploadInteractionsToMongo}.
+ *
+ * @baleen.javadoc
  */
 public class IdentifyInteractions extends BaleenTask {
 

@@ -1,6 +1,11 @@
 package com.tenode.baleen.extras.jobs.interactions.data;
 
-public class InteractionRelation {
+// TODO: Auto-generated Javadoc
+/**
+ * A interaction definition having a type, trigger word and between a source and target type.
+ */
+public class InteractionDefinition {
+
 	private final String type;
 
 	private final String subType;
@@ -11,7 +16,21 @@ public class InteractionRelation {
 
 	private final String target;
 
-	public InteractionRelation(String type, String subType, Word word, String source, String target) {
+	/**
+	 * Instantiates a new interaction definition.
+	 *
+	 * @param type
+	 *            the type (highlevel relation type, mapped to taxonomy)
+	 * @param subType
+	 *            the sub type (typically quite detailed, perhaps the lemma)
+	 * @param word
+	 *            the word (lemma)
+	 * @param source
+	 *            the source type
+	 * @param target
+	 *            the target type
+	 */
+	public InteractionDefinition(String type, String subType, Word word, String source, String target) {
 		this.type = type;
 		this.subType = subType;
 		this.word = word;
@@ -19,22 +38,47 @@ public class InteractionRelation {
 		this.target = target;
 	}
 
+	/**
+	 * Gets the type.
+	 *
+	 * @return the type
+	 */
 	public String getType() {
 		return type;
 	}
 
+	/**
+	 * Gets the sub type.
+	 *
+	 * @return the sub type
+	 */
 	public String getSubType() {
 		return subType;
 	}
 
+	/**
+	 * Gets the source.
+	 *
+	 * @return the source
+	 */
 	public String getSource() {
 		return source;
 	}
 
+	/**
+	 * Gets the target.
+	 *
+	 * @return the target
+	 */
 	public String getTarget() {
 		return target;
 	}
 
+	/**
+	 * Gets the word.
+	 *
+	 * @return the word
+	 */
 	public Word getWord() {
 		return word;
 	}
@@ -62,7 +106,7 @@ public class InteractionRelation {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		InteractionRelation other = (InteractionRelation) obj;
+		InteractionDefinition other = (InteractionDefinition) obj;
 		if (source == null) {
 			if (other.source != null) {
 				return false;

@@ -1,23 +1,54 @@
 package com.tenode.baleen.extras.jobs.interactions.data;
 
+/**
+ * Captures the source and target (UIMA) types of a relationship.
+ *
+ * Has sensible hashcode, equals and toString.
+ *
+ */
 public class RelationPair {
 
 	private final String source;
+
 	private final String target;
 
+	/**
+	 * Instantiates a new relation pair.
+	 *
+	 * @param pattern
+	 *            the pattern
+	 */
 	public RelationPair(PatternReference pattern) {
 		this(pattern.getSourceType(), pattern.getTargetType());
 	}
 
+	/**
+	 * Instantiates a new relation pair.
+	 *
+	 * @param source
+	 *            the source
+	 * @param target
+	 *            the target
+	 */
 	public RelationPair(String source, String target) {
 		this.source = source;
 		this.target = target;
 	}
 
+	/**
+	 * Gets the source.
+	 *
+	 * @return the source
+	 */
 	public String getSource() {
 		return source;
 	}
 
+	/**
+	 * Gets the target.
+	 *
+	 * @return the target
+	 */
 	public String getTarget() {
 		return target;
 	}
@@ -31,6 +62,11 @@ public class RelationPair {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -58,6 +94,16 @@ public class RelationPair {
 			return false;
 		}
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("RP[%s,%s]", source, target);
 	}
 
 }
