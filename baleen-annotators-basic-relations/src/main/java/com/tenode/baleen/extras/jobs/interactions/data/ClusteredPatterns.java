@@ -77,7 +77,9 @@ public class ClusteredPatterns {
 	}
 
 	/**
-	 * Gets the distinct relationship pairs in this cluster
+	 * Gets the distinct relationship pairs in this cluster.
+	 *
+	 * NOTE this is created on the fly, so should be called once and reused.
 	 *
 	 * @return the pairs
 	 */

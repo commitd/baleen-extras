@@ -1,6 +1,5 @@
 package com.tenode.baleen.extras.jobs.interactions.data;
 
-// TODO: Auto-generated Javadoc
 /**
  * A interaction definition having a type, trigger word and between a source and target type.
  */
