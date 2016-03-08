@@ -37,49 +37,49 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 
 	}
 
-	private String[] getNationalities() {
+	protected String[] getNationalities() {
 		return new String[] {};
 	}
 
-	private String[] getBuzzwords() {
+	protected String[] getBuzzwords() {
 		return new String[] {};
 	}
 
-	private String[] getLocations() {
+	protected String[] getLocations() {
 		return new String[] {};
 	}
 
-	private String[] getPeople() {
+	protected String[] getPeople() {
 		return new String[] {};
 	}
 
-	private String[] getOrganisations() {
+	protected String[] getOrganisations() {
 		return new String[] {};
 	}
 
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 
-		String text = jCas.getDocumentText();
-		Collection<Entity> entities = JCasUtil.select(jCas, Entity.class);
+		final String text = jCas.getDocumentText();
+		final Collection<Entity> entities = JCasUtil.select(jCas, Entity.class);
 
 		missing.entrySet().stream().forEach(m -> {
-			Matcher matcher = m.getKey().matcher(text);
+			final Matcher matcher = m.getKey().matcher(text);
 			while (matcher.find()) {
-				int begin = matcher.start();
-				int end = matcher.end();
+				final int begin = matcher.start();
+				final int end = matcher.end();
 
 				if (!SpanUtils.existingEntity(entities, begin, end)) {
 					try {
-						Constructor<? extends Entity> constructor = m.getValue().getConstructor(JCas.class);
-						Entity instance = constructor.newInstance(jCas);
+						final Constructor<? extends Entity> constructor = m.getValue().getConstructor(JCas.class);
+						final Entity instance = constructor.newInstance(jCas);
 
 						instance.setBegin(begin);
 						instance.setEnd(end);
 						instance.setConfidence(1.0);
 
 						addToJCasIndex(instance);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						getMonitor().warn("Unable to create annotation of class {}", m.getClass().getSimpleName());
 					}
 

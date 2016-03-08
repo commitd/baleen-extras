@@ -3,7 +3,7 @@ package com.tenode.baleen.extras.common.grammar.data;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -32,10 +32,12 @@ public final class ParseTreeNode {
 
 	}
 
-	public void traverseParent(BiConsumer<ParseTreeNode, ParseTreeNode> consumer) {
+	public void traverseParent(BiPredicate<ParseTreeNode, ParseTreeNode> consumer) {
 		if (parent != null) {
-			consumer.accept(parent, this);
-			parent.traverseParent(consumer);
+			final boolean test = consumer.test(parent, this);
+			if (test) {
+				parent.traverseParent(consumer);
+			}
 		}
 	}
 
@@ -97,7 +99,7 @@ public final class ParseTreeNode {
 
 		if (words != null && !words.isEmpty()) {
 
-			boolean result = words.stream().anyMatch(filter);
+			final boolean result = words.stream().anyMatch(filter);
 			if (result) {
 				return true;
 			}
