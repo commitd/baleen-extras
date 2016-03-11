@@ -26,7 +26,10 @@ import uk.gov.dstl.baleen.types.language.WordToken;
  * the original text.
  *
  * Note you can not override the type. The type to be entity type will be Interaction.
+ * 
+ * Deprecated - since MongoStemming seems to be as good 
  */
+@Deprecated
 public class MongoInteractions extends Mongo {
 
 	private final Map<Long, WordToken> wordTokenReference = new HashMap<>();

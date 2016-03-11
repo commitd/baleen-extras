@@ -14,7 +14,6 @@ import com.tenode.baleen.extras.jobs.io.CsvInteractionReader;
 import com.tenode.baleen.extras.jobs.io.CsvInteractionWriter;
 import com.tenode.baleen.wordnet.resources.WordNetResource;
 
-import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.uima.jobs.BaleenTask;
@@ -78,13 +77,13 @@ public class EnhanceInteractions extends BaleenTask {
 		dictionary = wordnet.getDictionary();
 
 		try (CsvInteractionWriter writer = new CsvInteractionWriter(outputFilename)) {
-			CsvInteractionReader reader = new CsvInteractionReader(inputFilename);
+			final CsvInteractionReader reader = new CsvInteractionReader(inputFilename);
 
 			writer.initialise();
 
 			reader.read((i, a) -> {
 
-				Set<String> alternatives = getAlternativeWords(i.getWord())
+				final Set<String> alternatives = getAlternativeWords(i.getWord())
 						.map(s -> s.trim().toLowerCase())
 						.filter(s -> s.length() > 2)
 						.collect(Collectors.toSet());
@@ -94,11 +93,11 @@ public class EnhanceInteractions extends BaleenTask {
 
 				try {
 					writer.write(i, alternatives);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					getMonitor().warn("Unable to write CSV row");
 				}
 			});
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new AnalysisEngineProcessException(e);
 		}
 
@@ -115,15 +114,15 @@ public class EnhanceInteractions extends BaleenTask {
 		IndexWord indexWord = null;
 		try {
 			indexWord = dictionary.lookupIndexWord(word.getPos(), word.getLemma());
-		} catch (JWNLException e) {
-			// Ignore
+		} catch (final Exception e) {
+			// Ignore - problems with wordnet
 		}
 
 		if (indexWord == null) {
 			return Stream.of(word.getLemma());
 		}
 
-		Stream<String> otherWords = indexWord.getSenses().stream()
+		final Stream<String> otherWords = indexWord.getSenses().stream()
 				.flatMap(s -> s.getWords().stream())
 				.map(x -> x.getLemma());
 

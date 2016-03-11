@@ -38,7 +38,7 @@ import uk.gov.dstl.baleen.uima.jobs.JobSettings;
  * This requires a wordnet dictionary and a mongo resource (to read from). The mongo collection
  * should hold patterns which have been extracted by a pipeline containing {@Link MongoPatternSaver}
  *
- * See {@link InteractionIdentifier} for more details of the implemntation.
+ * See {@link InteractionIdentifier} for more details of the implementation.
  *
  * The relationship types are based on Wordnet supersenses (meaning the original file in which the
  * word is defined). The provided a group of around 40 definitions.
@@ -146,12 +146,13 @@ public class IdentifyInteractions extends BaleenTask {
 
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
-		InteractionIdentifier identifier = new InteractionIdentifier(getMonitor(), minPatternsInCluster, threshold);
+		final InteractionIdentifier identifier = new InteractionIdentifier(getMonitor(), minPatternsInCluster,
+				threshold);
 		getMonitor().info("Loading patterns from Mongo");
-		List<PatternReference> patterns = readPatternsFromMongo();
+		final List<PatternReference> patterns = readPatternsFromMongo();
 		getMonitor().info("Found {} patterns", patterns.size());
 		getMonitor().info("Extracting interaction words...");
-		Stream<InteractionWord> words = identifier.process(patterns);
+		final Stream<InteractionWord> words = identifier.process(patterns);
 		getMonitor().info("Writing interaction words...");
 		write(words);
 		getMonitor().info("Interaction identification complete");
@@ -162,18 +163,18 @@ public class IdentifyInteractions extends BaleenTask {
 		// TODO: Ideally this would do something in a more streaming manner, as there are likely to
 		// be lots of examples. Loading all patterns into memory might be prohibitive.
 
-		DBCollection collection = mongo.getDB().getCollection(patternCollection);
+		final DBCollection collection = mongo.getDB().getCollection(patternCollection);
 
-		List<PatternReference> patterns = new ArrayList<>((int) collection.count());
+		final List<PatternReference> patterns = new ArrayList<>((int) collection.count());
 
-		DBCursor cursor = collection.find();
+		final DBCursor cursor = collection.find();
 		while (cursor.hasNext()) {
-			DBObject o = cursor.next();
+			final DBObject o = cursor.next();
 
-			BasicDBList list = (BasicDBList) o.get("words");
-			List<Word> tokens = list.stream().map(l -> {
-				BasicDBObject dbo = (BasicDBObject) l;
-				String pos = dbo.getString("pos");
+			final BasicDBList list = (BasicDBList) o.get("words");
+			final List<Word> tokens = list.stream().map(l -> {
+				final BasicDBObject dbo = (BasicDBObject) l;
+				final String pos = dbo.getString("pos");
 				String lemma = dbo.getString("lemma");
 
 				// Fall back to actual text if no lemma
@@ -185,7 +186,7 @@ public class IdentifyInteractions extends BaleenTask {
 			}).filter(w -> w.getPos() != null)
 					.collect(Collectors.toList());
 
-			PatternReference pattern = new PatternReference(o.get("_id").toString(), tokens);
+			final PatternReference pattern = new PatternReference(o.get("_id").toString(), tokens);
 			pattern.setSourceType(((BasicDBObject) o.get("source")).getString("type"));
 			pattern.setTargetType(((BasicDBObject) o.get("target")).getString("type"));
 			patterns.add(pattern);
@@ -200,16 +201,16 @@ public class IdentifyInteractions extends BaleenTask {
 		interactionWriters.forEach(w -> {
 			try {
 				w.initialise();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				getMonitor().error("Unable to initialise writer", e);
 			}
 		});
 
 		words.flatMap(interaction -> {
-			String lemma = interaction.getWord().getLemma();
+			final String lemma = interaction.getWord().getLemma();
 
 			// TODO: Find the best
-			String relationshipType = wordnet.getSuperSenses(interaction.getWord().getPos(), lemma).findAny()
+			final String relationshipType = wordnet.getSuperSenses(interaction.getWord().getPos(), lemma).findAny()
 					.orElse(lemma);
 
 			return interaction.toRelations(relationshipType, lemma);
@@ -219,7 +220,7 @@ public class IdentifyInteractions extends BaleenTask {
 
 						try {
 							w.write(r);
-						} catch (IOException e) {
+						} catch (final IOException e) {
 							getMonitor().warn("Unable to initialise writer", e);
 						}
 					});

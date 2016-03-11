@@ -20,7 +20,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * relationship coreference and deduplication based solely at a relationship level. The algorithm
  * works by looking is the relationship types are the same, and if the enttiies are the same (here
  * as well is difficult, this is based on entities having the same type and value which may be
- * incorrect for muliple John Smiths).
+ * incorrect for multiple John Smiths).
  *
  * This only really useful if you want to ensure that from a single document you get only a single
  * relationship of the same type, subtype between the same two entities because you want to
@@ -57,11 +57,20 @@ public class CleanRelations extends BaleenAnnotator {
 
 	private boolean isSame(final Relation a, final Relation b) {
 		return isSame(a.getSource(), b.getSource()) && isSame(a.getTarget(), b.getTarget())
-				&& isSame(a.getRelationshipType(), a.getRelationshipType())
-				&& isSame(a.getRelationshipType(), a.getRelationshipType());
+				&& isSame(a.getRelationshipType(), b.getRelationshipType())
+				&& isSame(a.getRelationSubType(), b.getRelationSubType());
 	}
 
 	private boolean isSame(final Entity a, final Entity b) {
+		if (a == b) {
+			return true;
+		}
+
+		if (a == null || b == null) {
+			// implies b != null (as a != b)
+			return false;
+		}
+
 		// TODO: is the value test enough?
 		return a.getType() == b.getType() && isSame(a.getValue(), b.getValue());
 	}

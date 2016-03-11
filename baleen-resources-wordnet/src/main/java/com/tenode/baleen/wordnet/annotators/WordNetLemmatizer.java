@@ -17,6 +17,13 @@ import uk.gov.dstl.baleen.types.language.WordLemma;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * Add lemma form of word to the WordToken (if the WordToken has no getLemma already).
+ *
+ * Uses WordNet, hence coverage will be as good as their dictionary.
+ *
+ * @baleen.javadoc
+ */
 public class WordNetLemmatizer extends BaleenAnnotator {
 
 	/**
@@ -30,15 +37,15 @@ public class WordNetLemmatizer extends BaleenAnnotator {
 
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
-		for (WordToken t : JCasUtil.select(jCas, WordToken.class)) {
-			if (t.getLemmas() == null || t.getLemmas().size() > 0) {
-				String text = t.getCoveredText();
-				POS pos = WordNetUtils.toPos(t.getPartOfSpeech());
+		for (final WordToken t : JCasUtil.select(jCas, WordToken.class)) {
+			if (t.getLemmas() == null || t.getLemmas().size() == 0) {
+				final String text = t.getCoveredText();
+				final POS pos = WordNetUtils.toPos(t.getPartOfSpeech());
 				if (pos != null) {
-					Optional<IndexWord> lookupWord = wordnet.lookupWord(pos, text);
+					final Optional<IndexWord> lookupWord = wordnet.lookupWord(pos, text);
 					if (lookupWord.isPresent()) {
 						t.setLemmas(new FSArray(jCas, 1));
-						WordLemma wordLemma = new WordLemma(jCas);
+						final WordLemma wordLemma = new WordLemma(jCas);
 						wordLemma.setLemmaForm(lookupWord.get().getLemma());
 						t.setLemmas(0, wordLemma);
 					}

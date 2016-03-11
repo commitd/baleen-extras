@@ -64,4 +64,16 @@ public class WordNetResourceTest {
 		Assert.assertEquals("verb.social", word.get(1));
 	}
 
+	@Test
+	public void testMissingLookupWord() throws JWNLException {
+		final Optional<IndexWord> word1 = wnr.lookupWord(POS.VERB, "ascasdcscz");
+		Assert.assertFalse(word1.isPresent());
+
+		final Optional<IndexWord> word2 = wnr.getWord(POS.VERB, "ascasdcscz");
+		Assert.assertFalse(word2.isPresent());
+
+		final long count = wnr.getSuperSenses(POS.VERB, "ascasdcscz").count();
+		Assert.assertEquals(0, count);
+	}
+
 }

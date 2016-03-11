@@ -79,7 +79,7 @@ public class WordNetResource extends BaleenResource {
 	public Optional<IndexWord> lookupWord(final POS pos, final String word) {
 		try {
 			return Optional.ofNullable(dictionary.lookupIndexWord(pos, word));
-		} catch (JWNLException e) {
+		} catch (final JWNLException e) {
 			getMonitor().warn("Lookup word failed", e);
 			return Optional.empty();
 		}
@@ -99,23 +99,34 @@ public class WordNetResource extends BaleenResource {
 	public Optional<IndexWord> getWord(final POS pos, final String lemma) {
 		try {
 			return Optional.ofNullable(dictionary.getIndexWord(pos, lemma));
-		} catch (JWNLException e) {
+		} catch (final JWNLException e) {
 			getMonitor().warn("Get word failed", e);
 			return Optional.empty();
 		}
 	}
 
+	/**
+	 * Gets the super senses of a word.
+	 *
+	 * The supersense is the original 'sense file' in which word was defined.
+	 *
+	 * @param pos
+	 *            the pos
+	 * @param word
+	 *            the word
+	 * @return the super senses
+	 */
 	public Stream<String> getSuperSenses(POS pos, String word) {
-		Optional<IndexWord> indexWord = lookupWord(pos, word);
+		final Optional<IndexWord> indexWord = lookupWord(pos, word);
 
 		if (!indexWord.isPresent()) {
 			return Stream.empty();
 		} else {
 			// TODO: This doesn't work, but is the same as the below:
 			// indexWord.get().getSenses().stream().map(Synset::getLexFileName).distinct();
-			List<Synset> senses = indexWord.get().getSenses();
-			Set<String> set = new HashSet<>();
-			for (Synset s : senses) {
+			final List<Synset> senses = indexWord.get().getSenses();
+			final Set<String> set = new HashSet<>();
+			for (final Synset s : senses) {
 				set.add(s.getLexFileName());
 			}
 			return set.stream();

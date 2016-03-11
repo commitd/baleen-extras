@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
-import com.google.common.base.Objects;
+import com.tenode.baleen.extras.annotators.relationships.data.RelationWrapper;
 import com.tenode.baleen.extras.common.annotators.SpanUtils;
 
 import uk.gov.dstl.baleen.types.language.Interaction;
@@ -88,7 +88,8 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 					.filter(r -> r.getSource().getInternalId() != r.getTarget().getInternalId()
 							&& !SpanUtils.overlaps(r.getSource(), r.getTarget()))
 					// Discard anything which has no relationship type
-					// TODO: Is this sensible, these are direct connection between A and
+
+					// TODO: Is this sensible? These are direct connection between A and
 					// B for the dependency graph (you can't be more connected than
 					// that) but then you have no relationship text to work with.
 					.filter(r -> r.getRelationshipType() != null
@@ -171,11 +172,11 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 			entities = new ArrayList<>(collection);
 		}
 
-		ListIterator<Entity> outer = entities.listIterator();
+		final ListIterator<Entity> outer = entities.listIterator();
 		while (outer.hasNext()) {
 			final Entity source = outer.next();
 
-			ListIterator<Entity> inner = entities.listIterator(outer.nextIndex());
+			final ListIterator<Entity> inner = entities.listIterator(outer.nextIndex());
 			while (inner.hasNext()) {
 				final Entity target = inner.next();
 
@@ -199,51 +200,4 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 				.map(RelationWrapper::getRelation);
 	}
 
-	private static class RelationWrapper {
-		private final Relation relation;
-
-		public RelationWrapper(final Relation relation) {
-			this.relation = relation;
-		}
-
-		public Relation getRelation() {
-			return relation;
-		}
-
-		// We specifically equals / hashcode on the specific aspects of Relation
-
-		// TODO: We don't mind about the begin/end value as long as the relation specific info is
-		// the same?
-
-		@Override
-		public boolean equals(final Object other) {
-			if (!(other instanceof RelationWrapper)) {
-				return false;
-			} else {
-				final Relation or = ((RelationWrapper) other).getRelation();
-				if (relation.getBegin() != or.getBegin()) {
-					return false;
-				} else if (relation.getEnd() != or.getEnd()) {
-					return false;
-				} else if (relation.getRelationshipType() != or.getRelationshipType()) {
-					return false;
-				} else if (relation.getRelationSubType() != or.getRelationSubType()) {
-					return false;
-				} else if (relation.getSource() != or.getSource()) {
-					return false;
-				} else if (relation.getTarget() != or.getTarget()) {
-					return false;
-				} else {
-					return true;
-				}
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashCode(relation.getBegin(), relation.getEnd(), relation.getRelationshipType(),
-					relation.getRelationSubType(), relation.getSource(), relation.getTarget());
-		}
-
-	}
 }
