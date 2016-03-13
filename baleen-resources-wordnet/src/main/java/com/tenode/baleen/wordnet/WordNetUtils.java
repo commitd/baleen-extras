@@ -1,8 +1,16 @@
+
 package com.tenode.baleen.wordnet;
 
 import net.sf.extjwnl.data.POS;
 
+/**
+ * Helper for working with Wordnet.
+ */
 public final class WordNetUtils {
+
+	/**
+	 * Instantiates a new word net utils.
+	 */
 	private WordNetUtils() {
 		// Do nothing
 	}
