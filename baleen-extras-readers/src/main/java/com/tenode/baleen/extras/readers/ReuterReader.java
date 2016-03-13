@@ -28,6 +28,8 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
  * Available for download at http://www.daviddlewis.com/resources/testcollections/reuters21578/
  *
  * Extract the data (use 'tar xvf reuters21579.tar.gz' or 7zip on Windows).
+ *
+ * @baleen.javadoc
  */
 public class ReuterReader extends AbstractStreamCollectionReader<String> {
 
@@ -44,6 +46,12 @@ public class ReuterReader extends AbstractStreamCollectionReader<String> {
 	@ExternalResource(key = KEY_PATH, mandatory = false)
 	private String sgmPath;
 
+	/**
+	 * Sets the path to the Reuters SGM files.
+	 *
+	 * @param sgmPath
+	 *            the new sgm path
+	 */
 	public void setSgmPath(final String sgmPath) {
 		this.sgmPath = sgmPath;
 	}

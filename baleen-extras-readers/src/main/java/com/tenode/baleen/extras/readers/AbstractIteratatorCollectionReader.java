@@ -11,6 +11,13 @@ import org.apache.uima.resource.ResourceInitializationException;
 import uk.gov.dstl.baleen.exceptions.BaleenException;
 import uk.gov.dstl.baleen.uima.BaleenCollectionReader;
 
+/**
+ * A collection reader which will can be can be represented by iterator, where each next() generates
+ * a new document.
+ *
+ * @param <T>
+ *            the generic type
+ */
 public abstract class AbstractIteratatorCollectionReader<T> extends BaleenCollectionReader {
 
 	private Iterator<T> iterator;
@@ -19,14 +26,14 @@ public abstract class AbstractIteratatorCollectionReader<T> extends BaleenCollec
 	protected final void doInitialize(UimaContext context) throws ResourceInitializationException {
 		try {
 			iterator = initializeIterator(context);
-		} catch (BaleenException e) {
+		} catch (final BaleenException e) {
 			throw new ResourceInitializationException(e);
 		}
 	}
 
 	@Override
 	protected final void doGetNext(JCas jCas) throws IOException, CollectionException {
-		T next = iterator.next();
+		final T next = iterator.next();
 		apply(next, jCas);
 	}
 
@@ -35,8 +42,25 @@ public abstract class AbstractIteratatorCollectionReader<T> extends BaleenCollec
 		return iterator.hasNext();
 	}
 
+	/**
+	 * Create the iterator (called once)
+	 *
+	 * @param context
+	 *            the context
+	 * @return the iterator
+	 * @throws BaleenException
+	 *             the baleen exception
+	 */
 	protected abstract Iterator<T> initializeIterator(UimaContext context) throws BaleenException;
 
+	/**
+	 * Convert the return item from the iterator to a jcas.
+	 *
+	 * @param next
+	 *            the next
+	 * @param jCas
+	 *            the j cas
+	 */
 	protected abstract void apply(T next, JCas jCas);
 
 }
