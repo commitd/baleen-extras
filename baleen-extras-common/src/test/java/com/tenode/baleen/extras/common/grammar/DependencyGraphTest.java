@@ -1,5 +1,10 @@
 package com.tenode.baleen.extras.common.grammar;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
 import java.util.Set;
 
 import org.apache.uima.fit.factory.JCasFactory;
@@ -9,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dstl.baleen.types.language.Dependency;
+import uk.gov.dstl.baleen.types.language.Sentence;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
 public class DependencyGraphTest {
@@ -110,6 +116,110 @@ public class DependencyGraphTest {
 		Assert.assertNotNull(graph);
 		graph.log();
 
+		assertEquals(4, graph.getWords().size());
+		assertEquals(1, graph.getDependents(a).size());
+		assertEquals(1, graph.getEdges(a).count());
+		assertEquals(0, graph.getGovernors(a).size());
+
+		// 0 as the root is not included in the graph
+		assertEquals(0, graph.getDependents(sample).size());
+		assertEquals(2, graph.getEdges(sample).count());
+		assertEquals(2, graph.getGovernors(sample).size());
+
 	}
 
+	@Test
+	public void testFilter() {
+		final DependencyGraph graph = DependencyGraph.build(jCas);
+
+		final DependencyGraph subgraph = graph
+				.filter(p -> p == a || p == sample);
+
+		subgraph.log();
+
+		assertEquals(2, subgraph.getWords().size());
+		assertEquals(1, subgraph.getGovernors(sample).size());
+
+	}
+
+	@Test
+	public void testBuildCovered() {
+		// Create a fake sub-sentence
+		final Sentence s = new Sentence(jCas);
+		s.setBegin(0);
+		s.setEnd(sample.getEnd());
+
+		final DependencyGraph graph = DependencyGraph.build(jCas, s);
+		Assert.assertNotNull(graph);
+		graph.log();
+
+		assertEquals(2, graph.getWords().size());
+		assertEquals(1, graph.getDependents(a).size());
+		assertEquals(1, graph.getEdges(a).count());
+		assertEquals(0, graph.getGovernors(a).size());
+
+		// 0 as the root is not included in the graph
+		assertEquals(0, graph.getDependents(sample).size());
+		assertEquals(1, graph.getEdges(sample).count());
+		assertEquals(1, graph.getGovernors(sample).size());
+
+	}
+
+	@Test
+	public void testShortestPath() {
+		final DependencyGraph graph = DependencyGraph.build(jCas);
+
+		assertTrue(graph.shortestPath(Collections.singletonList(a), Collections.singletonList(of), 1).isEmpty());
+		assertTrue(graph.shortestPath(Collections.singletonList(a), Collections.singletonList(of), 2).isEmpty());
+		assertFalse(graph.shortestPath(Collections.singletonList(a), Collections.singletonList(of), 5).isEmpty());
+
+	}
+
+	int traverseCount = 0;
+
+	@Test
+	public void testTravese() {
+		final DependencyGraph graph = DependencyGraph.build(jCas);
+
+		graph.traverse(1, Collections.singletonList(dA), (d, f, t, h) -> {
+			traverseCount++;
+			return true;
+		});
+
+		assertEquals(1, traverseCount);
+	}
+
+	@Test
+	public void testTraveseWithTerminate() {
+		final DependencyGraph graph = DependencyGraph.build(jCas);
+		traverseCount = 0;
+
+		graph.traverse(10, Collections.singletonList(dA), (d, f, t, h) -> {
+			traverseCount++;
+			return false;
+		});
+
+		// 2 as go in both direction (dA a -> a, and a -> sample)
+		assertEquals(2, traverseCount);
+	}
+
+	@Test
+	public void testTraveseMultiple() {
+		final DependencyGraph graph = DependencyGraph.build(jCas);
+		traverseCount = 0;
+
+		graph.traverse(10, Collections.singletonList(dA), (d, f, t, h) -> {
+			// System.out.println(f.getCoveredText() + "-" + t.getCoveredText());
+			// System.out.println("\t" + h.stream().map(w ->
+			// w.getCoveredText()).collect(Collectors.joining(",")));
+			// TODO: Ideally test the content so that the history is correct, but its hard to
+			// predict
+
+			traverseCount++;
+			return true;
+		});
+
+		assertEquals(4, traverseCount);
+
+	}
 }

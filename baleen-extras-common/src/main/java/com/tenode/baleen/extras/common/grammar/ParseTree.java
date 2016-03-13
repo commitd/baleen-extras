@@ -2,6 +2,7 @@ package com.tenode.baleen.extras.common.grammar;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,7 +41,7 @@ public class ParseTree {
 	}
 
 	public Stream<WordToken> getChildWords(PhraseChunk chunk, Predicate<String> chunkFilter) {
-		ParseTreeNode node = chunkToNode.get(chunk);
+		final ParseTreeNode node = chunkToNode.get(chunk);
 		if (node.hasChildren()) {
 			return node.getChildren().stream().filter(c -> chunkFilter.test(c.getChunk().getChunkType()))
 					.flatMap(c -> c.getWords().stream());
@@ -50,6 +51,7 @@ public class ParseTree {
 	}
 
 	public void traverseChildren(Consumer<List<ParseTreeNode>> consumer) {
+		consumer.accept(Collections.singletonList(root));
 		root.traverseChildren(consumer);
 	}
 
@@ -57,15 +59,15 @@ public class ParseTree {
 
 		// Build a tree phrase to phrase
 
-		Map<PhraseChunk, Collection<PhraseChunk>> index = JCasUtil.indexCovering(jCas, PhraseChunk.class,
+		final Map<PhraseChunk, Collection<PhraseChunk>> index = JCasUtil.indexCovering(jCas, PhraseChunk.class,
 				PhraseChunk.class);
 
-		Collection<PhraseChunk> phrases = JCasUtil.select(jCas, PhraseChunk.class);
+		final Collection<PhraseChunk> phrases = JCasUtil.select(jCas, PhraseChunk.class);
 
-		List<ParseTreeNode> roots = new LinkedList<>();
-		Map<PhraseChunk, ParseTreeNode> chunkToNode = new HashMap<>();
+		final List<ParseTreeNode> roots = new LinkedList<>();
+		final Map<PhraseChunk, ParseTreeNode> chunkToNode = new HashMap<>();
 
-		for (PhraseChunk chunk : phrases) {
+		for (final PhraseChunk chunk : phrases) {
 
 			ParseTreeNode treeNode = chunkToNode.get(chunk);
 			if (treeNode == null) {
@@ -73,13 +75,13 @@ public class ParseTree {
 				chunkToNode.put(chunk, treeNode);
 			}
 
-			Collection<PhraseChunk> covering = index.get(chunk);
+			final Collection<PhraseChunk> covering = index.get(chunk);
 			if (covering == null || covering.isEmpty()) {
 				// Nothing is covering this Jcas, so its a root
 				roots.add(treeNode);
 			} else {
 				// This is covered, so we add the smallest one as out parent
-				PhraseChunk parent = findSmallest(covering);
+				final PhraseChunk parent = findSmallest(covering);
 
 				ParseTreeNode parentNode = chunkToNode.get(parent);
 				if (parentNode == null) {
@@ -95,10 +97,10 @@ public class ParseTree {
 
 		// Add words to the tree
 
-		Map<PhraseChunk, Collection<WordToken>> wordIndex = JCasUtil.indexCovered(jCas, PhraseChunk.class,
+		final Map<PhraseChunk, Collection<WordToken>> wordIndex = JCasUtil.indexCovered(jCas, PhraseChunk.class,
 				WordToken.class);
 
-		Map<WordToken, ParseTreeNode> wordToNode = new HashMap<>();
+		final Map<WordToken, ParseTreeNode> wordToNode = new HashMap<>();
 
 		chunkToNode.values().forEach(n -> {
 
@@ -107,9 +109,9 @@ public class ParseTree {
 
 			// Get all the words which are within this chunk, and then remove those which are in
 			// children
-			Collection<WordToken> allWords = wordIndex.get(n.getChunk());
+			final Collection<WordToken> allWords = wordIndex.get(n.getChunk());
 			if (allWords != null) {
-				List<WordToken> words = new ArrayList<>(allWords);
+				final List<WordToken> words = new ArrayList<>(allWords);
 
 				// Remove the words which are covered by our children, leaving just our words
 				if (!n.hasChildren()) {

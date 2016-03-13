@@ -73,9 +73,9 @@ public class DependencyGraph {
 	}
 
 	private void addEdge(final Dependency dependency) {
-		WordToken governor = dependency.getGovernor();
-		WordToken dependent = dependency.getDependent();
-		Edge edge = new Edge(dependent, dependency, governor);
+		final WordToken governor = dependency.getGovernor();
+		final WordToken dependent = dependency.getDependent();
+		final Edge edge = new Edge(dependent, dependency, governor);
 		edges.put(governor, edge);
 		edges.put(dependent, edge);
 		dependents.put(dependent, dependency);
@@ -267,15 +267,15 @@ public class DependencyGraph {
 	 * @return the new filtered dependency graph
 	 */
 	public DependencyGraph filter(Predicate<WordToken> predicate) {
-		SetMultimap<WordToken, Edge> filteredEdges = HashMultimap.create();
-		SetMultimap<WordToken, Dependency> filteredDependent = HashMultimap.create();
-		SetMultimap<WordToken, Dependency> filteredGovernor = HashMultimap.create();
+		final SetMultimap<WordToken, Edge> filteredEdges = HashMultimap.create();
+		final SetMultimap<WordToken, Dependency> filteredDependent = HashMultimap.create();
+		final SetMultimap<WordToken, Dependency> filteredGovernor = HashMultimap.create();
 
 		edges.asMap().entrySet().stream()
 				.filter(w -> {
 					return predicate.test(w.getKey());
 				}).forEach(e -> {
-					WordToken key = e.getKey();
+					final WordToken key = e.getKey();
 					e.getValue().stream()
 							.filter(edge -> predicate.test(edge.getOther(key)))
 							.forEach(v -> filteredEdges.put(key, v));
@@ -283,12 +283,21 @@ public class DependencyGraph {
 
 		governors.asMap().keySet().stream()
 				.filter(predicate)
-				.forEach(k -> filteredGovernor.putAll(k, governors.get(k)));
+				.forEach(k -> {
+					final List<Dependency> filtered = governors.get(k).stream()
+							.filter(d -> predicate.test(d.getGovernor()) && predicate.test(d.getDependent()))
+							.collect(Collectors.toList());
+					filteredGovernor.putAll(k, filtered);
+				});
 
 		dependents.asMap().keySet().stream()
 				.filter(predicate)
-				.forEach(k -> filteredDependent.putAll(k, dependents.get(k)));
-
+				.forEach(k -> {
+					final List<Dependency> filtered = dependents.get(k).stream()
+							.filter(d -> predicate.test(d.getGovernor()) && predicate.test(d.getDependent()))
+							.collect(Collectors.toList());
+					filteredDependent.putAll(k, filtered);
+				});
 		return new DependencyGraph(filteredEdges, filteredDependent, filteredGovernor);
 	}
 
@@ -310,15 +319,15 @@ public class DependencyGraph {
 			return Collections.emptyList();
 		}
 
-		Set<WordToken> visited = new HashSet<>();
-		PriorityQueue<WordDistance> queue = new PriorityQueue<>();
+		final Set<WordToken> visited = new HashSet<>();
+		final PriorityQueue<WordDistance> queue = new PriorityQueue<>();
 		from.stream().forEach(t -> {
 			queue.add(new WordDistance(t));
 			visited.add(t);
 		});
 
 		while (!queue.isEmpty()) {
-			WordDistance wd = queue.poll();
+			final WordDistance wd = queue.poll();
 			LOGGER.debug("{}", wd);
 
 			if (to.contains(wd.getWord())) {
@@ -326,7 +335,7 @@ public class DependencyGraph {
 			}
 
 			if (wd.getDistance() < maxDistance) {
-				Set<WordToken> nextWords = edges.get(wd.getWord()).stream()
+				final Set<WordToken> nextWords = edges.get(wd.getWord()).stream()
 						.map(w -> w.getOther(wd.getWord()))
 						.collect(Collectors.toSet());
 				nextWords.removeAll(visited);
@@ -362,7 +371,7 @@ public class DependencyGraph {
 
 	/**
 	 * Build a dependency graph from a JCAS which has already been processed through a dependency
-	 * grammar.
+	 * grammar, but limit to a subset of the jcas (covered by annotation).
 	 *
 	 * Thus the JCAS as Dependency annotations.
 	 *
@@ -384,18 +393,21 @@ public class DependencyGraph {
 			return;
 		}
 
-		ImmutableStack<WordToken> history = new ImmutableStack<WordToken>();
+		final ImmutableStack<WordToken> history = new ImmutableStack<WordToken>();
 
 		final int governorDistance = distance - 1;
 		for (final Dependency d : start) {
 			if (governorDistance > 0) {
 				if (predicate.test(d, d.getDependent(), d.getGovernor(), history)) {
 					ImmutableStack<WordToken> stack = history.push(d.getDependent());
+					stack = stack.push(d.getGovernor());
 					traverse(governorDistance, d.getGovernor(), stack, predicate);
 				}
 			}
 			if (predicate.test(d, d.getGovernor(), d.getDependent(), history)) {
-				traverse(distance, d.getDependent(), history, predicate);
+				ImmutableStack<WordToken> stack = history.push(d.getGovernor());
+				stack = stack.push(d.getDependent());
+				traverse(distance, d.getDependent(), stack, predicate);
 			}
 		}
 	}
@@ -404,10 +416,12 @@ public class DependencyGraph {
 			TraversePredicate predicate) {
 		final int newDistance = distance - 1;
 
-		for (Edge e : edges.get(token)) {
-			WordToken other = e.getOther(token);
-			if (predicate.test(e.getDependency(), token, other, history) && newDistance > 0) {
-				ImmutableStack<WordToken> stack = history.push(other);
+		for (final Edge e : edges.get(token)) {
+			final WordToken other = e.getOther(token);
+
+			if (!history.contains(other) && predicate.test(e.getDependency(), token, other, history)
+					&& newDistance > 0) {
+				final ImmutableStack<WordToken> stack = history.push(other);
 				traverse(newDistance, other, stack, predicate);
 			}
 		}

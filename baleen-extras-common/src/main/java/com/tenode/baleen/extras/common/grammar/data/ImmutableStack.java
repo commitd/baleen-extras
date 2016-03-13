@@ -2,6 +2,8 @@ package com.tenode.baleen.extras.common.grammar.data;
 
 import java.util.stream.Stream;
 
+import uk.gov.dstl.baleen.types.language.WordToken;
+
 public class ImmutableStack<T> {
 
 	private final T head;
@@ -60,6 +62,10 @@ public class ImmutableStack<T> {
 		} else {
 			return Stream.concat(Stream.of(head), tail.stream());
 		}
+	}
+
+	public boolean contains(WordToken other) {
+		return head != null && head.equals(other) || tail != null && tail.contains(other);
 	}
 
 }
