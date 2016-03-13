@@ -12,7 +12,6 @@ public class StopWordRemoverTest {
 		final StopWordRemover swr = new StopWordRemover();
 
 		Assert.assertTrue(swr.getStopWords().containsAll(Arrays.asList(StopWordRemover.getDefaultStopword())));
-		Assert.assertEquals(StopWordRemover.getDefaultStopword().length, swr.getStopWords().size());
 	}
 
 	@Test

@@ -15,6 +15,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 
+import com.tenode.baleen.extras.common.jcas.SpanUtils;
+
 import uk.gov.dstl.baleen.types.common.Buzzword;
 import uk.gov.dstl.baleen.types.common.Nationality;
 import uk.gov.dstl.baleen.types.common.Organisation;

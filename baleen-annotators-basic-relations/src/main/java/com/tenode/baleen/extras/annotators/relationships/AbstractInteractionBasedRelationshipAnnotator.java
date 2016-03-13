@@ -12,7 +12,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.extras.annotators.relationships.data.RelationWrapper;
-import com.tenode.baleen.extras.common.annotators.SpanUtils;
+import com.tenode.baleen.extras.common.jcas.SpanUtils;
 
 import uk.gov.dstl.baleen.types.language.Interaction;
 import uk.gov.dstl.baleen.types.semantic.Entity;

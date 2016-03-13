@@ -10,8 +10,8 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
 import com.google.common.collect.Multimap;
-import com.tenode.baleen.extras.common.annotators.SpanUtils;
 import com.tenode.baleen.extras.common.jcas.ReferentUtils;
+import com.tenode.baleen.extras.common.jcas.SpanUtils;
 
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
