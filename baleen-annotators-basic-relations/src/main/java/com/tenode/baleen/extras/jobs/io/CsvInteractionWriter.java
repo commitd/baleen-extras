@@ -1,5 +1,6 @@
 package com.tenode.baleen.extras.jobs.io;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -38,6 +39,9 @@ public class CsvInteractionWriter implements InteractionWriter {
 
 	@Override
 	public void initialise() throws IOException {
+		// Create the parent dirs
+		new File(csvFilename).getParentFile().mkdirs();
+
 		writer = new CSVPrinter(new FileWriter(csvFilename, false), CSVFormat.RFC4180);
 
 		// Print the header

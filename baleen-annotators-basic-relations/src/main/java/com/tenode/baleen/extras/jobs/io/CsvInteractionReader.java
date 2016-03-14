@@ -51,12 +51,24 @@ public class CsvInteractionReader {
 		try (CSVParser parser = new CSVParser(new FileReader(inputFilename), CSVFormat.RFC4180)) {
 			StreamSupport.stream(parser.spliterator(), false)
 					.forEach(r -> {
+
 						String type = r.get(0);
 						String subType = r.get(1);
+
+						if ("Type".equalsIgnoreCase(type) && "Subtype".equalsIgnoreCase(subType)) {
+							// Hedaer, ignore
+							return;
+						}
+
 						String source = r.get(2);
 						String target = r.get(3);
 						String lemma = r.get(4);
 						POS pos = POS.getPOSForLabel(r.get(5));
+
+						if (pos == null) {
+							// Can't include words withouth a POS
+							return;
+						}
 
 						InteractionDefinition i = new InteractionDefinition(type, subType, new Word(lemma, pos), source,
 								target);

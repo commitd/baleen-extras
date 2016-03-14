@@ -37,6 +37,8 @@ public class InteractionIdentifier {
 
 	private final UimaMonitor monitor;
 
+	private final int minWordOccurances;
+
 	/**
 	 * Instantiates a new interaction identifier.
 	 *
@@ -47,9 +49,11 @@ public class InteractionIdentifier {
 	 * @param threshold
 	 *            the threshold for cluster (lower number more clusters)
 	 */
-	public InteractionIdentifier(UimaMonitor monitor, int minPatternsInCluster, double threshold) {
+	public InteractionIdentifier(UimaMonitor monitor, int minPatternsInCluster, int minWordOccurances,
+			double threshold) {
 		this.monitor = monitor;
 		this.minPatternsInCluster = minPatternsInCluster;
+		this.minWordOccurances = minWordOccurances;
 		this.threshold = threshold;
 	}
 
@@ -103,6 +107,7 @@ public class InteractionIdentifier {
 	 *
 	 * @param clusters
 	 *            the clusters
+	 * @param minWordOccurances
 	 * @return the stream of interaction words
 	 */
 	private Stream<InteractionWord> extractInteractionWords(List<ClusteredPatterns> clusters) {
@@ -115,7 +120,7 @@ public class InteractionIdentifier {
 			Set<RelationPair> relationPairs = cluster.getPairs();
 
 			return wordCount.entrySet().stream()
-					.filter(e -> e.getValue() >= 2)
+					.filter(e -> e.getValue() >= minWordOccurances)
 					.map(e -> new InteractionWord(e.getKey(), relationPairs));
 
 		}).filter(w -> w.getWord().getPos() == POS.NOUN || w.getWord().getPos() == POS.VERB).distinct();

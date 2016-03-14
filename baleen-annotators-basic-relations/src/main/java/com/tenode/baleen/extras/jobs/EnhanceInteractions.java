@@ -94,9 +94,11 @@ public class EnhanceInteractions extends BaleenTask {
 				try {
 					writer.write(i, alternatives);
 				} catch (final Exception e) {
-					getMonitor().warn("Unable to write CSV row");
+					getMonitor().warn("Unable to write CSV row", e);
 				}
 			});
+
+			getMonitor().info("Interaction enhacement complete and written to {}", outputFilename);
 		} catch (final IOException e) {
 			throw new AnalysisEngineProcessException(e);
 		}

@@ -92,7 +92,9 @@ public class IdentifyInteractions extends BaleenTask {
 	private String patternCollection;
 
 	/**
-	 * The name of the Mongo collection to hold the patterns
+	 * Minimum number of patterns to be considered a cluster.
+	 *
+	 * Ie the number of evidence points we need to start to consider an interaction.
 	 *
 	 * @baleen.config minPatterns 2
 	 */
@@ -101,7 +103,20 @@ public class IdentifyInteractions extends BaleenTask {
 	private int minPatternsInCluster;
 
 	/**
-	 * The similarity threshold between two patterns (before they are consider the same)
+	 * Minimum number of occurances of a word in a cluster before its considered potentally the
+	 * interaction word.
+	 *
+	 * Note that this should be equal to or higher than minPatterns.
+	 *
+	 * @baleen.config minOccurances 2
+	 */
+	public static final String KEY_MIN_OCCURANCE = "minOccurances";
+	@ConfigurationParameter(name = KEY_MIN_OCCURANCE, defaultValue = "2")
+	private int minWordOccurance;
+
+	/**
+	 * The similarity threshold between two patterns (before they are consider the same). (High is
+	 * more similar)
 	 *
 	 * @baleen.config patterns 0.2
 	 */
@@ -147,6 +162,7 @@ public class IdentifyInteractions extends BaleenTask {
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
 		final InteractionIdentifier identifier = new InteractionIdentifier(getMonitor(), minPatternsInCluster,
+				minWordOccurance,
 				threshold);
 		getMonitor().info("Loading patterns from Mongo");
 		final List<PatternReference> patterns = readPatternsFromMongo();

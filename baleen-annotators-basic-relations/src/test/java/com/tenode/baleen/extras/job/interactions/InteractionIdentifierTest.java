@@ -33,7 +33,7 @@ public class InteractionIdentifierTest {
 
 	@Before
 	public void before() throws JWNLException {
-		identifier = new InteractionIdentifier(monitor, 1, 0.2);
+		identifier = new InteractionIdentifier(monitor, 1, 2, 0.2);
 	}
 
 	@Test
