@@ -27,44 +27,52 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
  */
 public class SentenceEnhancer {
 
+	/**
+	 * Enhance the mentions by adding sentence information.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param mentions
+	 *            the mentions
+	 */
 	public void enhance(JCas jCas, List<Mention> mentions) {
 		// Create a map (mention annotation) to sentence
 
-		Set<WordToken> pronounAnnotation = mentions.stream()
+		final Set<WordToken> pronounAnnotation = mentions.stream()
 				.filter(p -> p.getType() == MentionType.PRONOUN)
 				.map(p -> {
 					return (WordToken) p.getAnnotation();
 				}).collect(Collectors.toSet());
 
-		Set<Entity> entityAnnotation = mentions.stream()
+		final Set<Entity> entityAnnotation = mentions.stream()
 				.filter(p -> p.getType() == MentionType.ENTITY)
 				.map(p -> {
 					return (Entity) p.getAnnotation();
 				}).collect(Collectors.toSet());
 
-		Set<PhraseChunk> npAnnotation = mentions.stream()
+		final Set<PhraseChunk> npAnnotation = mentions.stream()
 				.filter(p -> p.getType() == MentionType.NP)
 				.map(p -> {
 					return (PhraseChunk) p.getAnnotation();
 				}).collect(Collectors.toSet());
 
-		Map<WordToken, Collection<Sentence>> wordToSentence = JCasUtil.indexCovering(jCas, WordToken.class,
+		final Map<WordToken, Collection<Sentence>> wordToSentence = JCasUtil.indexCovering(jCas, WordToken.class,
 				Sentence.class).entrySet().stream()
 				.filter(e -> pronounAnnotation.contains(e.getKey()))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		Map<Entity, Collection<Sentence>> entityToSentence = JCasUtil.indexCovering(jCas, Entity.class,
+		final Map<Entity, Collection<Sentence>> entityToSentence = JCasUtil.indexCovering(jCas, Entity.class,
 				Sentence.class).entrySet().stream()
 				.filter(e -> entityAnnotation.contains(e.getKey()))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		Map<PhraseChunk, Collection<Sentence>> npToSentence = JCasUtil.indexCovering(jCas, PhraseChunk.class,
+		final Map<PhraseChunk, Collection<Sentence>> npToSentence = JCasUtil.indexCovering(jCas, PhraseChunk.class,
 				Sentence.class).entrySet().stream()
 				.filter(e -> npAnnotation.contains(e.getKey()))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
 		// Create a sentence count
 
-		List<Sentence> sentences = new ArrayList<Sentence>(JCasUtil.select(jCas, Sentence.class));
-		Map<Sentence, Integer> sentenceIndex = IntStream.range(0, sentences.size())
+		final List<Sentence> sentences = new ArrayList<Sentence>(JCasUtil.select(jCas, Sentence.class));
+		final Map<Sentence, Integer> sentenceIndex = IntStream.range(0, sentences.size())
 				.boxed()
 				.collect(Collectors.toMap(i -> sentences.get(i), i -> i));
 
@@ -88,7 +96,7 @@ public class SentenceEnhancer {
 				m.setSentence(null);
 				m.setSentenceIndex(Integer.MIN_VALUE);
 			} else {
-				Sentence sentence = collection.iterator().next();
+				final Sentence sentence = collection.iterator().next();
 				m.setSentence(sentence);
 				m.setSentenceIndex(sentenceIndex.getOrDefault(sentence, Integer.MIN_VALUE));
 			}

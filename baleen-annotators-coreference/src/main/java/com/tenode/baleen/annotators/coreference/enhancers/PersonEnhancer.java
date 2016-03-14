@@ -8,6 +8,9 @@ import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.data.MentionType;
 import com.tenode.baleen.annotators.coreference.data.Person;
 
+/**
+ * Add person information to mentions.
+ */
 public class PersonEnhancer implements MentionEnhancer {
 
 	private final static Map<String, Person> map = new HashMap<>();

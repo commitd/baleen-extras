@@ -5,6 +5,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * A cluster of mentions.
+ *
+ * All the mentions in this cluster are considered to be coreferent.
+ */
 public class Cluster {
 
 	// We require a set which maintains order, earlier entries (from earler passes) are likely more

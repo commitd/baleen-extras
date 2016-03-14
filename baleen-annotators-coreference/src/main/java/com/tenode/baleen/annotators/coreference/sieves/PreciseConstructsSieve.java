@@ -18,9 +18,11 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Location;
 
 /**
+ * Seives based on very specific (precise) rules.
+ *
+ * Includes acronyms or certain constructs like "Prime Minister, Tony Blair".
  *
  * Our parser, OpenNlp, does not output (,) so we need to do a manual check for that.
- *
  *
  */
 public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
@@ -41,8 +43,8 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 
 		parseTree.traverseChildren(children -> {
 			for (int i = 0; i < children.size() - 1; i++) {
-				ParseTreeNode a = children.get(i);
-				ParseTreeNode b = children.get(i + 1);
+				final ParseTreeNode a = children.get(i);
+				final ParseTreeNode b = children.get(i + 1);
 
 				// Appositive
 				// Look for (NP , NP)
@@ -52,9 +54,9 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 					// Is there a comma between them, without AND/BUT/ETC
 					// Not in paper: Need to see if there's an AND in the larger noun phrase, eg
 					// Police, Fire and Ambulance (will get police-fire at the moment)
-					String between = getJCas().getDocumentText().substring(a.getChunk().getEnd(),
+					final String between = getJCas().getDocumentText().substring(a.getChunk().getEnd(),
 							b.getChunk().getBegin());
-					ParseTreeNode parent = a.getParent();
+					final ParseTreeNode parent = a.getParent();
 
 					// Special case there if there's its a location "London, UK" will match
 					// but we don't want it too. Probabl need both the a and b to have a location
@@ -72,10 +74,10 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				// (NP VP(is / was) ) then take the NP under VP as
 
 				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("VP")) {
-					Optional<ParseTreeNode> np = b.getChildren().stream()
+					final Optional<ParseTreeNode> np = b.getChildren().stream()
 							.filter(n -> n.getChunk().getChunkType().equals("NP"))
 							.findFirst();
-					Optional<WordToken> is = b.getWords().stream()
+					final Optional<WordToken> is = b.getWords().stream()
 							.filter(w -> w.getCoveredText().equalsIgnoreCase("is"))
 							.findFirst();
 
@@ -90,8 +92,8 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("WHNP")) {
 					// The NP could be something that interests us, or it could a subpart of a large
 					// NP.
-					List<Mention> mention = findMentionsExactly(a.getChunk().getBegin(), a.getChunk().getEnd());
-					List<Mention> pronoun = findMentionsExactly(b.getChunk().getBegin(), b.getChunk().getEnd());
+					final List<Mention> mention = findMentionsExactly(a.getChunk().getBegin(), a.getChunk().getEnd());
+					final List<Mention> pronoun = findMentionsExactly(b.getChunk().getBegin(), b.getChunk().getEnd());
 					addPairwiseToCluster(mention, pronoun);
 				}
 			}
@@ -106,12 +108,12 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 		// Acronym
 		// The implement here depends on the acronym generator
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
-			Set<String> aAcronyms = a.getAcronyms();
+			final Mention a = getMentions().get(i);
+			final Set<String> aAcronyms = a.getAcronyms();
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
-				Set<String> bAcronyms = b.getAcronyms();
+				final Mention b = getMentions().get(j);
+				final Set<String> bAcronyms = b.getAcronyms();
 
 				if (aAcronyms != null && bAcronyms != null && b.isAcronym() != a.isAcronym()
 						&& !Sets.intersection(aAcronyms, bAcronyms).isEmpty()) {

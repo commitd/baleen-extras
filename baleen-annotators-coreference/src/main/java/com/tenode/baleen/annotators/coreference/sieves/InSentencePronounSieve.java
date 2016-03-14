@@ -10,6 +10,8 @@ import com.tenode.baleen.annotators.coreference.data.MentionType;
 import com.tenode.baleen.annotators.coreference.data.Person;
 
 /**
+ * Joins pronouns which are in the same sentence.
+ *
  * This is not part of the original paper, and it might have been taken care of during their
  * implementation. However it seems sensible.
  *
@@ -36,16 +38,16 @@ public class InSentencePronounSieve extends AbstractCoreferenceSieve {
 	public void sieve() {
 
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
-			String aText = a.getText();
+			final Mention a = getMentions().get(i);
+			final String aText = a.getText();
 
 			if (a.getType() != MentionType.PRONOUN) {
 				continue;
 			}
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
-				String bText = b.getText();
+				final Mention b = getMentions().get(j);
+				final String bText = b.getText();
 
 				if (b.getType() != MentionType.PRONOUN) {
 					continue;

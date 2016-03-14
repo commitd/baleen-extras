@@ -16,6 +16,11 @@ import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.data.MentionType;
 import com.tenode.baleen.annotators.coreference.data.Person;
 
+/**
+ * Attempts to connect pronouns to an entity.
+ *
+ * This is very difficult problems which will likely fail in the current implementation.
+ */
 public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 
 	private static final int MAX_SENTENCE_DISTANCE = 3;
@@ -27,13 +32,13 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 	@Override
 	public void sieve() {
 
-		Multimap<Mention, Mention> potential = HashMultimap.create();
+		final Multimap<Mention, Mention> potential = HashMultimap.create();
 
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
+			final Mention a = getMentions().get(i);
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
+				final Mention b = getMentions().get(j);
 
 				// We are coreferencing pronouns only
 				if (a.getType() != MentionType.PRONOUN && b.getType() != MentionType.PRONOUN) {
@@ -48,14 +53,14 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 					continue;
 				}
 
-				Mention pronoun = a.getType() == MentionType.PRONOUN ? a : b;
-				Mention other = a.getType() == MentionType.PRONOUN ? b : a;
+				final Mention pronoun = a.getType() == MentionType.PRONOUN ? a : b;
+				final Mention other = a.getType() == MentionType.PRONOUN ? b : a;
 
 				// If pronouns then we can have either way around, otherwise we need the entity/np
 				// first.
 				if (a.getType() == MentionType.PRONOUN && b.getType() == MentionType.PRONOUN) {
 					// Paper: Only consider within three
-					int sentenceDistance = pronoun.getSentenceIndex() - other.getSentenceIndex();
+					final int sentenceDistance = pronoun.getSentenceIndex() - other.getSentenceIndex();
 					if (Math.abs(sentenceDistance) > MAX_SENTENCE_DISTANCE) {
 						continue;
 					}
@@ -64,7 +69,7 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 
 					// Paper: Only consider within three
 					// Not in paper: And the pronoun must be after the mention
-					int sentenceDistance = pronoun.getSentenceIndex() - other.getSentenceIndex();
+					final int sentenceDistance = pronoun.getSentenceIndex() - other.getSentenceIndex();
 					if (sentenceDistance < 0 && sentenceDistance > MAX_SENTENCE_DISTANCE) {
 						continue;
 					}
@@ -116,14 +121,14 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 		// For each of the matches we need to select the best one
 
 		potential.asMap().entrySet().stream().forEach(e -> {
-			Mention key = e.getKey();
-			Collection<Mention> collection = e.getValue();
+			final Mention key = e.getKey();
+			final Collection<Mention> collection = e.getValue();
 
 			Mention match = null;
 			if (collection.size() > 1) {
-				List<Mention> list = new ArrayList<Mention>(collection);
+				final List<Mention> list = new ArrayList<Mention>(collection);
 				Collections.sort(list, (a, b) -> {
-					int sentenceIndex = Integer.compare(a.getSentenceIndex(), b.getSentenceIndex());
+					final int sentenceIndex = Integer.compare(a.getSentenceIndex(), b.getSentenceIndex());
 					if (sentenceIndex != 0) {
 						return sentenceIndex;
 					} else {

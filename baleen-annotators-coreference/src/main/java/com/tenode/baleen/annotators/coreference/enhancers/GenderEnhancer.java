@@ -13,6 +13,9 @@ import uk.gov.dstl.baleen.types.Base;
 import uk.gov.dstl.baleen.types.common.Nationality;
 import uk.gov.dstl.baleen.types.common.Person;
 
+/**
+ * Adds gender information to the mention.
+ */
 public class GenderEnhancer implements MentionEnhancer {
 	private final static Map<String, Gender> pronounMap = new HashMap<>();
 	private final GenderMultiplicityResource genderResource;
@@ -35,10 +38,10 @@ public class GenderEnhancer implements MentionEnhancer {
 		if (mention.getType() == MentionType.PRONOUN) {
 			mention.setGender(pronounMap.getOrDefault(mention.getText().toLowerCase(), Gender.UNKNOWN));
 		} else if (mention.getType() == MentionType.ENTITY) {
-			Base annotation = mention.getAnnotation();
+			final Base annotation = mention.getAnnotation();
 
 			if (annotation instanceof Person) {
-				Person p = (Person) annotation;
+				final Person p = (Person) annotation;
 
 				Gender gender = getGenderFromTitle(p.getTitle());
 				if (gender == Gender.UNKNOWN) {
@@ -52,7 +55,7 @@ public class GenderEnhancer implements MentionEnhancer {
 				mention.setGender(Gender.N);
 			}
 		} else {
-			Gender gender = genderResource.lookupGender(mention.getText());
+			final Gender gender = genderResource.lookupGender(mention.getText());
 			mention.setGender(gender);
 		}
 	}

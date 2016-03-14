@@ -10,6 +10,10 @@ import com.tenode.baleen.annotators.coreference.data.MentionType;
 
 import uk.gov.dstl.baleen.types.language.WordToken;
 
+/**
+ * Generates acronyms for a mention.
+ *
+ */
 public class AcronymEnhancer implements MentionEnhancer {
 
 	@Override
@@ -28,20 +32,20 @@ public class AcronymEnhancer implements MentionEnhancer {
 			acronyms = Collections.singleton(mention.getText().toUpperCase());
 		} else {
 
-			Collection<WordToken> words = mention.getWords();
+			final Collection<WordToken> words = mention.getWords();
 
 			acronyms = new HashSet<>();
 
 			// Generate acrynoms based on the covered text
 
-			String text = mention.getText();
+			final String text = mention.getText();
 
-			StringBuilder upperCase = new StringBuilder();
-			StringBuilder upperAndLowerCase = new StringBuilder();
+			final StringBuilder upperCase = new StringBuilder();
+			final StringBuilder upperAndLowerCase = new StringBuilder();
 
 			boolean considerNext = true;
 			for (int i = 0; i < text.length(); i++) {
-				char c = text.charAt(i);
+				final char c = text.charAt(i);
 				if (considerNext == true) {
 					if (Character.isUpperCase(c)) {
 						upperCase.append(c);
@@ -66,8 +70,8 @@ public class AcronymEnhancer implements MentionEnhancer {
 			// Now create acronym based on just the NNS,
 			// but unlike stanford use lower and upper case again
 
-			StringBuilder upperCaseNNP = new StringBuilder();
-			StringBuilder upperAndLowerCaseNNP = new StringBuilder();
+			final StringBuilder upperCaseNNP = new StringBuilder();
+			final StringBuilder upperAndLowerCaseNNP = new StringBuilder();
 			words.stream().filter(p -> p.getPartOfSpeech().equals("NNP")).map(w -> w.getCoveredText().charAt(0))
 					.forEach(c -> {
 						if (Character.isUpperCase(c)) {

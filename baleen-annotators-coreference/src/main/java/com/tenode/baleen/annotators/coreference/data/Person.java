@@ -1,9 +1,21 @@
 package com.tenode.baleen.annotators.coreference.data;
 
+/**
+ * Person of the term - first, second, third.
+ */
 public enum Person {
 
 	FIRST, SECOND, THIRD, UNKNOWN;
 
+	/**
+	 * Checks if is compatible.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return true, if is compatible
+	 */
 	public static boolean isCompatible(Person a, Person b) {
 		return a == Person.UNKNOWN || b == Person.UNKNOWN || a == b;
 	}

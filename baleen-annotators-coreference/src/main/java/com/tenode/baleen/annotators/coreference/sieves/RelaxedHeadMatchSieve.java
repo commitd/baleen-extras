@@ -11,6 +11,9 @@ import com.tenode.baleen.annotators.coreference.utils.StopWordExtractor;
 
 import uk.gov.dstl.baleen.types.Base;
 
+/**
+ * Sieve based on looser matching of head terms.
+ */
 public class RelaxedHeadMatchSieve extends AbstractCoreferenceSieve {
 
 	public RelaxedHeadMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
@@ -20,21 +23,21 @@ public class RelaxedHeadMatchSieve extends AbstractCoreferenceSieve {
 	@Override
 	public void sieve() {
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
+			final Mention a = getMentions().get(i);
 
 			if (a.getType() != MentionType.ENTITY) {
 				continue;
 			}
-			String aText = a.getText();
-			Class<? extends Base> aClazz = a.getAnnotation().getClass();
+			final String aText = a.getText();
+			final Class<? extends Base> aClazz = a.getAnnotation().getClass();
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
-				String bHead = b.getHead();
+				final Mention b = getMentions().get(j);
+				final String bHead = b.getHead();
 				if (bHead == null || bHead.isEmpty() || b.getType() != MentionType.ENTITY) {
 					continue;
 				}
-				Class<? extends Base> bClazz = b.getAnnotation().getClass();
+				final Class<? extends Base> bClazz = b.getAnnotation().getClass();
 
 				// Not i-within-i
 				if (a.overlaps(b)) {

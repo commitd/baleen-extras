@@ -11,6 +11,9 @@ import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.data.MentionType;
 
+/**
+ * String matching which is more easily satisified that exact matching.
+ */
 public class RelaxedStringMatchSieve extends AbstractCoreferenceSieve {
 
 	private static final Set<String> EXCLUDED = new HashSet<>(Arrays.asList("that", "there"));
@@ -29,17 +32,17 @@ public class RelaxedStringMatchSieve extends AbstractCoreferenceSieve {
 		// Text says nominal mention, we assume that to be mean Entity
 
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
+			final Mention a = getMentions().get(i);
 
-			String aHead = a.getHead();
+			final String aHead = a.getHead();
 			if (aHead == null || aHead.isEmpty() || a.getType() != MentionType.ENTITY
 					|| EXCLUDED.contains(aHead.toLowerCase())) {
 				continue;
 			}
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
-				String bHead = b.getHead();
+				final Mention b = getMentions().get(j);
+				final String bHead = b.getHead();
 				if (bHead == null || bHead.isEmpty() || b.getType() != MentionType.ENTITY
 						|| EXCLUDED.contains(aHead.toLowerCase())) {
 					continue;

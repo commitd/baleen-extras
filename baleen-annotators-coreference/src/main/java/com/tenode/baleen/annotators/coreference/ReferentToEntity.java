@@ -17,21 +17,34 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * Convert annotations which aren't entities but which have an referent target which is shared with
+ * an entity into an entity.
+ *
+ * This is useful for consumers which work specifically with entities but not with other types.
+ *
+ * @baleen.javadoc
+ */
 public class ReferentToEntity extends BaleenAnnotator {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 
-		Multimap<ReferenceTarget, Entity> referentMap = ReferentUtils.createReferentMap(jCas, Entity.class);
+		final Multimap<ReferenceTarget, Entity> referentMap = ReferentUtils.createReferentMap(jCas, Entity.class);
 
-		Map<ReferenceTarget, Entity> targets = ReferentUtils.filterToSingle(referentMap, this::getBestEntity);
+		final Map<ReferenceTarget, Entity> targets = ReferentUtils.filterToSingle(referentMap, this::getBestEntity);
 
 		// Now look through the non-entities and create entities in their place.
 
-		List<Entity> toAdd = ReferentUtils.streamReferent(jCas, targets)
+		final List<Entity> toAdd = ReferentUtils.streamReferent(jCas, targets)
 				.map(a -> {
-					ReferenceTarget referent = a.getReferent();
-					Entity entity = targets.get(referent);
+					final ReferenceTarget referent = a.getReferent();
+					final Entity entity = targets.get(referent);
 					if (entity != null) {
 						return SpanUtils.copyEntity(jCas, a.getBegin(), a.getEnd(), entity);
 					} else {
@@ -44,10 +57,26 @@ public class ReferentToEntity extends BaleenAnnotator {
 
 	}
 
+	/**
+	 * Gets the best entity from the list.
+	 *
+	 * @param list
+	 *            the list
+	 * @return the best entity
+	 */
 	private Entity getBestEntity(Collection<Entity> list) {
 		return list.stream().reduce((a, b) -> isBetterEntity(a, b) ? b : a).get();
 	}
 
+	/**
+	 * Checks if is better entity.
+	 *
+	 * @param original
+	 *            the original
+	 * @param challenger
+	 *            the challenger
+	 * @return true, if is better entity
+	 */
 	private boolean isBetterEntity(Entity original, Entity challenger) {
 		// Simple version, just look for the longest string
 		// we could look at how complete the attributes are, etc

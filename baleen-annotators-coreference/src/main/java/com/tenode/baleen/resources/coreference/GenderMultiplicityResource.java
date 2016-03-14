@@ -22,7 +22,7 @@ import com.tenode.baleen.annotators.coreference.data.Multiplicity;
 import uk.gov.dstl.baleen.uima.BaleenResource;
 
 /**
- * The Class NumberGenderResource.
+ * sGenderMultiplicityResource.
  *
  * Due to the nature of the data the gender should be reasonable high quality, but the multiplicity
  * is poor. This is because ther is no singular mention counts in the data, so its impossible to
@@ -67,7 +67,7 @@ public class GenderMultiplicityResource extends BaleenResource {
 						// Crazy, but if we retun then the inputstream gets closed so the lines()
 						// stream fails.
 						return reader.lines().collect(Collectors.toList()).stream();
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						getMonitor().warn("Unable to load from gender file", e);
 						return Stream.empty();
 					}
@@ -78,17 +78,17 @@ public class GenderMultiplicityResource extends BaleenResource {
 				.filter(s -> !s.contains("#"))
 				.forEach(s -> {
 					try {
-						String[] line = s.split("\t", 2);
-						String np = line[0].trim().toLowerCase();
-						Iterable<String> counts = LINE_SPLITTER.split(line[1]);
-						Iterator<String> iterator = counts.iterator();
+						final String[] line = s.split("\t", 2);
+						final String np = line[0].trim().toLowerCase();
+						final Iterable<String> counts = LINE_SPLITTER.split(line[1]);
+						final Iterator<String> iterator = counts.iterator();
 
-						int m = Integer.parseInt(iterator.next());
-						int f = Integer.parseInt(iterator.next());
-						int n = Integer.parseInt(iterator.next());
-						int p = Integer.parseInt(iterator.next());
+						final int m = Integer.parseInt(iterator.next());
+						final int f = Integer.parseInt(iterator.next());
+						final int n = Integer.parseInt(iterator.next());
+						final int p = Integer.parseInt(iterator.next());
 
-						int genderTotal = m + f + n;
+						final int genderTotal = m + f + n;
 
 						if (genderTotal > GENDER_SAMPLE_THRESHOLD) {
 
@@ -112,7 +112,7 @@ public class GenderMultiplicityResource extends BaleenResource {
 							saveMultiplicity(np, Multiplicity.SINGULAR);
 						}
 
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						getMonitor().warn("Unable to parse line {}", s);
 					}
 
@@ -122,7 +122,7 @@ public class GenderMultiplicityResource extends BaleenResource {
 	}
 
 	private void saveMultiplicity(String np, Multiplicity multiplicity) {
-		String key = np.replaceAll("!", "").trim();
+		final String key = np.replaceAll("!", "").trim();
 		if (np.startsWith("!")) {
 			endsWithMultiplicity.put(key, multiplicity);
 		} else if (np.endsWith("!")) {
@@ -133,7 +133,7 @@ public class GenderMultiplicityResource extends BaleenResource {
 	}
 
 	private void saveGender(String np, Gender gender) {
-		String key = np.replaceAll("!", "").trim();
+		final String key = np.replaceAll("!", "").trim();
 
 		if (key == "john") {
 			System.out.println(key);
@@ -166,7 +166,7 @@ public class GenderMultiplicityResource extends BaleenResource {
 			return t;
 		}
 
-		List<String> words = WORD_SPLITTER.splitToList(text);
+		final List<String> words = WORD_SPLITTER.splitToList(text);
 
 		// Try start
 		t = lookup(startsWith, words);
@@ -175,9 +175,9 @@ public class GenderMultiplicityResource extends BaleenResource {
 		}
 
 		// Try endWith
-		List<String> reversed = new ArrayList<>(words.size());
+		final List<String> reversed = new ArrayList<>(words.size());
 		for (int i = words.size() - 1; i > 0; i--) {
-			String word = reverse(words.get(i));
+			final String word = reverse(words.get(i));
 			reversed.add(word);
 		}
 
@@ -191,8 +191,8 @@ public class GenderMultiplicityResource extends BaleenResource {
 
 	private <T> T lookup(Map<String, T> map, List<String> words) {
 		for (int i = words.size() - 1; i >= 0; i--) {
-			String s = words.stream().skip(i).collect(Collectors.joining(" "));
-			T t = map.get(s);
+			final String s = words.stream().skip(i).collect(Collectors.joining(" "));
+			final T t = map.get(s);
 			if (t != null) {
 				return t;
 			}

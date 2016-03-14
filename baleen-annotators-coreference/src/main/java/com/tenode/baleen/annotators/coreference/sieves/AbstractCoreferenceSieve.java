@@ -13,6 +13,11 @@ import com.tenode.baleen.annotators.coreference.data.Mention;
 
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 
+/**
+ * Base class for coreference sieve.
+ *
+ * Provides helper functions to manage clusters, etc.
+ */
 public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
 	private final JCas jCas;
@@ -39,10 +44,10 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
 	protected void addToCluster(Mention a, Mention b) {
 		if (a.hasClusters()) {
-			Cluster cluster = a.getAnyCluster();
+			final Cluster cluster = a.getAnyCluster();
 			cluster.add(b);
 		} else if (b.hasClusters()) {
-			Cluster cluster = b.getAnyCluster();
+			final Cluster cluster = b.getAnyCluster();
 			cluster.add(a);
 		} else {
 			clusters.add(new Cluster(a, b));
@@ -53,10 +58,10 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 
 		// Technically these will all need to end up in the same cluster
 
-		Cluster cluster = a.stream().map(x -> x.getAnyCluster()).filter(Objects::nonNull).findAny()
+		final Cluster cluster = a.stream().map(x -> x.getAnyCluster()).filter(Objects::nonNull).findAny()
 				.orElseGet(() -> b.stream().map(x -> x.getAnyCluster()).filter(Objects::nonNull).findAny()
 						.orElseGet(() -> {
-							Cluster c = new Cluster();
+							final Cluster c = new Cluster();
 							clusters.add(c);
 							return c;
 						}));
@@ -66,8 +71,8 @@ public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {
 	}
 
 	protected void addCoveredToCluster(PhraseChunk a, PhraseChunk b) {
-		List<Mention> aMentions = findMentionsExactly(a.getBegin(), a.getEnd());
-		List<Mention> bMentions = findMentionsExactly(b.getBegin(), b.getEnd());
+		final List<Mention> aMentions = findMentionsExactly(a.getBegin(), a.getEnd());
+		final List<Mention> bMentions = findMentionsExactly(b.getBegin(), b.getEnd());
 
 		addPairwiseToCluster(aMentions, bMentions);
 	}

@@ -13,7 +13,7 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
- * A Mention which can be coreference.
+ * A Mention which can be coreferenced.
  *
  */
 public class Mention {
@@ -149,8 +149,8 @@ public class Mention {
 	}
 
 	public boolean overlaps(Mention mention) {
-		Base a = getAnnotation();
-		Base b = mention.getAnnotation();
+		final Base a = getAnnotation();
+		final Base b = mention.getAnnotation();
 		return !(a.getEnd() < b.getBegin() || b.getEnd() < a.getBegin());
 	}
 
@@ -239,7 +239,7 @@ public class Mention {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		Mention other = (Mention) obj;
+		final Mention other = (Mention) obj;
 		if (annotation == null) {
 			if (other.annotation != null) {
 				return false;

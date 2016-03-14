@@ -23,6 +23,9 @@ import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
+/**
+ * Extract mentions from the jCas.
+ */
 public class MentionDetector {
 
 	private final JCas jCas;
@@ -41,7 +44,7 @@ public class MentionDetector {
 	public List<Mention> detect() {
 		setup();
 
-		List<Mention> mentions = new ArrayList<>(pronouns.size() + entities.size());
+		final List<Mention> mentions = new ArrayList<>(pronouns.size() + entities.size());
 
 		detectPronouns(mentions);
 
@@ -68,7 +71,7 @@ public class MentionDetector {
 		pronouns.stream()
 				.map(Mention::new)
 				.map(m -> {
-					List<WordToken> list = Collections.singletonList((WordToken) m.getAnnotation());
+					final List<WordToken> list = Collections.singletonList((WordToken) m.getAnnotation());
 					m.setWords(list);
 					return m;
 				}).forEach(mentions::add);
@@ -79,7 +82,7 @@ public class MentionDetector {
 		entities.stream()
 				.map(Mention::new)
 				.map(m -> {
-					Collection<WordToken> list = JCasUtil.selectCovered(jCas, WordToken.class, m.getAnnotation());
+					final Collection<WordToken> list = JCasUtil.selectCovered(jCas, WordToken.class, m.getAnnotation());
 					m.setWords(new ArrayList<WordToken>(list));
 					m.setHeadWordToken(determineHead(m.getWords()));
 					return m;
@@ -98,10 +101,10 @@ public class MentionDetector {
 			return words.get(0);
 		} else {
 
-			List<WordToken> candidates = new LinkedList<WordToken>();
-			for (WordToken word : words) {
+			final List<WordToken> candidates = new LinkedList<WordToken>();
+			for (final WordToken word : words) {
 				if (word.getPartOfSpeech().startsWith("N")) {
-					Stream<WordToken> edges = dependencyGraph.getEdges(word);
+					final Stream<WordToken> edges = dependencyGraph.getEdges(word);
 					if (edges.anyMatch(p -> !words.contains(p))) {
 						candidates.add(word);
 					}
@@ -115,7 +118,7 @@ public class MentionDetector {
 			// TODO: No idea if its it possible to get more than one if all things work.
 			// I think this would be a case of marking an entity which cross the NP boundary and is
 			// likely wrong.
-			WordToken head = candidates.get(0);
+			final WordToken head = candidates.get(0);
 
 			// TODO: Not sure if we should pull out compound words here... (its a head word but even
 			// so)
@@ -127,7 +130,7 @@ public class MentionDetector {
 	private void detectPhrases(List<Mention> mentions) {
 
 		// Limit to noun phrases
-		List<PhraseChunk> phrases = JCasUtil.select(jCas, PhraseChunk.class).stream()
+		final List<PhraseChunk> phrases = JCasUtil.select(jCas, PhraseChunk.class).stream()
 				.filter(p -> p.getChunkType().startsWith("N"))
 				.collect(Collectors.toList());
 
@@ -140,15 +143,15 @@ public class MentionDetector {
 		// System.out.println("After remove covered");
 		// phrases.forEach(p -> System.out.println(p.getCoveredText()));
 
-		Map<PhraseChunk, Collection<WordToken>> phraseToWord = JCasUtil.indexCovered(jCas, PhraseChunk.class,
+		final Map<PhraseChunk, Collection<WordToken>> phraseToWord = JCasUtil.indexCovered(jCas, PhraseChunk.class,
 				WordToken.class);
 
 		// Create an index for head words
-		Multimap<WordToken, PhraseChunk> headToChunk = HashMultimap.create();
+		final Multimap<WordToken, PhraseChunk> headToChunk = HashMultimap.create();
 		phrases.stream()
 				.forEach(p -> {
-					Collection<WordToken> collection = phraseToWord.get(p);
-					WordToken head = determineHead(new ArrayList<>(collection));
+					final Collection<WordToken> collection = phraseToWord.get(p);
+					final WordToken head = determineHead(new ArrayList<>(collection));
 					if (head != null) {
 						headToChunk.put(head, p);
 					} // else what should we do to those without heads?
@@ -161,9 +164,9 @@ public class MentionDetector {
 					PhraseChunk largest = null;
 					int largestSize = 0;
 
-					for (PhraseChunk p : e.getValue()) {
+					for (final PhraseChunk p : e.getValue()) {
 						// the head is always common word, so we know they overlap
-						int size = p.getEnd() - p.getBegin();
+						final int size = p.getEnd() - p.getBegin();
 						if (largest == null || largestSize < size) {
 							largest = p;
 							largestSize = size;
@@ -171,7 +174,7 @@ public class MentionDetector {
 					}
 
 					// Remove all the small ones
-					for (PhraseChunk p : e.getValue()) {
+					for (final PhraseChunk p : e.getValue()) {
 						if (p != largest) {
 							phrases.remove(headToChunk.values());
 						}
@@ -188,7 +191,7 @@ public class MentionDetector {
 				.stream()
 				.filter(e -> e.getValue().size() == 1)
 				.filter(e -> {
-					WordToken t = e.getValue().iterator().next();
+					final WordToken t = e.getValue().iterator().next();
 					if (pronouns.contains(t)) {
 						// Remove NP which are
 						return true;
@@ -216,7 +219,7 @@ public class MentionDetector {
 		phrases.stream()
 				.map(Mention::new)
 				.map(m -> {
-					List<WordToken> words = new ArrayList<>(phraseToWord.get(m.getAnnotation()));
+					final List<WordToken> words = new ArrayList<>(phraseToWord.get(m.getAnnotation()));
 					// TODO: We already calcualted this early (for headToWord), but we just redo
 					// again here. Would be nice to reuse
 					m.setWords(words);

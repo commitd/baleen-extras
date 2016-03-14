@@ -22,6 +22,9 @@ import uk.gov.dstl.baleen.types.military.MilitaryPlatform;
 import uk.gov.dstl.baleen.types.semantic.Location;
 import uk.gov.dstl.baleen.types.semantic.Temporal;
 
+/**
+ * Adds animacy information to the mention.
+ */
 public class AnimacyEnhancer implements MentionEnhancer {
 
 	private final static Map<String, Animacy> pronounMap = new HashMap<>();
@@ -51,8 +54,8 @@ public class AnimacyEnhancer implements MentionEnhancer {
 		if (mention.getType() == MentionType.PRONOUN) {
 			mention.setAnimacy(pronounMap.getOrDefault(mention.getText().toLowerCase(), Animacy.UNKNOWN));
 		} else if (mention.getType() == MentionType.ENTITY) {
-			Class<? extends Base> entityClazz = mention.getAnnotation().getClass();
-			for (Class<? extends Base> clazz : semanticMap.keySet()) {
+			final Class<? extends Base> entityClazz = mention.getAnnotation().getClass();
+			for (final Class<? extends Base> clazz : semanticMap.keySet()) {
 				if (clazz.isAssignableFrom(entityClazz)) {
 					mention.setAnimacy(semanticMap.get(clazz));
 					return;

@@ -12,7 +12,7 @@ import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.data.MentionType;
 
 /**
- * Mentions are
+ * Coreference based on exact matching.
  *
  * See 3.3.3 Pass 3.
  */
@@ -32,16 +32,16 @@ public class ExactStringMatchSieve extends AbstractCoreferenceSieve {
 	@Override
 	public void sieve() {
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
-			String aText = a.getText();
+			final Mention a = getMentions().get(i);
+			final String aText = a.getText();
 
 			if (a.getType() == MentionType.PRONOUN || EXCLUDED.contains(aText.toLowerCase())) {
 				continue;
 			}
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
-				String bText = b.getText();
+				final Mention b = getMentions().get(j);
+				final String bText = b.getText();
 
 				if (b.getType() == MentionType.PRONOUN || EXCLUDED.contains(bText.toLowerCase())) {
 					continue;

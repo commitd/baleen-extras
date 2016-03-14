@@ -9,6 +9,9 @@ import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.utils.StopWordExtractor;
 
+/**
+ * THeda matching sieve which has controllable parameters.
+ */
 public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 
 	private final boolean compatibleModifiers;
@@ -28,7 +31,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 		// TODO: We really need to work over clusters for this to make sense!
 
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
+			final Mention a = getMentions().get(i);
 			String aHead = a.getHead();
 			if (aHead == null || aHead.isEmpty()) {
 				continue;
@@ -36,7 +39,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 			aHead = aHead.toLowerCase();
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
+				final Mention b = getMentions().get(j);
 				String bHead = b.getHead();
 				if (bHead == null || bHead.isEmpty()) {
 					continue;
@@ -75,8 +78,8 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 	}
 
 	private boolean haveSubsetOfSameModifier(Mention a, Mention b) {
-		Set<String> aModifiers = getModifiers(a);
-		Set<String> bModifiers = getModifiers(b);
+		final Set<String> aModifiers = getModifiers(a);
+		final Set<String> bModifiers = getModifiers(b);
 
 		// NOTE: This is ordered, a is earlier than b and it is unusal to introduce more information
 		// to an entity later in the document

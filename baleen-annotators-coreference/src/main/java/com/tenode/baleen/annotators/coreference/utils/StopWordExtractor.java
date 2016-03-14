@@ -6,6 +6,9 @@ import com.google.common.base.Splitter;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.extras.common.language.StopWordRemover;
 
+/**
+ * Remove stop words from mentions.
+ */
 public final class StopWordExtractor {
 	private static final StopWordRemover stopWordRemover = new StopWordRemover();
 
@@ -17,8 +20,8 @@ public final class StopWordExtractor {
 
 	// TODO: This should at a cluster level
 	public static boolean hasSubsetOfNonStopWords(Mention a, Mention b) {
-		List<String> aNonStop = getNonStopWords(a);
-		List<String> bNonStop = getNonStopWords(b);
+		final List<String> aNonStop = getNonStopWords(a);
+		final List<String> bNonStop = getNonStopWords(b);
 
 		// TODO: This should not include the head word? See the paper for clarification.
 

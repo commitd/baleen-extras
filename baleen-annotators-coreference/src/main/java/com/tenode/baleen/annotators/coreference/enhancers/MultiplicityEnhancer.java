@@ -11,6 +11,9 @@ import com.tenode.baleen.resources.coreference.GenderMultiplicityResource;
 import uk.gov.dstl.baleen.types.common.Organisation;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
+/**
+ * Add multiplicity information to mention.
+ */
 public class MultiplicityEnhancer implements MentionEnhancer {
 
 	private static final Map<String, Multiplicity> pronounMap = new HashMap<>();
@@ -47,7 +50,7 @@ public class MultiplicityEnhancer implements MentionEnhancer {
 			break;
 		case NP:
 			Multiplicity m = Multiplicity.UNKNOWN;
-			WordToken head = mention.getHeadWordToken();
+			final WordToken head = mention.getHeadWordToken();
 			if (head != null) {
 				if (head.getPartOfSpeech().equals("NNS")
 						|| mention.getHeadWordToken().getPartOfSpeech().equals("NPS")) {
@@ -64,7 +67,7 @@ public class MultiplicityEnhancer implements MentionEnhancer {
 		// TODO: Should we always check our resource and then override the multiplicity?
 
 		if (mention.getMultiplicity() == Multiplicity.UNKNOWN) {
-			Multiplicity assignedMultiplicity = multiplicityResource.lookupMultiplicity(mention.getText());
+			final Multiplicity assignedMultiplicity = multiplicityResource.lookupMultiplicity(mention.getText());
 			mention.setMultiplicity(assignedMultiplicity);
 		}
 	}

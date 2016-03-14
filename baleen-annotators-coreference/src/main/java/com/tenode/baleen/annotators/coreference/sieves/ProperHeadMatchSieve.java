@@ -17,6 +17,9 @@ import com.tenode.baleen.annotators.coreference.data.Cluster;
 import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.data.MentionType;
 
+/**
+ * Seive based on exact matching of the head word.
+ */
 public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 
 	public ProperHeadMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
@@ -28,7 +31,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 		// Note: Head must be proper nouns, but ours are by construction
 
 		for (int i = 0; i < getMentions().size(); i++) {
-			Mention a = getMentions().get(i);
+			final Mention a = getMentions().get(i);
 
 			String aHead = a.getHead();
 			if (aHead == null || aHead.isEmpty() || a.getType() == MentionType.PRONOUN) {
@@ -37,7 +40,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 			aHead = aHead.toLowerCase();
 
 			for (int j = i + 1; j < getMentions().size(); j++) {
-				Mention b = getMentions().get(j);
+				final Mention b = getMentions().get(j);
 				String bHead = b.getHead();
 				if (bHead == null || bHead.isEmpty() || b.getType() == MentionType.PRONOUN) {
 					continue;
@@ -57,8 +60,8 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 					}
 
 					// No numerical mismatches
-					List<Double> aNumbers = extractNumbers(a.getText());
-					List<Double> bNumbers = extractNumbers(b.getText());
+					final List<Double> aNumbers = extractNumbers(a.getText());
+					final List<Double> bNumbers = extractNumbers(b.getText());
 
 					if (!hasSameNumbers(aNumbers, bNumbers)) {
 						continue;
@@ -80,8 +83,8 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 		// modifiers but since locations should be other proper nouns we ignore that clause. We
 		// could look for Locations covered by the annotation.
 
-		Set<String> aModifiers = getSpatialAndPNModifier(a);
-		Set<String> bModifiers = getSpatialAndPNModifier(b);
+		final Set<String> aModifiers = getSpatialAndPNModifier(a);
+		final Set<String> bModifiers = getSpatialAndPNModifier(b);
 
 		return aModifiers.size() == bModifiers.size() && aModifiers.containsAll(bModifiers);
 	}
@@ -98,10 +101,10 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 
 	// Assymetric
 	private List<Double> extractNumbers(String text) {
-		List<Double> list = new LinkedList<>();
-		Matcher matcher = NUMBER.matcher(text);
+		final List<Double> list = new LinkedList<>();
+		final Matcher matcher = NUMBER.matcher(text);
 		while (matcher.find()) {
-			Double d = Doubles.tryParse(matcher.group().replaceAll(",", ""));
+			final Double d = Doubles.tryParse(matcher.group().replaceAll(",", ""));
 			if (d != null) {
 				list.add(d);
 			}
@@ -112,9 +115,9 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 	// Assymetric
 	private boolean hasSameNumbers(Collection<Double> aNumbers, Collection<Double> bNumbers) {
 
-		for (double b : bNumbers) {
+		for (final double b : bNumbers) {
 			boolean found = false;
-			for (double a : aNumbers) {
+			for (final double a : aNumbers) {
 				// 'Fuzzy match' the numbers
 				if (Math.abs(a - b) < 0.01 * Math.max(Math.abs(a), Math.abs(a))) {
 					found = true;
