@@ -74,7 +74,7 @@ public class CsvInteractionReader {
 								target);
 
 						List<String> alternatives = new ArrayList<>(r.size() - 6);
-						for (int j = 0; j < r.size(); j++) {
+						for (int j = 6; j < r.size(); j++) {
 							alternatives.add(r.get(j));
 						}
 
