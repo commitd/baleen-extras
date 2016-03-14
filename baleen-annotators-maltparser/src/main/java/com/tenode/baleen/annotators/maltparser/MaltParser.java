@@ -1,11 +1,14 @@
 package com.tenode.baleen.annotators.maltparser;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
@@ -60,9 +63,9 @@ public class MaltParser extends BaleenAnnotator {
 	 *
 	 * @baleen.config maltparser-universaldependencies-en.mco
 	 */
-	public static final String PARAM_FILE_NAME = "modelUrl";
+	public static final String PARAM_FILE_NAME = "model";
 	@ConfigurationParameter(name = MaltParser.PARAM_FILE_NAME, defaultValue = "maltparser-universaldependencies-en.mco")
-	private String modelUrl;
+	private String modelFilename;
 
 	/**
 	 * Convert to POS annotations to Universal Dependendency tags before input.
@@ -81,16 +84,31 @@ public class MaltParser extends BaleenAnnotator {
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
-		URL url;
-		try {
-			url = new URL(modelUrl);
-		} catch (final MalformedURLException e) {
-			url = getClass().getClassLoader().getResource(modelUrl);
+		File modelFile = new File(modelFilename);
+
+		if (!modelFile.exists()) {
+			// If the file doesn't exist then we will use try reading from the classpath.
+
+			// Unfortunately Maltparser.doInitialise doesn't seem to like reading it from the Baleen
+			// shaded Jar
+			// So we copy it our and delete it on exit
+
+			InputStream is = getClass().getClassLoader().getResourceAsStream(modelFilename);
+			if (is != null) {
+				try {
+					modelFile = File.createTempFile("baleen", "maltpaser-model");
+					FileUtils.copyInputStreamToFile(is, modelFile);
+					modelFile.deleteOnExit();
+				} catch (IOException e) {
+					getMonitor().error("Unable to copy internal model {}", e);
+				}
+
+			}
 		}
 
 		try {
-			model = ConcurrentMaltParserService.initializeParserModel(url);
-		} catch (final MaltChainedException e) {
+			model = ConcurrentMaltParserService.initializeParserModel(modelFile);
+		} catch (final MaltChainedException | MalformedURLException e) {
 			throw new ResourceInitializationException(e);
 		}
 
