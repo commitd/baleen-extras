@@ -49,11 +49,8 @@ public class WordNetResourceTest {
 
 	@Test
 	public void testLookupWord() throws JWNLException {
-		final IndexWord word = wnr.lookupWord(POS.VERB, "employs").get();
+		final IndexWord word = wnr.lookupWord(POS.VERB, "employing").get();
 		Assert.assertEquals("employ", word.getLemma());
-
-		// Check that we can go from verb to noun
-		assert word.getSenses().stream().filter(p -> p.getPOS() != POS.NOUN).count() > 0;
 	}
 
 	@Test
