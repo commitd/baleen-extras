@@ -25,10 +25,23 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Location;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
+/**
+ * Used to supply lists of words to match directly - effectively a simple gazetteer which is
+ * precompiled.
+ *
+ * Override the get* methods to provide the terms.
+ *
+ * @baleen.javadoc
+ */
 public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 
 	private final Map<Pattern, Class<? extends Entity>> missing = new HashMap<>();
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		Stream.of(getOrganisations()).forEach(addToMap(Organisation.class));
@@ -39,26 +52,56 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 
 	}
 
+	/**
+	 * Gets the nationalities.
+	 *
+	 * @return the nationalities
+	 */
 	protected String[] getNationalities() {
 		return new String[] {};
 	}
 
+	/**
+	 * Gets the buzzwords.
+	 *
+	 * @return the buzzwords
+	 */
 	protected String[] getBuzzwords() {
 		return new String[] {};
 	}
 
+	/**
+	 * Gets the locations.
+	 *
+	 * @return the locations
+	 */
 	protected String[] getLocations() {
 		return new String[] {};
 	}
 
+	/**
+	 * Gets the people.
+	 *
+	 * @return the people
+	 */
 	protected String[] getPeople() {
 		return new String[] {};
 	}
 
+	/**
+	 * Gets the organisations.
+	 *
+	 * @return the organisations
+	 */
 	protected String[] getOrganisations() {
 		return new String[] {};
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 
@@ -90,6 +133,13 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 		});
 	}
 
+	/**
+	 * Adds all the strings to map as the class.
+	 *
+	 * @param clazz
+	 *            the clazz
+	 * @return the consumer<? super string>
+	 */
 	private Consumer<? super String> addToMap(Class<? extends Entity> clazz) {
 		return s -> missing.put(Pattern.compile("\\b" + s + "\\b"), clazz);
 	};

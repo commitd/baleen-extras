@@ -46,6 +46,9 @@ public class DependencyGraph {
 	private final SetMultimap<WordToken, Dependency> dependents;
 	private final SetMultimap<WordToken, Dependency> governors;
 
+	/**
+	 * Instantiates a new dependency graph.
+	 */
 	private DependencyGraph() {
 		edges = HashMultimap.create();
 		dependents = HashMultimap.create();
@@ -53,6 +56,16 @@ public class DependencyGraph {
 
 	}
 
+	/**
+	 * Instantiates a new dependency graph.
+	 *
+	 * @param edges
+	 *            the edges
+	 * @param dependentMap
+	 *            the dependent map
+	 * @param governorMap
+	 *            the governor map
+	 */
 	private DependencyGraph(SetMultimap<WordToken, Edge> edges, SetMultimap<WordToken, Dependency> dependentMap,
 			SetMultimap<WordToken, Dependency> governorMap) {
 		this.edges = edges;
@@ -60,18 +73,45 @@ public class DependencyGraph {
 		this.governors = governorMap;
 	}
 
+	/**
+	 * Gets the dependencies where the word is the dependent.
+	 *
+	 * @param word
+	 *            the word
+	 * @return the dependents
+	 */
 	public Set<Dependency> getDependents(WordToken word) {
 		return Collections.unmodifiableSet(dependents.get(word));
 	}
 
+	/**
+	 * Gets the dependencies where the word is the governor.
+	 *
+	 * @param word
+	 *            the word
+	 * @return the governors
+	 */
 	public Set<Dependency> getGovernors(WordToken word) {
 		return Collections.unmodifiableSet(governors.get(word));
 	}
 
+	/**
+	 * Gets the edges to/from this word.
+	 *
+	 * @param word
+	 *            the word
+	 * @return the edges
+	 */
 	public Stream<WordToken> getEdges(WordToken word) {
 		return edges.get(word).stream().map(e -> e.getOther(word));
 	}
 
+	/**
+	 * Adds the edge.
+	 *
+	 * @param dependency
+	 *            the dependency
+	 */
 	private void addEdge(final Dependency dependency) {
 		final WordToken governor = dependency.getGovernor();
 		final WordToken dependent = dependency.getDependent();
@@ -102,6 +142,8 @@ public class DependencyGraph {
 	 *
 	 * @param distance
 	 *            the dependency distance
+	 * @param predicate
+	 *            the predicate
 	 * @param start
 	 *            array / of words to start from
 	 * @return the (set of) words within range
@@ -116,6 +158,8 @@ public class DependencyGraph {
 	 *
 	 * @param distance
 	 *            the dependency distance
+	 * @param predicate
+	 *            the predicate
 	 * @param start
 	 *            the start words (as list)
 	 * @return the (set of) words within range
@@ -159,6 +203,8 @@ public class DependencyGraph {
 	 *
 	 * @param distance
 	 *            the dependency distance
+	 * @param predicate
+	 *            the predicate
 	 * @param start
 	 *            array / of words to start from
 	 * @return the (set of) words within range
@@ -173,6 +219,8 @@ public class DependencyGraph {
 	 *
 	 * @param distance
 	 *            the dependency distance
+	 * @param predicate
+	 *            the predicate
 	 * @param start
 	 *            the start words (as list)
 	 * @return the (set of) words within range
@@ -193,6 +241,18 @@ public class DependencyGraph {
 
 	}
 
+	/**
+	 * Extract words recursively following the graph.
+	 *
+	 * @param collector
+	 *            the collector
+	 * @param distance
+	 *            the distance
+	 * @param predicate
+	 *            the predicate
+	 * @param token
+	 *            the token
+	 */
 	private void extractWords(final Set<WordToken> collector, final int distance, Predicate<Dependency> predicate,
 			final WordToken token) {
 		// The word itself
@@ -301,6 +361,12 @@ public class DependencyGraph {
 		return new DependencyGraph(filteredEdges, filteredDependent, filteredGovernor);
 	}
 
+	/**
+	 * Adds the dependency.
+	 *
+	 * @param dependency
+	 *            the dependency
+	 */
 	private void addDependency(Dependency dependency) {
 		if ((dependency.getDependencyType() == null || !dependency.getDependencyType().equals("ROOT"))
 				&& dependency.getGovernor() != null
@@ -310,10 +376,26 @@ public class DependencyGraph {
 		}
 	}
 
+	/**
+	 * Gets the words in te graph.
+	 *
+	 * @return the words
+	 */
 	public Set<WordToken> getWords() {
 		return Collections.unmodifiableSet(edges.keySet());
 	}
 
+	/**
+	 * Shortest path between from and to, limited by maxDistance..
+	 *
+	 * @param from
+	 *            the from
+	 * @param to
+	 *            the to
+	 * @param maxDistance
+	 *            the max distance
+	 * @return the list
+	 */
 	public List<WordToken> shortestPath(Collection<WordToken> from, Collection<WordToken> to, int maxDistance) {
 		if (from.isEmpty() || to.isEmpty() || maxDistance <= -1) {
 			return Collections.emptyList();
@@ -377,6 +459,8 @@ public class DependencyGraph {
 	 *
 	 * @param jCas
 	 *            the jCAS to process.
+	 * @param annnotation
+	 *            the annnotation
 	 * @return the dependency graph (non-null)
 	 */
 	public static DependencyGraph build(final JCas jCas, AnnotationFS annnotation) {
@@ -387,6 +471,17 @@ public class DependencyGraph {
 		return graph;
 	}
 
+	/**
+	 * Traverse the graph looking
+	 *
+	 * @param distance
+	 *            the distance
+	 * @param start
+	 *            the start
+	 * @param predicate
+	 *            the predicate - use this to act on the graph (eg collect information) and return
+	 *            false to stop or true to continue.
+	 */
 	public void traverse(int distance, Collection<Dependency> start,
 			TraversePredicate predicate) {
 		if (distance <= 0) {
@@ -412,6 +507,18 @@ public class DependencyGraph {
 		}
 	}
 
+	/**
+	 * Traverse the graph from token.
+	 *
+	 * @param distance
+	 *            the distance
+	 * @param token
+	 *            the token
+	 * @param history
+	 *            the history
+	 * @param predicate
+	 *            the predicate
+	 */
 	private void traverse(int distance, WordToken token, ImmutableStack<WordToken> history,
 			TraversePredicate predicate) {
 		final int newDistance = distance - 1;
@@ -427,9 +534,26 @@ public class DependencyGraph {
 		}
 	}
 
+	/**
+	 * A functional interface to implement
+	 */
 	@FunctionalInterface
 	public interface TraversePredicate {
 
+		/**
+		 * Test if should follow this dependencies.
+		 *
+		 *
+		 * @param dependency
+		 *            the dependency
+		 * @param from
+		 *            the from word
+		 * @param to
+		 *            the to word
+		 * @param history
+		 *            the history (all the word tokens up to from)
+		 * @return true, if successful
+		 */
 		boolean test(Dependency dependency, WordToken from, WordToken to, ImmutableStack<WordToken> history);
 
 	}

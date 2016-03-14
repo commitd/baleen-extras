@@ -35,6 +35,11 @@ public class RelationWrapper {
 	// TODO: We don't mind about the begin/end value as long as the relation specific info is
 	// the same?
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof RelationWrapper)) {
@@ -59,6 +64,11 @@ public class RelationWrapper {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(relation.getBegin(), relation.getEnd(), relation.getRelationshipType(),

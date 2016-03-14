@@ -44,6 +44,11 @@ public class Word {
 		return pos;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -53,6 +58,11 @@ public class Word {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -64,7 +74,7 @@ public class Word {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		Word other = (Word) obj;
+		final Word other = (Word) obj;
 		if (lemma == null) {
 			if (other.lemma != null) {
 				return false;
@@ -78,6 +88,11 @@ public class Word {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return String.format("%s [%s]", lemma, pos);

@@ -104,6 +104,12 @@ public class UploadInteractionsToMongo extends BaleenTask {
 	@ConfigurationParameter(name = KEY_CSV_FILENAME, defaultValue = "interactions.csv")
 	private String inputFilename;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * uk.gov.dstl.baleen.uima.jobs.BaleenTask#execute(uk.gov.dstl.baleen.uima.jobs.JobSettings)
+	 */
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
 
@@ -114,9 +120,9 @@ public class UploadInteractionsToMongo extends BaleenTask {
 				writer.clear();
 			}
 
-			CsvInteractionReader reader = new CsvInteractionReader(inputFilename);
+			final CsvInteractionReader reader = new CsvInteractionReader(inputFilename);
 			reader.read((i, a) -> writer.write(i, a));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new AnalysisEngineProcessException(e);
 		}
 	}

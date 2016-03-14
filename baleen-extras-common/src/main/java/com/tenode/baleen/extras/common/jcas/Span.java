@@ -2,8 +2,13 @@ package com.tenode.baleen.extras.common.jcas;
 
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
-// NOTE: Entity is specifically excluded from the equals / hashcode so that we get uniqueness
-// based on span and type alone.
+/**
+ * A span of text (begin/end) which can be assoicated with an entity.
+ *
+ * // NOTE: Entity is specifically excluded from the equals / hashcode so that we get uniqueness
+ * based on span and type alone
+ */
+// .
 public class Span {
 
 	private final int begin;
@@ -14,6 +19,16 @@ public class Span {
 
 	private final Entity entity;
 
+	/**
+	 * Instantiates a new span.
+	 *
+	 * @param entity
+	 *            the entity
+	 * @param begin
+	 *            the begin
+	 * @param end
+	 *            the end
+	 */
 	public Span(Entity entity, int begin, int end) {
 		this.entity = entity;
 		this.clazz = entity.getClass();
@@ -21,22 +36,47 @@ public class Span {
 		this.end = end;
 	}
 
+	/**
+	 * Gets the begin.
+	 *
+	 * @return the begin
+	 */
 	public int getBegin() {
 		return begin;
 	}
 
+	/**
+	 * Gets the end.
+	 *
+	 * @return the end
+	 */
 	public int getEnd() {
 		return end;
 	}
 
+	/**
+	 * Gets the class of the entity
+	 *
+	 * @return the class
+	 */
 	public Class<?> getClazz() {
 		return clazz;
 	}
 
+	/**
+	 * Gets the entity.
+	 *
+	 * @return the entity
+	 */
 	public Entity getEntity() {
 		return entity;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -47,6 +87,11 @@ public class Span {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -75,6 +120,11 @@ public class Span {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return String.format("%s[%d,%d]", getClass().getSimpleName(), begin, end);

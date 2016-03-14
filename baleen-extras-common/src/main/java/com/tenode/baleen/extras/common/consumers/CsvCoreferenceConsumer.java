@@ -17,10 +17,39 @@ import uk.gov.dstl.baleen.types.language.Sentence;
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
+/**
+ * WRite coreference information to a CSV.
+ *
+ * The format is as follows:
+ * <ul>
+ * <li>source
+ * <li>id
+ * <li>reference
+ * <li>type
+ * <li>text
+ * <li>value
+ * <li>EntityCount
+ * <li>then EntityCount * Entities (value, type)
+ * <li>nonEntityNonStopWordsCount
+ * <li>nonEntityNonStopWordsCount * nonEntityNonStopWords ( (format word then pos)
+ * <li>NonStopWordsNotCoveredByEntitiesCount
+ * <li>then NonStopWordsNotCoveredByEntitiesCount * NonStopWordsNotCoveredByEntities (format word
+ * then pos)
+ * </ul>
+ *
+ * @baleen.javadoc
+ */
 public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 
 	private final StopWordRemover stopWordRemover = new StopWordRemover();
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.tenode.baleen.extras.common.consumers.AbstractCsvConsumer#doInitialize(org.apache.uima.
+	 * UimaContext)
+	 */
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
@@ -28,10 +57,17 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 				"EntityCount then Entities... then nonEntityNonStopWords (format word then pos) then NonStopWordsNotCoveredByEntitiesCount then (format word then pos)...");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.tenode.baleen.extras.common.consumers.AbstractCsvConsumer#write(org.apache.uima.jcas.
+	 * JCas)
+	 */
 	@Override
 	protected void write(JCas jCas) {
 
-		String source = getDocumentAnnotation(jCas).getSourceUri();
+		final String source = getDocumentAnnotation(jCas).getSourceUri();
 
 		// For each entity we need to find all the other sentences they are contained in
 		// TODO: use coreference param , actually two flags
@@ -40,18 +76,20 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 		// - Or just output the coreferent map?
 
 		// This should be all entities and sentences
-		Map<Entity, Collection<Sentence>> coveringSentence = JCasUtil.indexCovering(jCas, Entity.class, Sentence.class);
-		Map<Sentence, Collection<Entity>> coveredEntities = JCasUtil.indexCovered(jCas, Sentence.class, Entity.class);
-		Map<Sentence, Collection<WordToken>> coveredTokens = JCasUtil.indexCovered(jCas, Sentence.class,
+		final Map<Entity, Collection<Sentence>> coveringSentence = JCasUtil.indexCovering(jCas, Entity.class,
+				Sentence.class);
+		final Map<Sentence, Collection<Entity>> coveredEntities = JCasUtil.indexCovered(jCas, Sentence.class,
+				Entity.class);
+		final Map<Sentence, Collection<WordToken>> coveredTokens = JCasUtil.indexCovered(jCas, Sentence.class,
 				WordToken.class);
-		Map<WordToken, Collection<Entity>> coveringEntity = JCasUtil.indexCovering(jCas, WordToken.class,
+		final Map<WordToken, Collection<Entity>> coveringEntity = JCasUtil.indexCovering(jCas, WordToken.class,
 				Entity.class);
 
 		JCasUtil.select(jCas, Entity.class).stream().map(e -> {
-			List<String> list = new ArrayList<>();
+			final List<String> list = new ArrayList<>();
 
 			Sentence sentence = null;
-			Collection<Sentence> sentences = coveringSentence.get(e);
+			final Collection<Sentence> sentences = coveringSentence.get(e);
 			if (!sentences.isEmpty()) {
 				sentence = sentences.iterator().next();
 			} else {
@@ -72,14 +110,14 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 			list.add(normalize(e.getCoveredText()));
 			list.add(normalize(e.getValue()));
 
-			Collection<Entity> entities = coveredEntities.get(sentence);
+			final Collection<Entity> entities = coveredEntities.get(sentence);
 
 			// Entities
-			int entityCountIndex = list.size();
+			final int entityCountIndex = list.size();
 			int entityCount = 0;
 			list.add("0");
 
-			for (Entity x : entities) {
+			for (final Entity x : entities) {
 				if (x.getInternalId() != e.getInternalId()) {
 					list.add(normalize(x.getValue()));
 					list.add(x.getType().getShortName());
@@ -90,15 +128,15 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 
 			// Add (non-stop) words - separate out the entities from the other words
 
-			List<WordToken> entityNonStopWords = new ArrayList<>();
-			List<WordToken> nonEntityNonStopWords = new ArrayList<>();
+			final List<WordToken> entityNonStopWords = new ArrayList<>();
+			final List<WordToken> nonEntityNonStopWords = new ArrayList<>();
 
-			for (WordToken t : coveredTokens.get(sentence)) {
+			for (final WordToken t : coveredTokens.get(sentence)) {
 				// Filter out entities
-				String word = t.getCoveredText();
+				final String word = t.getCoveredText();
 				if (!stopWordRemover.isStopWord(word)) {
 
-					Collection<Entity> collection = coveringEntity.get(t);
+					final Collection<Entity> collection = coveringEntity.get(t);
 					if (collection == null || collection.isEmpty()) {
 						nonEntityNonStopWords.add(t);
 					} else if (!collection.stream().anyMatch(x -> e.getInternalId() == x.getInternalId())) {

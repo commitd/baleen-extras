@@ -35,6 +35,11 @@ public class WordNetLemmatizer extends BaleenAnnotator {
 	@ExternalResource(key = KEY_WORDNET)
 	private WordNetResource wordnet;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 		for (final WordToken t : JCasUtil.select(jCas, WordToken.class)) {

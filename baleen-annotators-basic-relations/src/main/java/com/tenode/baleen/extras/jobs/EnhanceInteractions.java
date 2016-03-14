@@ -72,6 +72,12 @@ public class EnhanceInteractions extends BaleenTask {
 
 	private Dictionary dictionary;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * uk.gov.dstl.baleen.uima.jobs.BaleenTask#execute(uk.gov.dstl.baleen.uima.jobs.JobSettings)
+	 */
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
 		dictionary = wordnet.getDictionary();

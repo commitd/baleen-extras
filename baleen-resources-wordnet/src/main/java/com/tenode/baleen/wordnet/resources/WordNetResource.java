@@ -29,6 +29,12 @@ public class WordNetResource extends BaleenResource {
 
 	private Dictionary dictionary;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenResource#doInitialize(org.apache.uima.resource.
+	 * ResourceSpecifier, java.util.Map)
+	 */
 	@Override
 	protected boolean doInitialize(final ResourceSpecifier specifier, final Map<String, Object> additionalParams)
 			throws ResourceInitializationException {
@@ -42,6 +48,11 @@ public class WordNetResource extends BaleenResource {
 		return super.doInitialize(specifier, additionalParams);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenResource#doDestroy()
+	 */
 	@Override
 	protected void doDestroy() {
 		super.doDestroy();
@@ -57,7 +68,7 @@ public class WordNetResource extends BaleenResource {
 	}
 
 	/**
-	 * Get the WordNet dictionary
+	 * Get the WordNet dictionary.
 	 *
 	 * @return Wordnet dictionary
 	 */
@@ -73,8 +84,6 @@ public class WordNetResource extends BaleenResource {
 	 * @param word
 	 *            the word
 	 * @return the WordNet word, (as an optional)
-	 * @throws JWNLException
-	 *             the JWNL exception
 	 */
 	public Optional<IndexWord> lookupWord(final POS pos, final String word) {
 		try {
@@ -93,8 +102,6 @@ public class WordNetResource extends BaleenResource {
 	 * @param lemma
 	 *            the lemma
 	 * @return the WordNet word (as an optional)
-	 * @throws JWNLException
-	 *             the JWNL exception
 	 */
 	public Optional<IndexWord> getWord(final POS pos, final String lemma) {
 		try {

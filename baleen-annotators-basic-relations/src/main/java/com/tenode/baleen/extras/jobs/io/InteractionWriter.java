@@ -58,6 +58,11 @@ public interface InteractionWriter extends AutoCloseable {
 		// Do nothing
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.AutoCloseable#close()
+	 */
 	@Override
 	default void close() {
 		destroy();

@@ -42,6 +42,11 @@ public class ClearNlpTokeniser extends BaleenAnnotator {
 	private AbstractMPAnalyzer mpAnalyser;
 	private AbstractTokenizer tokeniser;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
@@ -54,6 +59,11 @@ public class ClearNlpTokeniser extends BaleenAnnotator {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 		final String text = jCas.getDocumentText();

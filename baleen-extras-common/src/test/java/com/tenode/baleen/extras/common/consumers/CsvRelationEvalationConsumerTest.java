@@ -69,7 +69,7 @@ public class CsvRelationEvalationConsumerTest extends AbstractAnnotatorTest {
 		assertEquals(2, lines.size());
 
 		// Header
-		assertTrue(lines.get(0).contains("file"));
+		assertTrue(lines.get(0).contains("source"));
 		// Relation
 		assertTrue(lines.get(1).contains("\tJohn\t"));
 		assertTrue(lines.get(1).contains("\tLondon\t"));

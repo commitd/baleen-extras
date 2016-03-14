@@ -30,7 +30,7 @@ public class ClusteredPatterns {
 	}
 
 	/**
-	 * Calculate similarity (similarity measure is as defined by the pattern)
+	 * Calculate similarity (similarity measure is as defined by the pattern).
 	 *
 	 * @param pattern
 	 *            the pattern
@@ -41,7 +41,7 @@ public class ClusteredPatterns {
 		if (patterns.isEmpty()) {
 			return 0;
 		} else {
-			double sum = patterns.stream().map(p -> p.calculateSimilarity(pattern)).reduce(0.0, (a, b) -> a + b);
+			final double sum = patterns.stream().map(p -> p.calculateSimilarity(pattern)).reduce(0.0, (a, b) -> a + b);
 			return sum / size();
 		}
 	}

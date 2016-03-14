@@ -82,6 +82,11 @@ public class InteractionDefinition {
 		return word;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -94,6 +99,11 @@ public class InteractionDefinition {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -105,7 +115,7 @@ public class InteractionDefinition {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		InteractionDefinition other = (InteractionDefinition) obj;
+		final InteractionDefinition other = (InteractionDefinition) obj;
 		if (source == null) {
 			if (other.source != null) {
 				return false;
@@ -144,6 +154,11 @@ public class InteractionDefinition {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return word.getLemma();

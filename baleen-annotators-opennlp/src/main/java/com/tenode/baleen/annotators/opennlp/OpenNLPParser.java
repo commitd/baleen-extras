@@ -58,6 +58,11 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	private Parser parser;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		try {
@@ -76,6 +81,11 @@ public class OpenNLPParser extends BaleenAnnotator {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	public void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 		// For each sentence (in the JCas)e, we recreate the spans from our
@@ -96,6 +106,16 @@ public class OpenNLPParser extends BaleenAnnotator {
 		});
 	}
 
+	/**
+	 * Update phrase chunks.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param sentence
+	 *            the sentence
+	 * @param parsed
+	 *            the parsed
+	 */
 	private void updatePhraseChunks(final JCas jCas, final Sentence sentence, final Parse parsed) {
 		// We remove all the existing PhraseChunks as they are going to be
 		// replace with the parsed
@@ -107,6 +127,16 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	}
 
+	/**
+	 * Adds the parsed as annotations.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param offset
+	 *            the offset
+	 * @param parsed
+	 *            the parsed
+	 */
 	private void addParsedAsAnnotations(final JCas jCas, final int offset, final Parse parsed) {
 		final String type = parsed.getType();
 
@@ -129,6 +159,15 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	}
 
+	/**
+	 * Parses the sentence.
+	 *
+	 * @param sentence
+	 *            the sentence
+	 * @param tokens
+	 *            the tokens
+	 * @return the parses the
+	 */
 	private Parse parseSentence(final Sentence sentence, final Collection<WordToken> tokens) {
 		final String text = sentence.getCoveredText();
 
@@ -147,6 +186,11 @@ public class OpenNLPParser extends BaleenAnnotator {
 		return parser.parse(parse);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doDestroy()
+	 */
 	@Override
 	public void doDestroy() {
 		parserChunkingModel = null;

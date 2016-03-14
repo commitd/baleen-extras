@@ -30,6 +30,11 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  */
 public abstract class AbstractInteractionBasedRelationshipAnnotator extends BaleenAnnotator {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected final void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
@@ -47,7 +52,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	/**
 	 * Extract relations from the jCas.
 	 *
-	 * It is the overridders repsonisbility to add these to the jCas Index (addRelationsToIndex)
+	 * It is the overridders responsibility to add these to the jCas Index (addRelationsToIndex)
 	 *
 	 * @param jCas
 	 *            the j cas
@@ -55,7 +60,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	protected abstract void extract(JCas jCas);
 
 	/**
-	 * Called before extract()
+	 * Called before extract().
 	 *
 	 * @param jCas
 	 *            the jcas
@@ -65,7 +70,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	}
 
 	/**
-	 * Called after extract (including on exception)
+	 * Called after extract (including on exception).
 	 *
 	 * @param jCas
 	 *            the jcas
@@ -150,7 +155,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 
 	/**
 	 * Creates the relations between all the entities provided (but not between an entity adn
-	 * itself)
+	 * itself).
 	 *
 	 * @param jCas
 	 *            the j cas
@@ -188,7 +193,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	}
 
 	/**
-	 * Make the stream distinct (no relations of the same type, between the same entities)
+	 * Make the stream distinct (no relations of the same type, between the same entities).
 	 *
 	 * @param stream
 	 *            the stream

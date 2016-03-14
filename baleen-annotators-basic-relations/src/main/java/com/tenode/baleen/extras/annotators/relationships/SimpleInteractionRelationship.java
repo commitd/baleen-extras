@@ -38,6 +38,13 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
  */
 public class SimpleInteractionRelationship extends AbstractInteractionBasedSentenceRelationshipAnnotator {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.annotators.relationships.
+	 * AbstractInteractionBasedSentenceRelationshipAnnotator#extract(org.apache.uima.jcas.JCas,
+	 * uk.gov.dstl.baleen.types.language.Sentence, java.util.Collection, java.util.Collection)
+	 */
 	@Override
 	protected Stream<Relation> extract(final JCas jCas, final Sentence sentence,
 			final Collection<Interaction> interactions,

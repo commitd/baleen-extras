@@ -57,6 +57,11 @@ public class PatternExtractor extends BaleenAnnotator {
 
 	private final java.util.regex.Pattern negationRegex = java.util.regex.Pattern.compile("\b((no)|(neither)|(not))\b");
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
@@ -120,6 +125,15 @@ public class PatternExtractor extends BaleenAnnotator {
 
 	}
 
+	/**
+	 * Count words between the pattern and words.
+	 *
+	 * @param p
+	 *            the p
+	 * @param words
+	 *            the words
+	 * @return the int
+	 */
 	private int countWordsBetween(final PatternExtract p, final List<WordToken> words) {
 		int startWord = -1;
 		int endWord = -1;
@@ -144,6 +158,17 @@ public class PatternExtractor extends BaleenAnnotator {
 		return endWord - startWord;
 	}
 
+	/**
+	 * Removes the additional words from the pattern extractor.
+	 *
+	 * Filters out stop words and words outside the pattern.
+	 *
+	 * @param pe
+	 *            the pe
+	 * @param tokens
+	 *            the tokens
+	 * @return the stream
+	 */
 	private Stream<WordToken> removeAdditionalWords(final PatternExtract pe, final Stream<WordToken> tokens) {
 		return tokens
 				.filter(t -> t.getBegin() >= pe.getStart() && t.getEnd() <= pe.getEnd())
@@ -151,6 +176,14 @@ public class PatternExtractor extends BaleenAnnotator {
 				.filter(t -> t.getCoveredText().trim().length() > 1);
 	}
 
+	/**
+	 * Output pattern (save to the jCas)
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param pattern
+	 *            the pattern
+	 */
 	private void outputPattern(final JCas jCas, final PatternExtract pattern) {
 		final Pattern a = new Pattern(jCas);
 		a.setBegin(pattern.getStart());

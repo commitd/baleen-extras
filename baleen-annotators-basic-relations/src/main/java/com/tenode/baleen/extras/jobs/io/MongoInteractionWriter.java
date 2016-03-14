@@ -1,3 +1,6 @@
+/*
+ *
+ */
 package com.tenode.baleen.extras.jobs.io;
 
 import java.util.Collection;
@@ -53,18 +56,24 @@ public class MongoInteractionWriter implements InteractionWriter {
 		relationTypes = db.getCollection(relationTypesCollection);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#write(com.tenode.baleen.extras.jobs.
+	 * interactions.data.InteractionDefinition, java.util.Collection)
+	 */
 	@Override
 	public void write(InteractionDefinition interaction,
 			Collection<String> alternatives) {
 		// Write to the interactions collection
 		// ADd in relationshiptype and subtype (which can be manually changed later)
-		BasicDBObject interactionObject = new BasicDBObject("value", alternatives);
+		final BasicDBObject interactionObject = new BasicDBObject("value", alternatives);
 		interactionObject.put("relationshipType", interaction.getType());
 		interactionObject.put("relationSubType", interaction.getSubType());
 		interactions.save(interactionObject);
 
 		// Write out to the relationship constraints
-		BasicDBObject relationTypeObject = new BasicDBObject()
+		final BasicDBObject relationTypeObject = new BasicDBObject()
 				.append("source", interaction.getSource())
 				.append("target", interaction.getTarget())
 				.append("type", interaction.getType());

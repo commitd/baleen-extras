@@ -24,6 +24,12 @@ public class MonitorInteractionWriter implements InteractionWriter {
 		this.monitor = monitor;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#write(com.tenode.baleen.extras.jobs.
+	 * interactions.data.InteractionDefinition, java.util.Collection)
+	 */
 	@Override
 	public void write(InteractionDefinition interaction, Collection<String> alternatives) {
 		monitor.info("Interaction {} {} {} {} {}", interaction.getType(), interaction.getSubType(),

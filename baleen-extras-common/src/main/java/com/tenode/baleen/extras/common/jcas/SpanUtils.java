@@ -7,12 +7,31 @@ import org.apache.uima.jcas.JCas;
 import uk.gov.dstl.baleen.types.Base;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
+/**
+ * Helpers for working with spans.
+ */
 public class SpanUtils {
 
+	/**
+	 * Instantiates a new span utils.
+	 */
 	private SpanUtils() {
 		// Singleton
 	}
 
+	/**
+	 * Copy entity.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param begin
+	 *            the begin
+	 * @param end
+	 *            the end
+	 * @param entity
+	 *            the entity
+	 * @return the entity
+	 */
 	public static Entity copyEntity(JCas jCas, int begin, int end, Entity entity) {
 		// TODO: This could be better, but would suggest if better is need
 
@@ -31,7 +50,7 @@ public class SpanUtils {
 	}
 
 	/**
-	 * Are any entities in the entities collection covering the range begin to end?
+	 * Are any entities in the entities collection covering the range begin to end?.
 	 *
 	 * @param entities
 	 *            the entities
@@ -48,7 +67,7 @@ public class SpanUtils {
 
 	/**
 	 * Does the entities collection contain an entity coveringthe range begin-end of the correct
-	 * class?
+	 * class?.
 	 *
 	 * @param entities
 	 *            the entities
@@ -66,6 +85,15 @@ public class SpanUtils {
 				.anyMatch(e -> e.getBegin() <= begin && end <= e.getEnd() && clazz.isInstance(e));
 	}
 
+	/**
+	 * Overlaps.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return true, if successful
+	 */
 	public static boolean overlaps(Base a, Base b) {
 		return !(a.getEnd() < b.getBegin() || b.getEnd() < a.getBegin());
 	}

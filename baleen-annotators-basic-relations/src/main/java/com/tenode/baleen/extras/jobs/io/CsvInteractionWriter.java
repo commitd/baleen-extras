@@ -37,6 +37,11 @@ public class CsvInteractionWriter implements InteractionWriter {
 		this.csvFilename = csvFilename;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#initialise()
+	 */
 	@Override
 	public void initialise() throws IOException {
 		// Create the parent dirs
@@ -56,17 +61,23 @@ public class CsvInteractionWriter implements InteractionWriter {
 		});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#write(com.tenode.baleen.extras.jobs.
+	 * interactions.data.InteractionDefinition, java.util.Collection)
+	 */
 	@Override
 	public void write(InteractionDefinition interaction, Collection<String> alternatives) throws IOException {
 		if (writer != null) {
-			Object[] record = new Object[6 + alternatives.size()];
+			final Object[] record = new Object[6 + alternatives.size()];
 			record[0] = interaction.getType();
 			record[1] = interaction.getSubType();
 			record[2] = interaction.getSource();
 			record[3] = interaction.getTarget();
 			record[4] = interaction.getWord().getLemma();
 			record[5] = interaction.getWord().getPos().getLabel();
-			Iterator<String> iterator = alternatives.iterator();
+			final Iterator<String> iterator = alternatives.iterator();
 			for (int i = 0; i < alternatives.size(); i++) {
 				record[6 + i] = iterator.next();
 			}
@@ -75,6 +86,11 @@ public class CsvInteractionWriter implements InteractionWriter {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#destroy()
+	 */
 	@Override
 	public void destroy() {
 		try {
@@ -82,7 +98,7 @@ public class CsvInteractionWriter implements InteractionWriter {
 				writer.flush();
 				writer.close();
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			writer = null;
 		}
 	}

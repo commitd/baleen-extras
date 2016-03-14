@@ -141,8 +141,8 @@ public final class PatternReference {
 		// Naive implementation, but perhaps correct way given that the tokens should be very small
 		// in general
 		int i = 0;
-		for (Word term : terms) {
-			for (Word token : tokens) {
+		for (final Word term : terms) {
+			for (final Word token : tokens) {
 				// Note we ignore the POS here
 				if (term.getLemma().equals(token.getLemma())) {
 					termFrequency[i]++;
@@ -164,7 +164,7 @@ public final class PatternReference {
 	 * @return the double
 	 */
 	public double calculateSimilarity(PatternReference pattern) {
-		int[] otherTF = pattern.getTermFrequency();
+		final int[] otherTF = pattern.getTermFrequency();
 
 		double score = 0;
 		for (int i = 0; i < termFrequency.length; i++) {
@@ -176,6 +176,11 @@ public final class PatternReference {
 		return score / (pattern.getTFMagnitude() * getTFMagnitude());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return id + ":" + tokens.stream().map(Word::getLemma).collect(Collectors.joining(";"));

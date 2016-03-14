@@ -122,6 +122,11 @@ public class RelationTypeFilter extends BaleenAnnotator {
 
 	private final Map<String, Set<RelationConstraint>> constraints = new HashMap<>();
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
@@ -145,6 +150,11 @@ public class RelationTypeFilter extends BaleenAnnotator {
 		});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
@@ -177,6 +187,15 @@ public class RelationTypeFilter extends BaleenAnnotator {
 
 	}
 
+	/**
+	 * Check if the relation is valid against the constraints.
+	 *
+	 * @param rcs
+	 *            the rcs
+	 * @param relation
+	 *            the relation
+	 * @return true, if successful
+	 */
 	private boolean checkValid(final Set<RelationConstraint> rcs, final Relation relation) {
 		return rcs.stream().anyMatch(p -> {
 			return p.matches(relation, symetric);

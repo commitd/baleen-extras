@@ -146,6 +146,11 @@ public class IdentifyInteractions extends BaleenTask {
 
 	private final List<InteractionWriter> interactionWriters = new ArrayList<>();
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.jobs.BaleenTask#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
@@ -159,6 +164,12 @@ public class IdentifyInteractions extends BaleenTask {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * uk.gov.dstl.baleen.uima.jobs.BaleenTask#execute(uk.gov.dstl.baleen.uima.jobs.JobSettings)
+	 */
 	@Override
 	protected void execute(JobSettings settings) throws AnalysisEngineProcessException {
 		final InteractionIdentifier identifier = new InteractionIdentifier(getMonitor(), minPatternsInCluster,
@@ -175,6 +186,11 @@ public class IdentifyInteractions extends BaleenTask {
 
 	}
 
+	/**
+	 * Read patterns from mongo.
+	 *
+	 * @return the list
+	 */
 	private List<PatternReference> readPatternsFromMongo() {
 		// TODO: Ideally this would do something in a more streaming manner, as there are likely to
 		// be lots of examples. Loading all patterns into memory might be prohibitive.
@@ -212,6 +228,12 @@ public class IdentifyInteractions extends BaleenTask {
 
 	}
 
+	/**
+	 * Write/save patterns to the writers.
+	 *
+	 * @param words
+	 *            the words
+	 */
 	private void write(Stream<InteractionWord> words) {
 
 		interactionWriters.forEach(w -> {

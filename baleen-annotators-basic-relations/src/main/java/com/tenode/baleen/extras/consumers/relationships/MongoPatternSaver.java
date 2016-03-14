@@ -66,6 +66,11 @@ public class MongoPatternSaver extends BaleenConsumer {
 
 	private DBCollection dbCollection;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
@@ -79,6 +84,11 @@ public class MongoPatternSaver extends BaleenConsumer {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
@@ -97,6 +107,13 @@ public class MongoPatternSaver extends BaleenConsumer {
 		}
 	}
 
+	/**
+	 * Save words.
+	 *
+	 * @param pattern
+	 *            the pattern
+	 * @return the DB object
+	 */
 	private DBObject saveWords(final Pattern pattern) {
 		final BasicDBList list = new BasicDBList();
 		for (int i = 0; i < pattern.getWords().size(); i++) {
@@ -114,6 +131,13 @@ public class MongoPatternSaver extends BaleenConsumer {
 		return list;
 	}
 
+	/**
+	 * Save entity.
+	 *
+	 * @param entity
+	 *            the entity
+	 * @return the DB object
+	 */
 	private DBObject saveEntity(final Entity entity) {
 		return new BasicDBObject()
 				.append("text", entity.getCoveredText())

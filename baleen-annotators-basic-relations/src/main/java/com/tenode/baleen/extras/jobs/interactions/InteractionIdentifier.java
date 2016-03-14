@@ -58,7 +58,7 @@ public class InteractionIdentifier {
 	}
 
 	/**
-	 * Process the pattern references and extract the list of distinct interaction words
+	 * Process the pattern references and extract the list of distinct interaction words.
 	 *
 	 * @param patterns
 	 *            the patterns
@@ -66,7 +66,7 @@ public class InteractionIdentifier {
 	 */
 	public Stream<InteractionWord> process(List<PatternReference> patterns) {
 
-		Set<Word> terms = gatherTerms(patterns);
+		final Set<Word> terms = gatherTerms(patterns);
 
 		monitor.info("Gathered {} terms", terms.size());
 
@@ -80,7 +80,7 @@ public class InteractionIdentifier {
 		monitor.info("Sorted patterns by frequency");
 
 		// Cluster
-		List<ClusteredPatterns> clusters = cluster(patterns);
+		final List<ClusteredPatterns> clusters = cluster(patterns);
 
 		monitor.info("Patterns clustered into {} clusters", clusters.size());
 
@@ -103,7 +103,7 @@ public class InteractionIdentifier {
 	}
 
 	/**
-	 * Extract interaction words from the clustered patterns
+	 * Extract interaction words from the clustered patterns.
 	 *
 	 * @param clusters
 	 *            the clusters
@@ -111,13 +111,13 @@ public class InteractionIdentifier {
 	 * @return the stream of interaction words
 	 */
 	private Stream<InteractionWord> extractInteractionWords(List<ClusteredPatterns> clusters) {
-		Stream<InteractionWord> distinctWords = clusters.stream().flatMap(cluster -> {
+		final Stream<InteractionWord> distinctWords = clusters.stream().flatMap(cluster -> {
 			// TODO: Should we use token or terms here?
-			Map<Word, Long> wordCount = cluster.getPatterns().stream()
+			final Map<Word, Long> wordCount = cluster.getPatterns().stream()
 					.flatMap(p -> p.getTokens().stream())
 					.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-			Set<RelationPair> relationPairs = cluster.getPairs();
+			final Set<RelationPair> relationPairs = cluster.getPairs();
 
 			return wordCount.entrySet().stream()
 					.filter(e -> e.getValue() >= minWordOccurances)
@@ -146,7 +146,7 @@ public class InteractionIdentifier {
 	}
 
 	/**
-	 * Calculate term frequencies for each pattern
+	 * Calculate term frequencies for each pattern.
 	 *
 	 * @param patterns
 	 *            the patterns
@@ -158,7 +158,7 @@ public class InteractionIdentifier {
 	}
 
 	/**
-	 * Sort the patterns by term frequency
+	 * Sort the patterns by term frequency.
 	 *
 	 * @param patterns
 	 *            the patterns
@@ -168,7 +168,7 @@ public class InteractionIdentifier {
 	}
 
 	/**
-	 * Cluster the patterns together based on similarity
+	 * Cluster the patterns together based on similarity.
 	 *
 	 * @param patterns
 	 *            the patterns
@@ -184,7 +184,7 @@ public class InteractionIdentifier {
 			ClusteredPatterns bestCluster = null;
 
 			for (final ClusteredPatterns cp : clusters) {
-				double score = cp.calculateSimilarity(pr);
+				final double score = cp.calculateSimilarity(pr);
 
 				if (score > maxScore) {
 					maxScore = score;
@@ -205,7 +205,7 @@ public class InteractionIdentifier {
 	}
 
 	/**
-	 * Calculate threshold for a set of patterns
+	 * Calculate threshold for a set of patterns.
 	 *
 	 * @param patterns
 	 *            the patterns
@@ -230,9 +230,9 @@ public class InteractionIdentifier {
 	 */
 	private void filterClusters(List<ClusteredPatterns> clusters) {
 		if (minPatternsInCluster != 0) {
-			Iterator<ClusteredPatterns> iterator = clusters.iterator();
+			final Iterator<ClusteredPatterns> iterator = clusters.iterator();
 			while (iterator.hasNext()) {
-				ClusteredPatterns patterns = iterator.next();
+				final ClusteredPatterns patterns = iterator.next();
 
 				if (patterns.size() < minPatternsInCluster) {
 					iterator.remove();

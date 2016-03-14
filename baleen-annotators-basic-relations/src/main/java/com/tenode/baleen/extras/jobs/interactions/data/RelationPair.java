@@ -53,6 +53,11 @@ public class RelationPair {
 		return target;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -78,7 +83,7 @@ public class RelationPair {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		RelationPair other = (RelationPair) obj;
+		final RelationPair other = (RelationPair) obj;
 		if (source == null) {
 			if (other.source != null) {
 				return false;

@@ -16,7 +16,7 @@ public final class WordNetUtils {
 	}
 
 	/**
-	 * Conver a string (Penntree bank / simple word) to a Part of speech type.
+	 * Convert a string (Penntree bank / simple word) to a Part of speech type.
 	 *
 	 * @param pos
 	 *            the pos

@@ -14,6 +14,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import uk.gov.dstl.baleen.uima.BaleenConsumer;
 
+/**
+ * Base class for outputting CSV files.
+ */
 public abstract class AbstractCsvConsumer extends BaleenConsumer {
 
 	private final static Pattern NORMALIZE = Pattern.compile("\\s+");
@@ -24,36 +27,60 @@ public abstract class AbstractCsvConsumer extends BaleenConsumer {
 
 	private CSVPrinter writer;
 
-	public AbstractCsvConsumer() {
+	/**
+	 * Instantiates a new abstract csv consumer.
+	 */
+	protected AbstractCsvConsumer() {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
 		try {
 			writer = new CSVPrinter(new FileWriter(filename, false), CSVFormat.TDF);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new ResourceInitializationException(e);
 		}
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected final void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 		write(jCas);
 
 		try {
 			writer.flush();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			getMonitor().warn("Unable to flush file", e);
 		}
 
 	}
 
+	/**
+	 * Write the JCas to CSV.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 */
 	protected abstract void write(JCas jCas);
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doDestroy()
+	 */
 	@Override
 	protected void doDestroy() {
 
@@ -62,7 +89,7 @@ public abstract class AbstractCsvConsumer extends BaleenConsumer {
 				try {
 					writer.flush();
 					writer.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					getMonitor().warn("Failed to close csv writer", e);
 				}
 			}
@@ -73,15 +100,28 @@ public abstract class AbstractCsvConsumer extends BaleenConsumer {
 		super.doDestroy();
 	}
 
+	/**
+	 * Called by implementors to write a row.
+	 *
+	 * @param row
+	 *            the row
+	 */
 	protected void write(Object... row) {
 		try {
 			writer.printRecord(row);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			getMonitor().warn("Failed to write line to csv", e);
 
 		}
 	}
 
+	/**
+	 * Normalize the text (called by implementors).
+	 *
+	 * @param text
+	 *            the text
+	 * @return the string
+	 */
 	protected String normalize(String text) {
 		return NORMALIZE.matcher(text).replaceAll(" ").trim();
 	}

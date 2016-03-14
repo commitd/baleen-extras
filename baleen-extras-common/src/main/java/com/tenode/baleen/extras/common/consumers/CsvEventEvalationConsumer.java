@@ -19,27 +19,55 @@ import uk.gov.dstl.baleen.types.semantic.ComplexEvent;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.uima.utils.UimaTypesUtils;
 
+/**
+ * Write event to CSV for evaluation purposes.
+ *
+ * Format is:
+ * <ul>
+ * <li>source
+ * <li>sentence
+ * <li>type
+ * <li>Words
+ * <li>Entities
+ * <li>Arguments...
+ *
+ */
 public class CsvEventEvalationConsumer extends AbstractCsvConsumer {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.tenode.baleen.extras.common.consumers.AbstractCsvConsumer#doInitialize(org.apache.uima.
+	 * UimaContext)
+	 */
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
 
-		write("file", "sentence", "type", "words", "Entities then arguments...");
+		write("source", "sentence", "type", "words", "Entities then arguments...");
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.tenode.baleen.extras.common.consumers.AbstractCsvConsumer#write(org.apache.uima.jcas.
+	 * JCas)
+	 */
 	@Override
 	protected void write(JCas jCas) {
-		String source = getDocumentAnnotation(jCas).getSourceUri();
+		final String source = getDocumentAnnotation(jCas).getSourceUri();
 
-		Map<ComplexEvent, Collection<Sentence>> coveringSentence = JCasUtil.indexCovering(jCas, ComplexEvent.class,
+		final Map<ComplexEvent, Collection<Sentence>> coveringSentence = JCasUtil.indexCovering(jCas,
+				ComplexEvent.class,
 				Sentence.class);
 
 		JCasUtil.select(jCas, ComplexEvent.class).stream().map(e -> {
 
 			String sentence = "";
-			Collection<Sentence> sentences = coveringSentence.get(e);
+			final Collection<Sentence> sentences = coveringSentence.get(e);
 			if (!sentences.isEmpty()) {
 				sentence = sentences.iterator().next().getCoveredText();
 			} else {
@@ -47,7 +75,7 @@ public class CsvEventEvalationConsumer extends AbstractCsvConsumer {
 				return null;
 			}
 
-			List<String> list = new ArrayList<>();
+			final List<String> list = new ArrayList<>();
 			list.add(source);
 			list.add(sentence);
 
@@ -70,9 +98,9 @@ public class CsvEventEvalationConsumer extends AbstractCsvConsumer {
 			if (e.getEntities() != null && e.getEntities().size() > 0) {
 				Arrays.stream(e.getEntities().toArray())
 						.forEach(x -> {
-					Entity t = (Entity) x;
-					list.add(normalize(t.getCoveredText()));
-				});
+							final Entity t = (Entity) x;
+							list.add(normalize(t.getCoveredText()));
+						});
 			}
 
 			if (e.getArguments() != null && e.getArguments().size() > 0) {

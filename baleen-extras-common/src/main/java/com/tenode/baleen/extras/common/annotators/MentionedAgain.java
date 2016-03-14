@@ -28,6 +28,11 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  */
 public class MentionedAgain extends BaleenAnnotator {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 		final String text = jCas.getDocumentText();

@@ -80,6 +80,11 @@ public class MaltParser extends BaleenAnnotator {
 
 	private ConcurrentMaltParserModel model;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
+	 */
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
@@ -115,6 +120,11 @@ public class MaltParser extends BaleenAnnotator {
 		udTags = udTags == null ? true : udTags;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
@@ -165,6 +175,13 @@ public class MaltParser extends BaleenAnnotator {
 		}
 	}
 
+	/**
+	 * Gets the lemma.
+	 *
+	 * @param token
+	 *            the token
+	 * @return the lemma
+	 */
 	private String getLemma(final WordToken token) {
 		final FSArray array = token.getLemmas();
 		if (array == null || array.size() == 0) {
@@ -227,6 +244,13 @@ public class MaltParser extends BaleenAnnotator {
 		MaltParser.pennToUniversalTags.put("`", "PUNCT");
 	}
 
+	/**
+	 * Convert penn to universal.
+	 *
+	 * @param tag
+	 *            the tag
+	 * @return the string
+	 */
 	private String convertPennToUniversal(final String tag) {
 		return MaltParser.pennToUniversalTags.getOrDefault(tag, tag);
 	}

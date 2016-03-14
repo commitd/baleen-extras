@@ -23,12 +23,18 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
 public abstract class AbstractInteractionBasedSentenceRelationshipAnnotator
 		extends AbstractInteractionBasedRelationshipAnnotator {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.tenode.baleen.extras.annotators.relationships.
+	 * AbstractInteractionBasedRelationshipAnnotator#extract(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected final void extract(JCas jCas) {
 
-		Map<Sentence, Collection<Interaction>> sentenceToInteraction = JCasUtil.indexCovered(jCas, Sentence.class,
+		final Map<Sentence, Collection<Interaction>> sentenceToInteraction = JCasUtil.indexCovered(jCas, Sentence.class,
 				Interaction.class);
-		Map<Sentence, Collection<Entity>> sentenceToEntities = JCasUtil.indexCovered(jCas, Sentence.class,
+		final Map<Sentence, Collection<Entity>> sentenceToEntities = JCasUtil.indexCovered(jCas, Sentence.class,
 				Entity.class);
 
 		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {

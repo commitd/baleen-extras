@@ -16,6 +16,12 @@ import uk.gov.dstl.baleen.uima.BaleenResource;
  */
 public class ClearNlpEntityDictionary extends BaleenResource {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.gov.dstl.baleen.uima.BaleenResource#doInitialize(org.apache.uima.resource.
+	 * ResourceSpecifier, java.util.Map)
+	 */
 	@Override
 	protected boolean doInitialize(final ResourceSpecifier specifier, final Map<String, Object> additionalParams)
 			throws ResourceInitializationException {

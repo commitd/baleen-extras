@@ -30,6 +30,11 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  */
 public class CleanRelations extends BaleenAnnotator {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
+	 */
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 		final List<Relation> relations = new ArrayList<>(JCasUtil.select(jCas, Relation.class));
@@ -55,12 +60,30 @@ public class CleanRelations extends BaleenAnnotator {
 		removeFromJCasIndex(toRemove);
 	}
 
+	/**
+	 * Checks if relations are the same.
+	 *
+	 * @param a
+	 *            the first relation
+	 * @param b
+	 *            the second relation
+	 * @return true, if is same
+	 */
 	private boolean isSame(final Relation a, final Relation b) {
 		return isSame(a.getSource(), b.getSource()) && isSame(a.getTarget(), b.getTarget())
 				&& isSame(a.getRelationshipType(), b.getRelationshipType())
 				&& isSame(a.getRelationSubType(), b.getRelationSubType());
 	}
 
+	/**
+	 * Checks if entity is the same
+	 *
+	 * @param a
+	 *            the first entity
+	 * @param b
+	 *            the second entity
+	 * @return true, if is same
+	 */
 	private boolean isSame(final Entity a, final Entity b) {
 		if (a == b) {
 			return true;
@@ -75,6 +98,15 @@ public class CleanRelations extends BaleenAnnotator {
 		return a.getType() == b.getType() && isSame(a.getValue(), b.getValue());
 	}
 
+	/**
+	 * Checks if two strings are the same.
+	 *
+	 * @param a
+	 *            first string
+	 * @param b
+	 *            second string
+	 * @return true, if is same
+	 */
 	private boolean isSame(final String a, final String b) {
 		if (a == b) {
 			return true;

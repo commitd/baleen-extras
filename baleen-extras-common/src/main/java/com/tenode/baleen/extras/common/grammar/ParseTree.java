@@ -22,6 +22,11 @@ import com.tenode.baleen.extras.common.grammar.data.ParseTreeNode;
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
+/**
+ * A tree formed of a hierarchy of ParseChunks.
+ *
+ * @baleen.javadoc
+ */
 public class ParseTree {
 
 	private static final Comparator<? super ParseTreeNode> SENTENCE_ORDER = (a, b) -> Integer
@@ -33,6 +38,16 @@ public class ParseTree {
 	private final Map<PhraseChunk, ParseTreeNode> chunkToNode;
 	private final Map<WordToken, ParseTreeNode> wordToNode;
 
+	/**
+	 * Instantiates a new parses the tree.
+	 *
+	 * @param roots
+	 *            the roots
+	 * @param chunkToNode
+	 *            the chunk to node
+	 * @param wordToNode
+	 *            the word to node
+	 */
 	private ParseTree(List<ParseTreeNode> roots, Map<PhraseChunk, ParseTreeNode> chunkToNode,
 			Map<WordToken, ParseTreeNode> wordToNode) {
 		this.root = new ParseTreeNode(roots);
@@ -40,6 +55,15 @@ public class ParseTree {
 		this.wordToNode = wordToNode;
 	}
 
+	/**
+	 * Gets the child words.
+	 *
+	 * @param chunk
+	 *            the chunk
+	 * @param chunkFilter
+	 *            the chunk filter
+	 * @return the child words
+	 */
 	public Stream<WordToken> getChildWords(PhraseChunk chunk, Predicate<String> chunkFilter) {
 		final ParseTreeNode node = chunkToNode.get(chunk);
 		if (node.hasChildren()) {
@@ -50,11 +74,24 @@ public class ParseTree {
 		}
 	}
 
+	/**
+	 * Traverse children.
+	 *
+	 * @param consumer
+	 *            the consumer
+	 */
 	public void traverseChildren(Consumer<List<ParseTreeNode>> consumer) {
 		consumer.accept(Collections.singletonList(root));
 		root.traverseChildren(consumer);
 	}
 
+	/**
+	 * Builds the tree.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @return the parses the tree
+	 */
 	public static ParseTree build(JCas jCas) {
 
 		// Build a tree phrase to phrase
@@ -136,6 +173,13 @@ public class ParseTree {
 		return new ParseTree(roots, chunkToNode, wordToNode);
 	}
 
+	/**
+	 * Find smallest (covered text length) covering chunk
+	 *
+	 * @param covering
+	 *            the covering
+	 * @return the phrase chunk
+	 */
 	private static PhraseChunk findSmallest(Collection<PhraseChunk> covering) {
 		return covering.stream()
 				.sorted(SHORTEST_FIRST)
@@ -144,6 +188,13 @@ public class ParseTree {
 
 	}
 
+	/**
+	 * Gets the parent of the token
+	 *
+	 * @param token
+	 *            the token
+	 * @return the parent
+	 */
 	public ParseTreeNode getParent(WordToken token) {
 		return wordToNode.get(token);
 	}
