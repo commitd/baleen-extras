@@ -53,6 +53,6 @@ public class AbstractCoreferenceSieveTest extends AbstractMultiAnnotatorTest {
 						parserChunkingDesc),
 				createAnalysisEngine(MaltParser.class),
 				createAnalysisEngine(Coreference.class, Coreference.PARAM_GENDER_MULTIPLICITY, gMDesc, "pass",
-						singlePass));
+						singlePass, "pronomial", true));
 	}
 }

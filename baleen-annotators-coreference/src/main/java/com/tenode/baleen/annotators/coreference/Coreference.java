@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -126,6 +127,22 @@ public class Coreference extends BaleenAnnotator {
 	@ConfigurationParameter(name = PARAM_SINGLE_PASS, defaultValue = "-1")
 	private int singlePass;
 
+	/**
+	 * Should the prononiam (John - he) be performed.
+	 *
+	 * This is the worst performing seive in that is must 'guess' without any real rules what entity
+	 * the pronoun is referring to. We currently have little data about animacy etc which will help
+	 * (They - BBC ok, He - BBC not ok).
+	 *
+	 * Currently a closest entity of the same type is used, but that won't perform well in many
+	 * cases.
+	 *
+	 * @baleen.resource pronomial false
+	 */
+	public static final String PARAM_INCLUDE_PRONOMIAL = "pronomial";
+	@ConfigurationParameter(name = PARAM_INCLUDE_PRONOMIAL, defaultValue = "false")
+	private Boolean includePronomial;
+
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 
@@ -175,22 +192,19 @@ public class Coreference extends BaleenAnnotator {
 
 		CoreferenceSieve[] sieves = new CoreferenceSieve[] {
 				new ExtractReferenceTargets(jCas, clusters, mentions), // Good
-				// TODO: new SpeakerIdentificationSieve(jCas, clusters, mentions),
+				// TODO: new SpeakerIdentificationSieve(jCas, clusters, mentions) Not implemented
 				new ExactStringMatchSieve(jCas, clusters, mentions), // Good
 				new RelaxedStringMatchSieve(jCas, clusters, mentions), // Good
 				new InSentencePronounSieve(jCas, clusters, mentions), // Good
 				new PreciseConstructsSieve(jCas, parseTree, clusters, mentions), // Good
-				// - TODO:
-				// Produces
-				// Singleton
-				// clusters?
 				// Pass A-C are all strict head with different params
 				new StrictHeadMatchSieve(jCas, clusters, mentions, true, true), // Good
 				new StrictHeadMatchSieve(jCas, clusters, mentions, true, false), // Good
 				new StrictHeadMatchSieve(jCas, clusters, mentions, false, true), // Good
 				new ProperHeadMatchSieve(jCas, clusters, mentions), // Good
 				new RelaxedHeadMatchSieve(jCas, clusters, mentions), // Good
-				new PronounResolutionSieve(jCas, clusters, mentions) // Ok - Needs more help from
+				includePronomial == true ? new PronounResolutionSieve(jCas, clusters, mentions) : null
+				// Questionable - Needs more help from
 				// Baleen entities yet and more data from animacy if its to work well.
 		};
 
@@ -201,12 +215,15 @@ public class Coreference extends BaleenAnnotator {
 			getMonitor().info("Single pass mode {}: {}", singlePass, sieves[0].getClass().getSimpleName());
 		}
 
-		Arrays.stream(sieves).forEach(s -> {
-			s.sieve();
-			// getMonitor().info("Cluster size after {} is {}", s.getClass().getSimpleName(),
-			// clusters.size());
-			// logClusters(clusters);
-		});
+		Arrays.stream(sieves)
+				.filter(Objects::nonNull)
+				.forEach(s -> {
+					s.sieve();
+					// getMonitor().info("Cluster size after {} is {}",
+					// s.getClass().getSimpleName(),
+					// clusters.size());
+					// logClusters(clusters);
+				});
 
 		return clusters;
 	}
