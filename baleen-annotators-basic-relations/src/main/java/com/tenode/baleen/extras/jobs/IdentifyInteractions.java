@@ -225,8 +225,7 @@ public class IdentifyInteractions extends BaleenTask {
 		words.flatMap(interaction -> {
 			final String lemma = interaction.getWord().getLemma();
 
-			// TODO: Find the best
-			final String relationshipType = wordnet.getSuperSenses(interaction.getWord().getPos(), lemma).findAny()
+			final String relationshipType = wordnet.getBestSuperSense(interaction.getWord().getPos(), lemma)
 					.orElse(lemma);
 
 			return interaction.toRelations(relationshipType, lemma);

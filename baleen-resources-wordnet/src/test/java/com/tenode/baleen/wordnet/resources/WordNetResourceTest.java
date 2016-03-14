@@ -1,4 +1,4 @@
-package com.tenode.baleen.resources.wordnet;
+package com.tenode.baleen.wordnet.resources;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,8 +10,6 @@ import org.apache.uima.resource.impl.CustomResourceSpecifier_impl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.tenode.baleen.wordnet.resources.WordNetResource;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
@@ -59,6 +57,13 @@ public class WordNetResourceTest {
 
 		Assert.assertEquals("verb.consumption", word.get(0));
 		Assert.assertEquals("verb.social", word.get(1));
+	}
+
+	@Test
+	public void testBestSuperSense() throws JWNLException {
+		final Optional<String> word = wnr.getBestSuperSense(POS.VERB, "know");
+
+		Assert.assertEquals("verb.cognition", word.get());
 	}
 
 	@Test

@@ -124,6 +124,8 @@ public class WordNetResource extends BaleenResource {
 		} else {
 			// TODO: This doesn't work, but is the same as the below:
 			// indexWord.get().getSenses().stream().map(Synset::getLexFileName).distinct();
+			// There's something about the list created by getSense() which doesn't work well with
+			// streams.
 			final List<Synset> senses = indexWord.get().getSenses();
 			final Set<String> set = new HashSet<>();
 			for (final Synset s : senses) {
@@ -131,7 +133,35 @@ public class WordNetResource extends BaleenResource {
 			}
 			return set.stream();
 		}
+	}
 
+	/**
+	 * Gets the best super sense for a word.
+	 *
+	 * @param pos
+	 *            the pos
+	 * @param word
+	 *            the word
+	 * @return the best super sense
+	 */
+	public Optional<String> getBestSuperSense(POS pos, String word) {
+		final Optional<IndexWord> indexWord = lookupWord(pos, word);
+
+		if (!indexWord.isPresent()) {
+			return Optional.empty();
+		} else {
+			List<Synset> senses = indexWord.get().getSenses();
+			if (senses.isEmpty()) {
+				return Optional.empty();
+			} else {
+				// At this stage we could do something clever, look at the gloss to see is there are
+				// word overlaps
+				// but we opt for a more predicatable concept of selecting the most commonly used
+				// meaning sense.
+
+				return Optional.of(senses.get(0).getLexFileName());
+			}
+		}
 	}
 
 }
