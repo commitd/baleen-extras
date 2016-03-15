@@ -21,6 +21,7 @@ import uk.gov.dstl.baleen.types.common.Buzzword;
 import uk.gov.dstl.baleen.types.common.Nationality;
 import uk.gov.dstl.baleen.types.common.Organisation;
 import uk.gov.dstl.baleen.types.common.Person;
+import uk.gov.dstl.baleen.types.common.Vehicle;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Location;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
@@ -49,6 +50,7 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 		Stream.of(getLocations()).forEach(addToMap(Location.class));
 		Stream.of(getBuzzwords()).forEach(addToMap(Buzzword.class));
 		Stream.of(getNationalities()).forEach(addToMap(Nationality.class));
+		Stream.of(getVehicles()).forEach(addToMap(Vehicle.class));
 
 	}
 
@@ -58,6 +60,15 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 	 * @return the nationalities
 	 */
 	protected String[] getNationalities() {
+		return new String[] {};
+	}
+
+	/**
+	 * Gets the vehicles.
+	 *
+	 * @return the vehicles
+	 */
+	protected String[] getVehicles() {
 		return new String[] {};
 	}
 

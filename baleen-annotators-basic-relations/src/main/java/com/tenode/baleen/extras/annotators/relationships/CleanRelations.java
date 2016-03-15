@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
@@ -29,6 +30,15 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  *
  */
 public class CleanRelations extends BaleenAnnotator {
+
+	/**
+	 * Symmetric relations (x ~ y and y ~ x are considered the same) if true
+	 *
+	 * @baleen.config symmetric true
+	 */
+	public static final String KEY_SYMMETRIC = "symmetric";
+	@ConfigurationParameter(name = KEY_SYMMETRIC, defaultValue = "true")
+	private Boolean symmetric;
 
 	/*
 	 * (non-Javadoc)
@@ -71,8 +81,9 @@ public class CleanRelations extends BaleenAnnotator {
 	 */
 	private boolean isSame(final Relation a, final Relation b) {
 		return isSame(a.getSource(), b.getSource()) && isSame(a.getTarget(), b.getTarget())
-				&& isSame(a.getRelationshipType(), b.getRelationshipType())
-				&& isSame(a.getRelationSubType(), b.getRelationSubType());
+				|| symmetric && isSame(a.getSource(), b.getTarget()) && isSame(a.getTarget(), b.getSource())
+						&& isSame(a.getRelationshipType(), b.getRelationshipType())
+						&& isSame(a.getRelationSubType(), b.getRelationSubType());
 	}
 
 	/**

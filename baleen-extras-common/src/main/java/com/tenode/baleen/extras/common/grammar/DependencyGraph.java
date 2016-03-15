@@ -490,18 +490,9 @@ public class DependencyGraph {
 
 		final ImmutableStack<WordToken> history = new ImmutableStack<WordToken>();
 
-		final int governorDistance = distance - 1;
 		for (final Dependency d : start) {
-			if (governorDistance > 0) {
-				if (predicate.test(d, d.getDependent(), d.getGovernor(), history)) {
-					ImmutableStack<WordToken> stack = history.push(d.getDependent());
-					stack = stack.push(d.getGovernor());
-					traverse(governorDistance, d.getGovernor(), stack, predicate);
-				}
-			}
-			if (predicate.test(d, d.getGovernor(), d.getDependent(), history)) {
-				ImmutableStack<WordToken> stack = history.push(d.getGovernor());
-				stack = stack.push(d.getDependent());
+			if (predicate.test(d, null, d.getDependent(), history)) {
+				ImmutableStack<WordToken> stack = history.push(d.getDependent());
 				traverse(distance, d.getDependent(), stack, predicate);
 			}
 		}

@@ -16,7 +16,7 @@ public class Patterns extends AbstractPrintAnnotator<Pattern> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.tenode.baleen.extras.common.print.AbstractPrintAnnotator#print(uk.gov.dstl.baleen.types.
 	 * Base)
@@ -26,6 +26,7 @@ public class Patterns extends AbstractPrintAnnotator<Pattern> {
 		final StringBuilder sb = new StringBuilder();
 
 		writeLine(sb, t.getCoveredText());
+		writeLine(sb, t.getWords());
 
 		return sb.toString();
 	}

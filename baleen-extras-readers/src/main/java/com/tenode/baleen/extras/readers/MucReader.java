@@ -39,11 +39,20 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 	 *
 	 * Note that only files which do not beign with key- will be used.
 	 *
-	 * @baleen.resource path
+	 * @baleen.config path
 	 */
 	public static final String KEY_PATH = "path";
 	@ConfigurationParameter(name = KEY_PATH, mandatory = true)
 	private String mucPath;
+
+	/**
+	 * Max number of documents to read before stopping (-1 for all)
+	 *
+	 * @baleen.config path
+	 */
+	public static final String KEY_MAX_DOCUMENTS = "max";
+	@ConfigurationParameter(name = KEY_MAX_DOCUMENTS, defaultValue = "0")
+	private Integer maxDocuments;
 
 	/**
 	 * Sets the MUC file path - used for tests only.
@@ -60,7 +69,7 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 		final File[] files = new File(mucPath)
 				.listFiles(f -> !f.getName().startsWith("key-") && f.isFile());
 
-		return Arrays.stream(files)
+		Stream<MucEntry> map = Arrays.stream(files)
 				.flatMap(f -> {
 					try {
 						final byte[] bytes = Files.readAllBytes(f.toPath());
@@ -94,6 +103,12 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 					e.setText(text);
 					return e;
 				});
+
+		if (maxDocuments > 0) {
+			map = map.limit(maxDocuments);
+		}
+
+		return map;
 	}
 
 	@Override

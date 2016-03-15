@@ -1,6 +1,7 @@
 package com.tenode.baleen.extras.jobs;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +16,7 @@ import com.tenode.baleen.extras.jobs.io.CsvInteractionWriter;
 import com.tenode.baleen.wordnet.resources.WordNetResource;
 
 import net.sf.extjwnl.data.IndexWord;
+import net.sf.extjwnl.data.Synset;
 import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.uima.jobs.BaleenTask;
 import uk.gov.dstl.baleen.uima.jobs.JobSettings;
@@ -74,7 +76,7 @@ public class EnhanceInteractions extends BaleenTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * uk.gov.dstl.baleen.uima.jobs.BaleenTask#execute(uk.gov.dstl.baleen.uima.jobs.JobSettings)
 	 */
@@ -130,10 +132,14 @@ public class EnhanceInteractions extends BaleenTask {
 			return Stream.of(word.getLemma());
 		}
 
-		final Stream<String> otherWords = indexWord.getSenses().stream()
-				.flatMap(s -> s.getWords().stream())
-				.map(x -> x.getLemma());
+		Set<String> set = new HashSet<String>();
+		set.add(word.getLemma());
+		for (Synset synset : indexWord.getSenses()) {
+			for (net.sf.extjwnl.data.Word w : synset.getWords()) {
+				set.add(w.getLemma());
+			}
+		}
 
-		return Stream.concat(Stream.of(word.getLemma()), otherWords).distinct();
+		return set.stream();
 	}
 }
