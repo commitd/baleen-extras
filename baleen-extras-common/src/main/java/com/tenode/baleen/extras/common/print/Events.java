@@ -26,6 +26,7 @@ public class Events extends AbstractPrintAnnotator<ComplexEvent> {
 		final StringBuilder sb = new StringBuilder();
 
 		writeLine(sb, t.getValue());
+		writeLine(sb, t.getTokens());
 		writeLine(sb, t.getEventType());
 		writeLine(sb, t.getEntities());
 		writeLine(sb, t.getArguments());
