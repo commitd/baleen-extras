@@ -151,11 +151,11 @@ public class ParseTree {
 				final List<WordToken> words = new ArrayList<>(allWords);
 
 				// Remove the words which are covered by our children, leaving just our words
-				if (!n.hasChildren()) {
+				if (n.hasChildren()) {
 					n.getChildren().stream()
 							.map(t -> wordIndex.get(t.getChunk()))
 							.filter(Objects::nonNull)
-							.forEach(words::remove);
+							.forEach(words::removeAll);
 				}
 
 				// Add the words into the treenode
@@ -197,6 +197,17 @@ public class ParseTree {
 	 */
 	public ParseTreeNode getParent(WordToken token) {
 		return wordToNode.get(token);
+	}
+
+	/**
+	 * Output a basic representation of the tree
+	 */
+	public void log() {
+		root.log("");
+
+		wordToNode.forEach((w, n) -> {
+			System.out.println(w.getCoveredText() + ":" + n.toString());
+		});
 	}
 
 }

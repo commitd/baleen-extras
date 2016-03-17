@@ -25,7 +25,7 @@ public abstract class AbstractInteractionBasedSentenceRelationshipAnnotator
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.tenode.baleen.extras.annotators.relationships.
 	 * AbstractInteractionBasedRelationshipAnnotator#extract(org.apache.uima.jcas.JCas)
 	 */
@@ -40,6 +40,7 @@ public abstract class AbstractInteractionBasedSentenceRelationshipAnnotator
 		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
 
 			final Collection<Interaction> interactions = sentenceToInteraction.get(sentence);
+
 			final Collection<Entity> entities = sentenceToEntities.get(sentence);
 
 			// Check we have enough in the sentence to warrant further work

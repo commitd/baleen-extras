@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
@@ -151,7 +152,7 @@ public final class ParseTreeNode {
 	}
 
 	/**
-	 * Adds the words.
+	 * Adds the words which are at this node (not its children)
 	 *
 	 * @param word
 	 *            the word
@@ -178,7 +179,12 @@ public final class ParseTreeNode {
 	 */
 	@Override
 	public String toString() {
-		return chunk.getCoveredText() + "[" + chunk.getChunkType() + "]";
+		if (chunk != null) {
+			return String.format("%s [%s]", chunk.getCoveredText(), chunk.getChunkType());
+		} else {
+			return "No chunk";
+		}
+
 	}
 
 	/**
@@ -202,6 +208,29 @@ public final class ParseTreeNode {
 			return children.stream().anyMatch(c -> c.containsWord(filter));
 		}
 		return false;
+	}
+
+	public void log(String indent) {
+		String wordString = "";
+		if (words != null) {
+			wordString = getWords().stream().map(WordToken::getCoveredText).collect(Collectors.joining(","));
+		}
+		String chunkString = "";
+		if (chunk != null) {
+			chunkString = chunk.getChunkType();
+		}
+		String parentString = "";
+		if (parent != null) {
+			parentString = getParent().toString();
+		}
+
+		System.out.println(indent + chunkString + ": " + wordString + ": " + parentString);
+		if (children != null) {
+			String childIndent = "\t" + indent;
+			for (ParseTreeNode c : children) {
+				c.log(childIndent);
+			}
+		}
 	}
 
 }
