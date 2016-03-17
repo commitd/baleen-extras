@@ -84,22 +84,28 @@ public class InteractionIdentifier {
 
 		monitor.info("Patterns clustered into {} clusters", clusters.size());
 
+		// logClusters(clusters);
+
 		// Remove small clusters
 		filterClusters(clusters);
 
 		monitor.info("Patterns filtered to {} clusters", clusters.size());
 
 		// For debugging:
-		// clusters.forEach(c -> {
-		// System.out.println("-----------------");
-		// c.getPatterns().forEach(p -> System.out.println(p));
-		// });
+		// logClusters(clusters);
 
 		monitor.info("Finding interaction words");
 
 		// Find interaction words
 		return extractInteractionWords(clusters);
 
+	}
+
+	private void logClusters(List<ClusteredPatterns> clusters) {
+		clusters.forEach(c -> {
+			System.out.println("-----------------");
+			c.getPatterns().forEach(p -> System.out.println(p));
+		});
 	}
 
 	/**

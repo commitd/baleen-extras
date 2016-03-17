@@ -106,7 +106,7 @@ public class UploadInteractionsToMongo extends BaleenTask {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * uk.gov.dstl.baleen.uima.jobs.BaleenTask#execute(uk.gov.dstl.baleen.uima.jobs.JobSettings)
 	 */
@@ -117,6 +117,7 @@ public class UploadInteractionsToMongo extends BaleenTask {
 				interactionCollection)) {
 
 			if (clearCollection) {
+				getMonitor().info("Clearing previous interacton collection");
 				writer.clear();
 			}
 
@@ -125,6 +126,7 @@ public class UploadInteractionsToMongo extends BaleenTask {
 		} catch (final IOException e) {
 			throw new AnalysisEngineProcessException(e);
 		}
+		getMonitor().info("Finished uploading interactions to Mongo");
 	}
 
 }
