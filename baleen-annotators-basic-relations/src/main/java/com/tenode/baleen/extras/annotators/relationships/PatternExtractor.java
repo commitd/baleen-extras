@@ -2,6 +2,7 @@ package com.tenode.baleen.extras.annotators.relationships;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,10 +66,23 @@ public class PatternExtractor extends BaleenAnnotator {
 	@Override
 	protected void doProcess(final JCas jCas) throws AnalysisEngineProcessException {
 
+		final Set<WordToken> wordsCoveredByEntites = JCasUtil.indexCovered(jCas, Entity.class, WordToken.class).values()
+				.stream().flatMap(l -> l.stream()).collect(Collectors.toSet());
+
 		for (final Sentence sentence : JCasUtil.select(jCas, Sentence.class)) {
 
 			final List<Entity> entities = JCasUtil.selectCovered(jCas, Entity.class, sentence);
+
 			final List<WordToken> words = JCasUtil.selectCovered(jCas, WordToken.class, sentence);
+
+			// We discard any punctuation in our word list since this appears to be unpredictable
+			// output from OPenNLP parsing and we just want to count word distance.
+			// If we have "hello world" then we might can get "hello, world, " which variation POS
+			// tags. This filter is a little bit of a mess as a result.
+			final List<WordToken> wordIndexes = words.stream()
+					.filter(w -> Character
+							.isAlphabetic(w.getPartOfSpeech().charAt(0)) && w.getCoveredText().length() > 1)
+					.collect(Collectors.toList());
 
 			// Remove words which are covered by an entity
 			final List<WordToken> nonEntityWords = words.stream().filter(w -> !entities.stream().anyMatch(e -> {
@@ -90,7 +104,7 @@ public class PatternExtractor extends BaleenAnnotator {
 						// A is before B
 						patterns.add(new PatternExtract(a, b, a.getEnd(), b.getBegin()));
 					} else if (a.getBegin() > b.getEnd()) {
-						patterns.add(new PatternExtract(a, b, b.getEnd(), a.getBegin()));
+						patterns.add(new PatternExtract(b, a, b.getEnd(), a.getBegin()));
 					} else {
 						// Overlapping entities ... ignore as no words between them
 					}
@@ -102,7 +116,7 @@ public class PatternExtractor extends BaleenAnnotator {
 
 			patterns.stream()
 					.filter(p -> {
-						final int count = countWordsBetween(p, words);
+						final int count = countWordsBetween(p, wordIndexes);
 						return count >= 0 && count < windowSize;
 					})
 					.filter(p -> !negationRegex.matcher(p.getCoveredText(lowerText)).matches())
@@ -114,7 +128,9 @@ public class PatternExtractor extends BaleenAnnotator {
 						// words I think we want
 						// to extract a phrase. Their example is "play a role" which becomes
 						// "play,role"
-						p.setWordTokens(removeAdditionalWords(p, nonEntityWords.stream()).collect(Collectors.toList()));
+						p.setWordTokens(
+								removeAdditionalWords(words, p, wordsCoveredByEntites)
+										.collect(Collectors.toList()));
 
 						if (!p.isEmpty()) {
 							outputPattern(jCas, p);
@@ -134,18 +150,23 @@ public class PatternExtractor extends BaleenAnnotator {
 	 *            the words
 	 * @return the int
 	 */
-	private int countWordsBetween(final PatternExtract p, final List<WordToken> words) {
+	private int countWordsBetween(PatternExtract p, final List<WordToken> words) {
+
+		int begin = p.getStart();
+		int end = p.getEnd();
+
 		int startWord = -1;
 		int endWord = -1;
 
 		int i = 0;
 		for (final WordToken w : words) {
-			if (w.getBegin() <= p.getStart() && w.getEnd() >= p.getStart()) {
+
+			if (w.getBegin() >= begin && startWord == -1) {
 				startWord = i;
 			}
 
-			if (w.getBegin() <= p.getEnd() && w.getEnd() >= p.getEnd()) {
-				endWord = i;
+			if (w.getBegin() >= end && endWord == -1) {
+				endWord = i - 1;
 			}
 
 			i++;
@@ -163,15 +184,19 @@ public class PatternExtractor extends BaleenAnnotator {
 	 *
 	 * Filters out stop words and words outside the pattern.
 	 *
+	 * @param words
+	 *
 	 * @param pe
 	 *            the pe
 	 * @param tokens
 	 *            the tokens
 	 * @return the stream
 	 */
-	private Stream<WordToken> removeAdditionalWords(final PatternExtract pe, final Stream<WordToken> tokens) {
-		return tokens
+	private Stream<WordToken> removeAdditionalWords(List<WordToken> words, final PatternExtract pe,
+			final Set<WordToken> entityWords) {
+		return words.stream()
 				.filter(t -> t.getBegin() >= pe.getStart() && t.getEnd() <= pe.getEnd())
+				.filter(t -> !entityWords.contains(t))
 				.filter(t -> {
 					String s = t.getCoveredText();
 					return s.length() > 1 && !stopWordRemover.isStopWord(s);

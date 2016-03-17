@@ -16,7 +16,7 @@ public class Entities extends AbstractPrintAnnotator<Entity> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.tenode.baleen.extras.common.print.AbstractPrintAnnotator#print(uk.gov.dstl.baleen.types.
 	 * Base)
@@ -27,6 +27,7 @@ public class Entities extends AbstractPrintAnnotator<Entity> {
 
 		writeLine(sb, t.getValue());
 		writeLine(sb, t.getTypeName());
+		writeLine(sb, String.format("%d %d", t.getBegin(), t.getEnd()));
 
 		return sb.toString();
 	}

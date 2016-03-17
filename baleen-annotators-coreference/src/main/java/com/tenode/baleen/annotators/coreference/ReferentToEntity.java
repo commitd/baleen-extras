@@ -1,12 +1,14 @@
 package com.tenode.baleen.annotators.coreference;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
 import com.google.common.collect.Multimap;
@@ -37,6 +39,8 @@ public class ReferentToEntity extends BaleenAnnotator {
 
 		final Multimap<ReferenceTarget, Entity> referentMap = ReferentUtils.createReferentMap(jCas, Entity.class);
 
+		final Collection<Entity> entities = new HashSet<>(JCasUtil.select(jCas, Entity.class));
+
 		final Map<ReferenceTarget, Entity> targets = ReferentUtils.filterToSingle(referentMap, this::getBestEntity);
 
 		// Now look through the non-entities and create entities in their place.
@@ -45,7 +49,7 @@ public class ReferentToEntity extends BaleenAnnotator {
 				.map(a -> {
 					final ReferenceTarget referent = a.getReferent();
 					final Entity entity = targets.get(referent);
-					if (entity != null) {
+					if (entity != null && !entities.contains(entity)) {
 						return SpanUtils.copyEntity(jCas, a.getBegin(), a.getEnd(), entity);
 					} else {
 						return null;
