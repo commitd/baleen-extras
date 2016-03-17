@@ -1,7 +1,7 @@
 package com.tenode.baleen.extras.common.annotators;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +37,7 @@ public class AddTitleToPerson extends BaleenAnnotator {
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
 		// We copy this array as we'll modify people as we go
-		List<Person> people = new ArrayList<>(JCasUtil.select(jCas, Person.class));
+		Collection<Person> people = JCasUtil.select(jCas, Person.class);
 
 		for (Person p : people) {
 

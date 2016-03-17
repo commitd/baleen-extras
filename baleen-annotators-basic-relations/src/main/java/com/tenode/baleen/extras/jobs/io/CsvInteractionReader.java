@@ -52,6 +52,10 @@ public class CsvInteractionReader {
 			StreamSupport.stream(parser.spliterator(), false)
 					.forEach(r -> {
 
+						if (r.size() < 2) {
+							return;
+						}
+
 						String type = r.get(0);
 						String subType = r.get(1);
 
