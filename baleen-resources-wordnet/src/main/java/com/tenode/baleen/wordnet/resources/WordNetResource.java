@@ -31,7 +31,7 @@ public class WordNetResource extends BaleenResource {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenResource#doInitialize(org.apache.uima.resource.
 	 * ResourceSpecifier, java.util.Map)
 	 */
@@ -50,7 +50,7 @@ public class WordNetResource extends BaleenResource {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenResource#doDestroy()
 	 */
 	@Override
@@ -136,7 +136,7 @@ public class WordNetResource extends BaleenResource {
 			final List<Synset> senses = indexWord.get().getSenses();
 			final Set<String> set = new HashSet<>();
 			for (final Synset s : senses) {
-				set.add(s.getLexFileName());
+				set.add(stripPOSFromSupersense(s.getLexFileName()));
 			}
 			return set.stream();
 		}
@@ -157,7 +157,7 @@ public class WordNetResource extends BaleenResource {
 		if (!indexWord.isPresent()) {
 			return Optional.empty();
 		} else {
-			List<Synset> senses = indexWord.get().getSenses();
+			final List<Synset> senses = indexWord.get().getSenses();
 			if (senses.isEmpty()) {
 				return Optional.empty();
 			} else {
@@ -166,8 +166,27 @@ public class WordNetResource extends BaleenResource {
 				// but we opt for a more predicatable concept of selecting the most commonly used
 				// meaning sense.
 
-				return Optional.of(senses.get(0).getLexFileName());
+				return Optional.of(stripPOSFromSupersense(senses.get(0).getLexFileName()));
 			}
+		}
+	}
+
+	/**
+	 * Strip POS from supersense.
+	 *
+	 * Since the lexfile has filename "noun.cogition" we remove the "noun." so that verb based and
+	 * noun based words of the same supersense have the same value.
+	 *
+	 * @param sense
+	 *            the sense
+	 * @return the string
+	 */
+	private String stripPOSFromSupersense(String sense) {
+		final int index = sense.indexOf(".");
+		if (index != -1) {
+			return sense.substring(index);
+		} else {
+			return sense;
 		}
 	}
 
