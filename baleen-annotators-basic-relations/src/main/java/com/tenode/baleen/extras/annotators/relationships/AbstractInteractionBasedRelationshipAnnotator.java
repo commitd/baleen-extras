@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
 	 */
 	@Override
@@ -88,6 +89,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	protected void addRelationsToIndex(final Stream<Relation> relations) {
 		if (relations != null) {
 			relations
+					.filter(Objects::nonNull)
 					// Only add events aren't in the same
 					// Prevents overlapping spans since that makes no sense
 					.filter(r -> r.getSource().getInternalId() != r.getTarget().getInternalId()
@@ -200,7 +202,9 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	 * @return the stream
 	 */
 	protected Stream<Relation> distinct(final Stream<Relation> stream) {
-		return stream.map(RelationWrapper::new)
+		return stream
+				.filter(Objects::nonNull)
+				.map(RelationWrapper::new)
 				.distinct()
 				.map(RelationWrapper::getRelation);
 	}

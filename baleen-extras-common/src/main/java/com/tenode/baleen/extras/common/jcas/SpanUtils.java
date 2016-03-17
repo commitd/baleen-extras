@@ -3,8 +3,8 @@ package com.tenode.baleen.extras.common.jcas;
 import java.util.Collection;
 
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 
-import uk.gov.dstl.baleen.types.Base;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
@@ -94,7 +94,7 @@ public class SpanUtils {
 	 *            the b
 	 * @return true, if successful
 	 */
-	public static boolean overlaps(Base a, Base b) {
+	public static boolean overlaps(Annotation a, Annotation b) {
 		return !(a.getEnd() < b.getBegin() || b.getEnd() < a.getBegin());
 	}
 
