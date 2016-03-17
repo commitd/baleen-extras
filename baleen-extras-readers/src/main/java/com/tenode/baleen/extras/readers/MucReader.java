@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -32,7 +33,9 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MucReader.class);
 
-	private static final Splitter ARTICLE_SPLITTER = Splitter.on("\n\n\n").trimResults().omitEmptyStrings();
+	// This should be \n\n\n but the TST-MUC-11 is different!
+	private static final Splitter ARTICLE_SPLITTER = Splitter.on(Pattern.compile("\n\n\\s*\n")).trimResults()
+			.omitEmptyStrings();
 
 	/**
 	 * Location of the directory containing the muc34 files.
