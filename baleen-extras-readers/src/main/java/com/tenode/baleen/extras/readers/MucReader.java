@@ -49,15 +49,6 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 	private String mucPath;
 
 	/**
-	 * Max number of documents to read before stopping (-1 for all)
-	 *
-	 * @baleen.config path
-	 */
-	public static final String KEY_MAX_DOCUMENTS = "max";
-	@ConfigurationParameter(name = KEY_MAX_DOCUMENTS, defaultValue = "0")
-	private Integer maxDocuments;
-
-	/**
 	 * Sets the MUC file path - used for tests only.
 	 *
 	 * @param path
@@ -106,10 +97,6 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 					e.setText(text);
 					return e;
 				});
-
-		if (maxDocuments > 0) {
-			map = map.limit(maxDocuments);
-		}
 
 		return map;
 	}

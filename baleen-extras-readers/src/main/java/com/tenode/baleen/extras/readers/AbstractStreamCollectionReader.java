@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.apache.uima.UimaContext;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 
 import uk.gov.dstl.baleen.exceptions.BaleenException;
 
@@ -15,9 +16,35 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
  */
 public abstract class AbstractStreamCollectionReader<T> extends AbstractIteratatorCollectionReader<T> {
 
+	/**
+	 * Max number of documents to read before stopping (-1 for all)
+	 *
+	 * @baleen.config max 0
+	 */
+	public static final String KEY_MAX_DOCUMENTS = "max";
+	@ConfigurationParameter(name = KEY_MAX_DOCUMENTS, defaultValue = "0")
+	private Integer maxDocuments;
+
+	/**
+	 * Skip the first documents
+	 *
+	 * @baleen.config skip 0
+	 */
+	public static final String KEY_SKIP_DOCUMENTS = "skip";
+	@ConfigurationParameter(name = KEY_SKIP_DOCUMENTS, defaultValue = "0")
+	private Integer skipDocuments;
+
 	@Override
 	protected final Iterator<T> initializeIterator(UimaContext context) throws BaleenException {
-		return initializeStream(context).iterator();
+		Stream<T> stream = initializeStream(context);
+
+		stream = stream.skip(skipDocuments);
+
+		if (maxDocuments > 0) {
+			stream = stream.limit(maxDocuments);
+		}
+
+		return stream.iterator();
 	}
 
 	/**
