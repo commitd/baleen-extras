@@ -26,8 +26,8 @@ public class Entities extends AbstractPrintAnnotator<Entity> {
 		final StringBuilder sb = new StringBuilder();
 
 		writeLine(sb, t.getValue());
-		writeLine(sb, t.getTypeName());
-		writeLine(sb, String.format("%d %d", t.getBegin(), t.getEnd()));
+		writeLine(sb, "Type", t.getTypeName());
+		writeLine(sb, "Span", String.format("%d %d", t.getBegin(), t.getEnd()));
 
 		return sb.toString();
 	}

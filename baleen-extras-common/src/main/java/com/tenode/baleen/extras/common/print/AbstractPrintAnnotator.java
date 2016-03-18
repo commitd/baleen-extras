@@ -67,9 +67,11 @@ public abstract class AbstractPrintAnnotator<T extends Base> extends BaleenAnnot
 	 *            the value
 	 */
 	protected void writeLine(StringBuilder sb, String value) {
-		sb.append("\t");
-		sb.append(value);
-		sb.append("\n");
+		if (value != null && !value.isEmpty()) {
+			sb.append("\t");
+			sb.append(value);
+			sb.append("\n");
+		}
 	}
 
 	/**
@@ -125,6 +127,79 @@ public abstract class AbstractPrintAnnotator<T extends Base> extends BaleenAnnot
 	protected <S extends Base> void writeLine(StringBuilder sb, FSArray array, Class<S> clazz,
 			Function<S, String> toString) {
 		writeLine(sb, asString(array, clazz, toString, ";"));
+	}
+
+	/**
+	 * Write a line
+	 *
+	 * @param sb
+	 *            the sb
+	 * @param value
+	 *            the value
+	 */
+	protected void writeLine(StringBuilder sb, String prefix, String value) {
+		if (value != null && !value.isEmpty()) {
+			sb.append("\t");
+			sb.append(prefix);
+			sb.append(": ");
+			sb.append(value);
+			sb.append("\n");
+		}
+	}
+
+	/**
+	 * Write an annotation
+	 *
+	 * @param sb
+	 *            the sb
+	 * @param annotation
+	 *            the annotation
+	 */
+	protected void writeLine(StringBuilder sb, String prefix, Base annotation) {
+		writeLine(sb, prefix, annotation.getCoveredText() + "[" + annotation.getType().getName() + "]");
+	}
+
+	/**
+	 * Write a string array.
+	 *
+	 * @param sb
+	 *            the sb
+	 * @param array
+	 *            the array
+	 */
+	protected void writeLine(StringBuilder sb, String prefix, StringArray array) {
+		writeLine(sb, prefix, asString(array, ";"));
+	}
+
+	/**
+	 * Write line.
+	 *
+	 * @param sb
+	 *            the sb
+	 * @param array
+	 *            the array
+	 */
+	protected void writeLine(StringBuilder sb, String prefix, FSArray array) {
+		writeLine(sb, prefix, asString(array, Annotation.class, fs -> fs.getCoveredText(), ";"));
+	}
+
+	/**
+	 * Write a FSArray.
+	 *
+	 * @param <S>
+	 *            the generic type
+	 * @param sb
+	 *            the sb
+	 * @param array
+	 *            the array
+	 * @param clazz
+	 *            the clazz
+	 * @param toString
+	 *            the to string
+	 */
+	protected <S extends Base> void writeLine(StringBuilder sb, String prefix, FSArray array, Class<S> clazz,
+			Function<S, String> toString) {
+		writeLine(sb, prefix, asString(array, clazz, toString, ";"));
 	}
 
 	/**

@@ -25,8 +25,8 @@ public class Patterns extends AbstractPrintAnnotator<Pattern> {
 	protected String print(Pattern t) {
 		final StringBuilder sb = new StringBuilder();
 
-		writeLine(sb, t.getCoveredText());
-		writeLine(sb, t.getWords());
+		writeLine(sb, "text", t.getCoveredText());
+		writeLine(sb, "words", t.getWords());
 
 		return sb.toString();
 	}

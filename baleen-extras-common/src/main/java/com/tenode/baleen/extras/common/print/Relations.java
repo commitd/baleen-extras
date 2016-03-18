@@ -16,7 +16,7 @@ public class Relations extends AbstractPrintAnnotator<Relation> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.tenode.baleen.extras.common.print.AbstractPrintAnnotator#print(uk.gov.dstl.baleen.types.
 	 * Base)
@@ -24,9 +24,9 @@ public class Relations extends AbstractPrintAnnotator<Relation> {
 	@Override
 	protected String print(Relation t) {
 		final StringBuilder sb = new StringBuilder();
-		writeLine(sb, t.getRelationshipType() + ": " + t.getRelationSubType());
-		writeLine(sb, t.getSource());
-		writeLine(sb, t.getTarget());
+		writeLine(sb, "type", t.getRelationshipType() + ": " + t.getRelationSubType());
+		writeLine(sb, "source", t.getSource());
+		writeLine(sb, "target", t.getTarget());
 		return sb.toString();
 	}
 }
