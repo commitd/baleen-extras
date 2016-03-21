@@ -53,7 +53,7 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 	@Override
 	public void doInitialize(UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
-		write("source", "id", "reference", "type", "text", "value",
+		write("source", "id", "reference", "type", "value",
 				"EntityCount then Entities... then nonEntityNonStopWords (format word then pos) then NonStopWordsNotCoveredByEntitiesCount then (format word then pos)...");
 	}
 
@@ -107,7 +107,6 @@ public class CsvCoreferenceConsumer extends AbstractCsvConsumer {
 			}
 
 			list.add(e.getType().getShortName());
-			list.add(normalize(e.getCoveredText()));
 			list.add(normalize(e.getValue()));
 
 			final Collection<Entity> entities = coveredEntities.get(sentence);

@@ -46,9 +46,9 @@
 		<module>baleen-annotators-clearnlp</module>
 		<module>baleen-annotators-maltparser</module>
 		<module>baleen-annotators-opennlp</module>
-		<module>baleen-annotators-basic-relations</module>
 		<module>baleen-resources-wordnet</module>
 		<module>baleen-extras-readers</module>
+		<module>baleen-annotators-basic-relations</module>
 		<module>baleen-annotators-coreference</module>
 	</modules>
 </project>
