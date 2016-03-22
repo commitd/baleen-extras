@@ -90,13 +90,13 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 					String text = e.getText();
 					// Make the paragraphs and text nicer
 					text = text.replaceAll("\n", " ");
-					// Remove all the [blah]. They are used for all sort of things like acronyms or
-					// speaker information. They cause the grammar parsers a lot of issues.
-					text = text.replaceAll("\\[.*?\\]", "");
+
 					// Strip out the clarification tags []
-					text = text.replaceFirst("^(\\[.*?\\]\\s*)*", "");
+					text = text.replaceAll("(\\[.*?\\]\\s*)*", "");
 					text = text.replaceAll("\\s{3,}", "\n\n");
 					text = text.toLowerCase().trim();
+					// Baleen bug? Lower case U.S. breaks the sentence splitter?
+					text = text.replaceAll(Pattern.quote("u.s."), "us");
 					e.setText(text);
 					return e;
 				});
