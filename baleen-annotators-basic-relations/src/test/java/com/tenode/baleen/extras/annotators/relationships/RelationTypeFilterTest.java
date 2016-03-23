@@ -30,7 +30,7 @@ public class RelationTypeFilterTest extends AbstractAnnotatorTest {
 	public void before() {
 		fongoErd = ExternalResourceFactory.createExternalResourceDescription("mongo", SharedFongoResource.class,
 				"fongo.collection", "relationTypes", "fongo.data",
-				"[ { \"source\": \"uk.gov.dstl.baleen.types.common.Person\", \"target\": \"uk.gov.dstl.baleen.types.semantic.Location\", \"type\": \"went\" } ]");
+				"[ { \"source\": \"uk.gov.dstl.baleen.types.common.Person\", \"target\": \"uk.gov.dstl.baleen.types.semantic.Location\", \"type\": \"went\", \"subType\": \"past\", \"pos\": \"VBG\", \"value\":[ \"went\" ] } ]");
 
 	}
 
@@ -47,6 +47,7 @@ public class RelationTypeFilterTest extends AbstractAnnotatorTest {
 		p2l.setSource(p);
 		p2l.setTarget(l);
 		p2l.setRelationshipType("went");
+		p2l.setRelationSubType("past");
 		p2l.addToIndexes();
 
 		final Relation p2p = new Relation(jCas);
@@ -75,12 +76,14 @@ public class RelationTypeFilterTest extends AbstractAnnotatorTest {
 		p2l.setSource(p);
 		p2l.setTarget(l);
 		p2l.setRelationshipType("went");
+		p2l.setRelationSubType("past");
 		p2l.addToIndexes();
 
 		final Relation p2p = new Relation(jCas);
 		p2p.setSource(p);
 		p2p.setTarget(p);
 		p2p.setRelationshipType("went");
+		p2l.setRelationSubType("past");
 		p2p.addToIndexes();
 
 		processJCas("mongo", fongoErd, "strict", true);
@@ -103,12 +106,14 @@ public class RelationTypeFilterTest extends AbstractAnnotatorTest {
 		p2l.setSource(p);
 		p2l.setTarget(l);
 		p2l.setRelationshipType("went");
+		p2l.setRelationSubType("past");
 		p2l.addToIndexes();
 
 		final Relation l2p = new Relation(jCas);
 		l2p.setSource(l);
 		l2p.setTarget(p);
 		l2p.setRelationshipType("went");
+		p2l.setRelationSubType("past");
 		l2p.addToIndexes();
 
 		processJCas("mongo", fongoErd, "symmetric", false);

@@ -1,4 +1,3 @@
-//Dstl (c) Crown Copyright 2015
 package com.tenode.baleen.abta.clearnlp;
 
 import java.util.List;

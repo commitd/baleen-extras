@@ -67,7 +67,7 @@ public class CsvInteractionReader {
 						String source = r.get(2);
 						String target = r.get(3);
 						String lemma = r.get(4);
-						POS pos = POS.getPOSForLabel(r.get(5));
+						POS pos = POS.getPOSForLabel(r.get(5).toLowerCase());
 
 						if (pos == null) {
 							// Can't include words withouth a POS

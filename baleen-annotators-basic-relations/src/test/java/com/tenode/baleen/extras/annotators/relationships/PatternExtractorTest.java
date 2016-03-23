@@ -52,6 +52,8 @@ public class PatternExtractorTest extends AnnotatorTestBase {
 				final WordToken wordToken = new WordToken(jCas);
 				wordToken.setBegin(offset);
 				wordToken.setEnd(end);
+				// Fake the POS
+				wordToken.setPartOfSpeech("VBZ");
 				wordToken.addToIndexes(jCas);
 				offset = end + 1;
 			} else {
@@ -96,6 +98,8 @@ public class PatternExtractorTest extends AnnotatorTestBase {
 				final WordToken wordToken = new WordToken(jCas);
 				wordToken.setBegin(offset);
 				wordToken.setEnd(end);
+				// Fake the POS
+				wordToken.setPartOfSpeech("VBZ");
 				wordToken.addToIndexes(jCas);
 				offset = end + 1;
 			} else {

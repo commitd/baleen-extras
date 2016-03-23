@@ -56,7 +56,8 @@ public class PatternExtractor extends BaleenAnnotator {
 
 	private final StopWordRemover stopWordRemover = new StopWordRemover();
 
-	private final java.util.regex.Pattern negationRegex = java.util.regex.Pattern.compile("\b((no)|(neither)|(not))\b");
+	private final java.util.regex.Pattern negationRegex = java.util.regex.Pattern
+			.compile("\\b((no)|(neither)|(not)|(never))\\b");
 
 	/*
 	 * (non-Javadoc)
@@ -119,7 +120,10 @@ public class PatternExtractor extends BaleenAnnotator {
 						final int count = countWordsBetween(p, wordIndexes);
 						return count >= 0 && count < windowSize;
 					})
-					.filter(p -> !negationRegex.matcher(p.getCoveredText(lowerText)).matches())
+					.filter(p -> {
+						String covered = p.getCoveredText(lowerText);
+						return !negationRegex.matcher(covered).find();
+					})
 					.forEach(p -> {
 						// Remove any other entities from the pattern
 						// Remove stop words from the pattern

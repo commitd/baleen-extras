@@ -37,7 +37,7 @@ public class UploadInteractionsToMongoTest extends AbstractBaleenTaskTest {
 	public void test() throws ResourceInitializationException, AnalysisEngineProcessException, IOException,
 			ResourceAccessException {
 		final File file = File.createTempFile("test", "uimt");
-		Files.write("MOVEMENT,went,source,target,went,VERB,gone", file, StandardCharsets.UTF_8);
+		Files.write("Type,SubType\nMOVEMENT,went,source,target,went,VERB,gone", file, StandardCharsets.UTF_8);
 
 		final AnalysisEngine ae = create(UploadInteractionsToMongo.class, "mongo", fongoErd, "input", file);
 		execute(ae);

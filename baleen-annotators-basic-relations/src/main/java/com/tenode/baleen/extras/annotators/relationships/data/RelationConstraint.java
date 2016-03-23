@@ -36,7 +36,11 @@ public class RelationConstraint {
 		this.type = type;
 		this.subType = subType;
 		this.pos = pos;
-		this.posChar = Character.toLowerCase(pos.charAt(0));
+		if (pos != null && pos.length() > 0) {
+			this.posChar = Character.toLowerCase(pos.charAt(0));
+		} else {
+			this.posChar = '?';
+		}
 		this.source = source;
 		this.target = target;
 
@@ -93,7 +97,8 @@ public class RelationConstraint {
 	 * @return true, if is valid
 	 */
 	public boolean isValid() {
-		return !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(source) && !Strings.isNullOrEmpty(target);
+		return !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(subType) && !Strings.isNullOrEmpty(pos)
+				&& !Strings.isNullOrEmpty(source) && !Strings.isNullOrEmpty(target);
 	}
 
 	/**

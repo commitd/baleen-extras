@@ -80,10 +80,10 @@ public class CleanRelations extends BaleenAnnotator {
 	 * @return true, if is same
 	 */
 	private boolean isSame(final Relation a, final Relation b) {
-		return isSame(a.getSource(), b.getSource()) && isSame(a.getTarget(), b.getTarget())
-				|| symmetric && isSame(a.getSource(), b.getTarget()) && isSame(a.getTarget(), b.getSource())
-						&& isSame(a.getRelationshipType(), b.getRelationshipType())
-						&& isSame(a.getRelationSubType(), b.getRelationSubType());
+		return (isSame(a.getSource(), b.getSource()) && isSame(a.getTarget(), b.getTarget())
+				|| symmetric && isSame(a.getSource(), b.getTarget()) && isSame(a.getTarget(), b.getSource()))
+				&& isSame(a.getRelationshipType(), b.getRelationshipType())
+				&& isSame(a.getRelationSubType(), b.getRelationSubType());
 	}
 
 	/**
