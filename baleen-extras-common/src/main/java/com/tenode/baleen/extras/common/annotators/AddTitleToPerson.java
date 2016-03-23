@@ -78,7 +78,7 @@ public class AddTitleToPerson extends BaleenAnnotator {
 		if (title == null || title.isEmpty()) {
 			return prefix;
 		} else {
-			return title;
+			return prefix + " " + title;
 		}
 	}
 

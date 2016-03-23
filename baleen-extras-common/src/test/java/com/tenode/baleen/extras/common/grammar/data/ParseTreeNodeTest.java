@@ -142,4 +142,11 @@ public class ParseTreeNodeTest {
 
 	}
 
+	@Test
+	public void testStringAndlog() {
+		assertFalse(a.toString().isEmpty());
+		// Test no crash
+		a.log("\t");
+	}
+
 }

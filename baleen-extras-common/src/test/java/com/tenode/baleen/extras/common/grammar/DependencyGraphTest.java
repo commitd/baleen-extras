@@ -199,8 +199,8 @@ public class DependencyGraphTest {
 			return false;
 		});
 
-		// 2 as go in both direction (dA a -> a, and a -> sample)
-		assertEquals(2, traverseCount);
+		// 1 as go in both direction (dA a -> sample)
+		assertEquals(1, traverseCount);
 	}
 
 	@Test

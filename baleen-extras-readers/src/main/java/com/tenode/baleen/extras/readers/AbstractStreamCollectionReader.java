@@ -25,7 +25,7 @@ public abstract class AbstractStreamCollectionReader<T> extends AbstractIteratat
 	 */
 	public static final String KEY_MAX_DOCUMENTS = "max";
 	@ConfigurationParameter(name = KEY_MAX_DOCUMENTS, defaultValue = "0")
-	private Integer maxDocuments;
+	private int maxDocuments;
 
 	/**
 	 * Skip the first documents
@@ -34,7 +34,7 @@ public abstract class AbstractStreamCollectionReader<T> extends AbstractIteratat
 	 */
 	public static final String KEY_SKIP_DOCUMENTS = "skip";
 	@ConfigurationParameter(name = KEY_SKIP_DOCUMENTS, defaultValue = "0")
-	private Integer skipDocuments;
+	private int skipDocuments;
 
 	protected void setSkipDocuments(int skipDocuments) {
 		this.skipDocuments = skipDocuments;
@@ -57,11 +57,11 @@ public abstract class AbstractStreamCollectionReader<T> extends AbstractIteratat
 
 		Stream<T> stream = initializeStream(context);
 
-		if (skipDocuments != null && skipDocuments > 0) {
+		if (skipDocuments > 0) {
 			stream = stream.skip(skipDocuments);
 		}
 
-		if (maxDocuments != null && maxDocuments > 0) {
+		if (maxDocuments > 0) {
 			stream = stream.limit(maxDocuments);
 		}
 

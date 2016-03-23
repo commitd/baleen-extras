@@ -514,11 +514,14 @@ public class DependencyGraph {
 			TraversePredicate predicate) {
 		final int newDistance = distance - 1;
 
+		if (newDistance <= 0) {
+			return;
+		}
+
 		for (final Edge e : edges.get(token)) {
 			final WordToken other = e.getOther(token);
 
-			if (!history.contains(other) && predicate.test(e.getDependency(), token, other, history)
-					&& newDistance > 0) {
+			if (!history.contains(other) && predicate.test(e.getDependency(), token, other, history)) {
 				final ImmutableStack<WordToken> stack = history.push(other);
 				traverse(newDistance, other, stack, predicate);
 			}

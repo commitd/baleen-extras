@@ -76,9 +76,9 @@ public class CsvCoreferenceConsumerTest extends AbstractAnnotatorTest {
 		// Header
 		assertTrue(lines.get(0).contains("source"));
 		// Right 'entities'
-		assertTrue(lines.get(1).split("\t")[5].contains("John"));
-		assertTrue(lines.get(2).split("\t")[5].contains("London"));
-		assertTrue(lines.get(3).split("\t")[5].contains("Jonny"));
+		assertTrue(lines.get(1).split("\t")[4].contains("John"));
+		assertTrue(lines.get(2).split("\t")[4].contains("London"));
+		assertTrue(lines.get(3).split("\t")[4].contains("Jonny"));
 
 		// Check ref ids are the same
 		assertEquals(lines.get(1).split("\t")[2], lines.get(3).split("\t")[2]);
