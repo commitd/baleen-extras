@@ -13,6 +13,8 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
  *
  * @param <T>
  *            the generic type
+ *
+ * @baleen.javadoc
  */
 public abstract class AbstractStreamCollectionReader<T> extends AbstractIteratatorCollectionReader<T> {
 
@@ -34,13 +36,32 @@ public abstract class AbstractStreamCollectionReader<T> extends AbstractIteratat
 	@ConfigurationParameter(name = KEY_SKIP_DOCUMENTS, defaultValue = "0")
 	private Integer skipDocuments;
 
+	protected void setSkipDocuments(int skipDocuments) {
+		this.skipDocuments = skipDocuments;
+	}
+
+	protected Integer getSkipDocuments() {
+		return skipDocuments;
+	}
+
+	protected Integer getMaxDocuments() {
+		return maxDocuments;
+	}
+
+	protected void setMaxDocuments(Integer maxDocuments) {
+		this.maxDocuments = maxDocuments;
+	}
+
 	@Override
 	protected final Iterator<T> initializeIterator(UimaContext context) throws BaleenException {
+
 		Stream<T> stream = initializeStream(context);
 
-		stream = stream.skip(skipDocuments);
+		if (skipDocuments != null && skipDocuments > 0) {
+			stream = stream.skip(skipDocuments);
+		}
 
-		if (maxDocuments > 0) {
+		if (maxDocuments != null && maxDocuments > 0) {
 			stream = stream.limit(maxDocuments);
 		}
 
