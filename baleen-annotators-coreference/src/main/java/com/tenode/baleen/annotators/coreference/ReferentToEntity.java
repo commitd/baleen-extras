@@ -49,7 +49,7 @@ public class ReferentToEntity extends BaleenAnnotator {
 				.map(a -> {
 					final ReferenceTarget referent = a.getReferent();
 					final Entity entity = targets.get(referent);
-					if (entity != null && !entities.contains(entity)) {
+					if (entity != null && !entities.contains(a)) {
 						return SpanUtils.copyEntity(jCas, a.getBegin(), a.getEnd(), entity);
 					} else {
 						return null;
