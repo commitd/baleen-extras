@@ -4,15 +4,10 @@
 package com.tenode.baleen.extras.jobs.io;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.tenode.baleen.extras.annotators.relationships.RelationTypeFilter;
 import com.tenode.baleen.extras.jobs.UploadInteractionsToMongo;
 import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
@@ -76,37 +71,19 @@ public class MongoInteractionWriter implements InteractionWriter {
 		final BasicDBObject interactionObject = new BasicDBObject();
 		interactionObject.put("relationshipType", interaction.getType());
 		interactionObject.put("relationSubType", interaction.getSubType());
-
-		// Does if it already exist?
-		DBCursor find = interactions.find(interactionObject);
-		if (find.hasNext()) {
-			DBObject dbObject = find.next();
-
-			BasicDBList list = (BasicDBList) dbObject.get("value");
-			Set<String> set = new HashSet<String>(alternatives);
-			if (list != null) {
-				list.stream()
-						.filter(o -> o instanceof String)
-						.forEach(s -> {
-							set.add((String) s);
-						});
-			}
-			dbObject.put("value", set);
-			interactions.save(dbObject);
-		} else {
-			// Create a new one
-			interactionObject.put("value", alternatives);
-			interactions.save(interactionObject);
-		}
+		interactionObject.put("value", alternatives);
+		interactions.save(interactionObject);
 
 		// Write out to the relationship constraints
 		final BasicDBObject relationTypeObject = new BasicDBObject()
 				.append("source", interaction.getSource())
 				.append("target", interaction.getTarget())
 				.append("type", interaction.getType())
-				.append("subType", interaction.getSubType());
-		relationTypes.save(relationTypeObject);
+				.append("subType", interaction.getSubType())
+				.append("pos", interaction.getWord().getPos().getLabel())
+				.append("value", alternatives);
 
+		relationTypes.save(relationTypeObject);
 	}
 
 	/**

@@ -1,7 +1,11 @@
 package com.tenode.baleen.extras.annotators.relationships.data;
 
+import java.util.Collection;
+
 import com.google.common.base.Strings;
 
+import uk.gov.dstl.baleen.types.language.Interaction;
+import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;
 
@@ -13,6 +17,9 @@ public class RelationConstraint {
 	private final String type;
 	private final String source;
 	private final String target;
+	private final String pos;
+	private final String subType;
+	private final char posChar;
 
 	/**
 	 * Instantiates a new relation constraint.
@@ -24,11 +31,51 @@ public class RelationConstraint {
 	 * @param target
 	 *            the target
 	 */
-	public RelationConstraint(final String type, final String source, final String target) {
+	public RelationConstraint(final String type, final String subType, final String pos, final String source,
+			final String target) {
 		this.type = type;
+		this.subType = subType;
+		this.pos = pos;
+		this.posChar = Character.toLowerCase(pos.charAt(0));
 		this.source = source;
 		this.target = target;
 
+	}
+
+	/**
+	 * Gets the source.
+	 *
+	 * @return the source
+	 */
+	public String getSource() {
+		return source;
+	}
+
+	/**
+	 * Gets the target.
+	 *
+	 * @return the target
+	 */
+	public String getTarget() {
+		return target;
+	}
+
+	/**
+	 * Gets the POS.
+	 *
+	 * @return the part of speech
+	 */
+	public String getPos() {
+		return pos;
+	}
+
+	/**
+	 * Gets the sub type.
+	 *
+	 * @return the sub type
+	 */
+	public String getSubType() {
+		return subType;
 	}
 
 	/**
@@ -67,13 +114,33 @@ public class RelationConstraint {
 		final String sourceType = sourceEntity.getTypeName();
 		final String targetType = targetEntity.getTypeName();
 
+		final boolean relationType = type.equalsIgnoreCase(relation.getRelationshipType())
+				&& subType.equalsIgnoreCase(relation.getRelationSubType());
+
 		if (!symmetric) {
-			return sourceType.equalsIgnoreCase(source) && targetType.equalsIgnoreCase(target);
+			return relationType && sourceType.equalsIgnoreCase(source) && targetType.equalsIgnoreCase(target);
 		} else {
-			return sourceType.equalsIgnoreCase(source) && targetType.equalsIgnoreCase(target)
-					|| sourceType.equalsIgnoreCase(target) && targetType.equalsIgnoreCase(source);
+			return relationType && (sourceType.equalsIgnoreCase(source) && targetType.equalsIgnoreCase(target)
+					|| sourceType.equalsIgnoreCase(target) && targetType.equalsIgnoreCase(source));
 		}
 
+	}
+
+	public boolean matches(Interaction interaction, Collection<WordToken> words) {
+		String interactionType = interaction.getRelationshipType();
+		String interactionSubType = interaction.getRelationSubType();
+
+		if (interactionSubType.equalsIgnoreCase("attacked")) {
+
+		}
+
+		boolean typeMatch = type.equalsIgnoreCase(interactionType) && subType.equalsIgnoreCase(interactionSubType);
+		if (words == null || words.isEmpty()) {
+			return typeMatch;
+		} else {
+			return typeMatch && words.stream()
+					.anyMatch(w -> posChar == Character.toLowerCase(w.getPartOfSpeech().charAt(0)));
+		}
 	}
 
 	/*
@@ -88,6 +155,9 @@ public class RelationConstraint {
 		result = prime * result + (source == null ? 0 : source.hashCode());
 		result = prime * result + (target == null ? 0 : target.hashCode());
 		result = prime * result + (type == null ? 0 : type.hashCode());
+		result = prime * result + (subType == null ? 0 : subType.hashCode());
+		result = prime * result + (pos == null ? 0 : pos.hashCode());
+
 		return result;
 	}
 
@@ -129,12 +199,26 @@ public class RelationConstraint {
 		} else if (!type.equals(other.type)) {
 			return false;
 		}
+		if (subType == null) {
+			if (other.subType != null) {
+				return false;
+			}
+		} else if (!subType.equals(other.subType)) {
+			return false;
+		}
+		if (pos == null) {
+			if (other.pos != null) {
+				return false;
+			}
+		} else if (!pos.equals(other.pos)) {
+			return false;
+		}
 		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

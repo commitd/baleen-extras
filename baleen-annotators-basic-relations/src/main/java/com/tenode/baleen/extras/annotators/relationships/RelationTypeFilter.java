@@ -80,6 +80,15 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	private String typeField;
 
 	/**
+	 * The name of the field in Mongo that contains the relation sub type
+	 *
+	 * @baleen.config type
+	 */
+	public static final String PARAM_SUBTYPE_FIELD = "subTypeField";
+	@ConfigurationParameter(name = PARAM_SUBTYPE_FIELD, defaultValue = "subType")
+	private String subTypeField;
+
+	/**
 	 * The name of the field in Mongo that contains the relation source type
 	 *
 	 * @baleen.config source
@@ -98,6 +107,15 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	private String targetField;
 
 	/**
+	 * The name of the field in Mongo that contains the relation pos
+	 *
+	 * @baleen.config posField pos
+	 */
+	public static final String PARAM_POS_FIELD = "posField";
+	@ConfigurationParameter(name = PARAM_POS_FIELD, defaultValue = "pos")
+	private String posField;
+
+	/**
 	 * Determines strictness of filtering.
 	 *
 	 * In strict mode the relationsship type must be defined and the source and target type the same
@@ -108,7 +126,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config false
 	 */
 	public static final String PARAM_STRICT = "strict";
-	@ConfigurationParameter(name = RelationTypeFilter.PARAM_STRICT, defaultValue = "false")
+	@ConfigurationParameter(name = PARAM_STRICT, defaultValue = "false")
 	private boolean strict;
 
 	/**
@@ -117,7 +135,7 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @baleen.config true
 	 */
 	public static final String PARAM_SYMMETRIC = "symmetric";
-	@ConfigurationParameter(name = RelationTypeFilter.PARAM_SYMMETRIC, defaultValue = "true")
+	@ConfigurationParameter(name = PARAM_SYMMETRIC, defaultValue = "true")
 	private boolean symetric;
 
 	private final Map<String, Set<RelationConstraint>> constraints = new HashMap<>();
@@ -135,6 +153,8 @@ public class RelationTypeFilter extends BaleenAnnotator {
 
 		dbCollection.find().forEach(o -> {
 			final RelationConstraint constraint = new RelationConstraint((String) o.get(typeField),
+					(String) o.get(subTypeField),
+					(String) o.get(posField),
 					(String) o.get(sourceField),
 					(String) o.get(targetField));
 

@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
+import uk.gov.dstl.baleen.types.language.Interaction;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
@@ -42,6 +43,33 @@ public class SpanUtils {
 			instance.setEnd(end);
 			instance.setReferent(entity.getReferent());
 			instance.setValue(entity.getValue());
+			return instance;
+		} catch (final Exception e) {
+			return null;
+		}
+
+	}
+
+	/**
+	 * Copy an annotation.
+	 *
+	 * @param jCas
+	 *            the j cas
+	 * @param begin
+	 *            the begin
+	 * @param end
+	 *            the end
+	 * @param interaction
+	 *            the interaction
+	 * @return the interaction
+	 */
+	public static Interaction copyInteraction(JCas jCas, int begin, int end, Interaction annotation) {
+		try {
+			final Interaction instance = annotation.getClass().getConstructor(JCas.class).newInstance(jCas);
+
+			instance.setBegin(begin);
+			instance.setEnd(end);
+			instance.setValue(annotation.getValue());
 			return instance;
 		} catch (final Exception e) {
 			return null;

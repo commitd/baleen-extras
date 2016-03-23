@@ -93,7 +93,7 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 
 					// Strip out the clarification tags []
 					text = text.replaceAll("(\\[.*?\\]\\s*)*", "");
-					text = text.replaceAll("\\s{3,}", "\n\n");
+					text = text.replaceAll("\\s{3,}", " \n\n");
 					text = text.toLowerCase().trim();
 					// Baleen bug? Lower case U.S. breaks the sentence splitter?
 					text = text.replaceAll(Pattern.quote("u.s."), "us");
