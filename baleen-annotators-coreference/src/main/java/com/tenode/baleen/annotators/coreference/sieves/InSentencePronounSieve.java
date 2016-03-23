@@ -22,7 +22,7 @@ import com.tenode.baleen.annotators.coreference.data.Person;
  */
 public class InSentencePronounSieve extends AbstractCoreferenceSieve {
 
-	// TODO: Not implemented, as these seem ambiguous, ven in subsets:
+	// TODO: Not implemented, as these seem ambiguous:
 	// Ok if third singular in following sets
 	// - {he his} {him himself} .
 	// - I don't think we can do anything with she, her, hers,herself (since no equivalent of his so

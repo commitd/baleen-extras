@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tenode.baleen.extras.common.grammar.data.ParseTreeNode;
 
@@ -28,6 +30,8 @@ import uk.gov.dstl.baleen.types.language.WordToken;
  * @baleen.javadoc
  */
 public class ParseTree {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParseTree.class);
 
 	private static final Comparator<? super ParseTreeNode> SENTENCE_ORDER = (a, b) -> Integer
 			.compare(a.getChunk().getBegin(), b.getChunk().getBegin());
@@ -206,7 +210,7 @@ public class ParseTree {
 		root.log("");
 
 		wordToNode.forEach((w, n) -> {
-			System.out.println(w.getCoveredText() + ":" + n.toString());
+			LOGGER.info("{} : {} ", w.getCoveredText(), n.toString());
 		});
 	}
 

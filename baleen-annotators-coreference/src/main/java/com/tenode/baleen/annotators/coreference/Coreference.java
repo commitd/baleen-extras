@@ -152,8 +152,6 @@ public class Coreference extends BaleenAnnotator {
 		// Detect mentions
 		List<Mention> mentions = new MentionDetector(jCas, dependencyGraph, parseTree).detect();
 
-		// mentions.forEach(System.out::println);
-
 		// Extract head words and other aspects needed for later, determine acronyms, denonym,
 		// gender, etc
 		enhanceMention(jCas, dependencyGraph, parseTree, mentions);
@@ -192,7 +190,7 @@ public class Coreference extends BaleenAnnotator {
 
 		CoreferenceSieve[] sieves = new CoreferenceSieve[] {
 				new ExtractReferenceTargets(jCas, clusters, mentions), // Good
-				// TODO: new SpeakerIdentificationSieve(jCas, clusters, mentions) Not implemented
+				// TODO: SpeakerIdentificationSieve not implemented
 				new ExactStringMatchSieve(jCas, clusters, mentions), // Good
 				new RelaxedStringMatchSieve(jCas, clusters, mentions), // Good
 				new InSentencePronounSieve(jCas, clusters, mentions), // Good
@@ -219,10 +217,6 @@ public class Coreference extends BaleenAnnotator {
 				.filter(Objects::nonNull)
 				.forEach(s -> {
 					s.sieve();
-					// getMonitor().info("Cluster size after {} is {}",
-					// s.getClass().getSimpleName(),
-					// clusters.size());
-					// logClusters(clusters);
 				});
 
 		return clusters;
@@ -295,10 +289,6 @@ public class Coreference extends BaleenAnnotator {
 		List<Cluster> merged = new ArrayList<>(clusters.size());
 
 		for (Cluster cluster : clusters) {
-
-			// System.err.println("Raw Cluster:");
-			// cluster.getMentions().stream()
-			// .forEach(a -> System.err.println("\t" + a.getAnnotation().getCoveredText()));
 
 			boolean overlap = false;
 			for (Cluster mergedCluster : merged) {

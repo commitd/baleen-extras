@@ -53,8 +53,7 @@ public abstract class AbstractPrintAnnotator<T extends Base> extends BaleenAnnot
 				.map(this::print)
 				.filter(Objects::nonNull)
 				.forEach(s -> {
-					System.out.println(clazz.getName() + ":");
-					System.out.println(s);
+					getMonitor().info("{}: {}", clazz.getName(), s);
 				});
 	}
 

@@ -82,7 +82,7 @@ public class MaltParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
 	 */
 	@Override
@@ -122,7 +122,7 @@ public class MaltParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
 	 */
 	@Override
@@ -140,7 +140,6 @@ public class MaltParser extends BaleenAnnotator {
 				final String lemma = getLemma(wt);
 				final String tag = udTags ? convertPennToUniversal(pos) : pos;
 				tokens[i] = String.format("%d\t%s\t%s\t%s\t%s\t_", i + 1, wt.getCoveredText(), lemma, tag, pos);
-				// System.out.println(tokens[i]);
 				i++;
 			}
 
@@ -151,8 +150,6 @@ public class MaltParser extends BaleenAnnotator {
 
 					if (node.hasHead()) {
 						final Dependency dep = new Dependency(jCas);
-						// System.out.println(node.getIndex() + " : " + node.isRoot() + ": " +
-						// node.getHeadIndex());
 						if (node.getHeadIndex() != 0) {
 							dep.setGovernor(wordTokens.get(node.getHeadIndex() - 1));
 							final String label = node.getLabel(7);

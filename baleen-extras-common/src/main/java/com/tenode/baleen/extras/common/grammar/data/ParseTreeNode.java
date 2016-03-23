@@ -8,6 +8,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.tenode.baleen.extras.common.grammar.ParseTree;
+
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
@@ -15,6 +20,8 @@ import uk.gov.dstl.baleen.types.language.WordToken;
  * A node in the parse tree.
  */
 public final class ParseTreeNode {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParseTree.class);
 
 	private final PhraseChunk chunk;
 
@@ -224,7 +231,7 @@ public final class ParseTreeNode {
 			parentString = getParent().toString();
 		}
 
-		System.out.println(indent + chunkString + ": " + wordString + ": " + parentString);
+		LOGGER.info("{}{}: {}: {}", indent, chunkString, wordString, parentString);
 		if (children != null) {
 			String childIndent = "\t" + indent;
 			for (ParseTreeNode c : children) {

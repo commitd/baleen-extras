@@ -129,10 +129,8 @@ public class WordNetResource extends BaleenResource {
 		if (!indexWord.isPresent()) {
 			return Stream.empty();
 		} else {
-			// TODO: This doesn't work, but is the same as the below:
-			// indexWord.get().getSenses().stream().map(Synset::getLexFileName).distinct();
-			// There's something about the list created by getSense() which doesn't work well with
-			// streams.
+			// NOTE: This was stream but it WordNet getSenses() somehow seems incompatible with
+			// streams
 			final List<Synset> senses = indexWord.get().getSenses();
 			final Set<String> set = new HashSet<>();
 			for (final Synset s : senses) {

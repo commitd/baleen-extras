@@ -12,8 +12,6 @@ import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.Parse;
@@ -41,8 +39,6 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * @baleen.javadoc
  */
 public class OpenNLPParser extends BaleenAnnotator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OpenNLPParser.class);
-
 	private static final Set<String> PHRASE_TYPES = new HashSet<String>(
 			Arrays.asList("ADJP", "ADVP", "FRAG", "INTJ", "LST", "NAC", "NP", "NX", "PP", "PRN", "PRT", "QP", "RRC",
 					"UCP", "VP", "WHADJP", "WHAVP", "WHNP", "WHPP", "X"));
@@ -60,7 +56,7 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
 	 */
 	@Override
@@ -83,7 +79,7 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
 	 */
 	@Override
@@ -120,7 +116,7 @@ public class OpenNLPParser extends BaleenAnnotator {
 		// We remove all the existing PhraseChunks as they are going to be
 		// replace with the parsed
 		// version
-		// TODO: Or should we create a new ConstiuentPhraseChunk type in Uima?
+		// TODO: Should we create a new ConstiuentPhraseChunk type in Uima?
 		removeFromJCasIndex(JCasUtil.selectCovered(jCas, PhraseChunk.class, sentence));
 
 		addParsedAsAnnotations(jCas, sentence.getBegin(), parsed);
@@ -151,8 +147,6 @@ public class OpenNLPParser extends BaleenAnnotator {
 			phraseChunk.setChunkType(parsed.getType());
 
 			addToJCasIndex(phraseChunk);
-
-			// LOGGER.debug("{} [{}]", phraseChunk.getCoveredText(), phraseChunk.getChunkType());
 		}
 
 		Arrays.stream(parsed.getChildren()).forEach(p -> addParsedAsAnnotations(jCas, offset, p));
@@ -188,7 +182,7 @@ public class OpenNLPParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doDestroy()
 	 */
 	@Override

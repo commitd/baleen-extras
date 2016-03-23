@@ -151,7 +151,8 @@ public class MentionDetector {
 					final WordToken head = determineHead(new ArrayList<>(collection));
 					if (head != null) {
 						headToChunk.put(head, p);
-					} // else what should we do to those without heads?
+					}
+					// TODO: What should we do to those without heads?
 				});
 
 		// Paper: keep the largest noun phrase which has the same head word.

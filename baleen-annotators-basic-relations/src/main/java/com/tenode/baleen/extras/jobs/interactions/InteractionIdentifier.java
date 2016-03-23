@@ -10,6 +10,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.tenode.baleen.extras.jobs.interactions.data.ClusteredPatterns;
 import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
 import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
@@ -30,6 +33,8 @@ import uk.gov.dstl.baleen.uima.UimaMonitor;
  * they contain). Then the content of the clusters is and common words extracted
  */
 public class InteractionIdentifier {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(InteractionIdentifier.class);
 
 	private final int minPatternsInCluster;
 
@@ -84,15 +89,10 @@ public class InteractionIdentifier {
 
 		monitor.info("Patterns clustered into {} clusters", clusters.size());
 
-		// logClusters(clusters);
-
 		// Remove small clusters
 		filterClusters(clusters);
 
 		monitor.info("Patterns filtered to {} clusters", clusters.size());
-
-		// For debugging:
-		// logClusters(clusters);
 
 		monitor.info("Finding interaction words");
 
@@ -103,8 +103,8 @@ public class InteractionIdentifier {
 
 	private void logClusters(List<ClusteredPatterns> clusters) {
 		clusters.forEach(c -> {
-			System.out.println("-----------------");
-			c.getPatterns().forEach(p -> System.out.println(p));
+			LOGGER.debug("-----------------");
+			c.getPatterns().forEach(p -> LOGGER.debug(p.toString()));
 		});
 	}
 
