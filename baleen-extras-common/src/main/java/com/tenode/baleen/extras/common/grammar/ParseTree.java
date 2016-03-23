@@ -209,9 +209,7 @@ public class ParseTree {
 	public void log() {
 		root.log("");
 
-		wordToNode.forEach((w, n) -> {
-			LOGGER.info("{} : {} ", w.getCoveredText(), n.toString());
-		});
+		wordToNode.forEach((w, n) -> LOGGER.info("{} : {} ", w.getCoveredText(), n.toString()));
 	}
 
 }

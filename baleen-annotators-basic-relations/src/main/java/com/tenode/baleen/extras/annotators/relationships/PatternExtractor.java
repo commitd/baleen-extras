@@ -85,11 +85,6 @@ public class PatternExtractor extends BaleenAnnotator {
 							.isAlphabetic(w.getPartOfSpeech().charAt(0)) && w.getCoveredText().length() > 1)
 					.collect(Collectors.toList());
 
-			// Remove words which are covered by an entity
-			final List<WordToken> nonEntityWords = words.stream().filter(w -> !entities.stream().anyMatch(e -> {
-				return e.getBegin() <= w.getBegin() && w.getEnd() <= e.getEnd();
-			})).collect(Collectors.toList());
-
 			// Find entities within (windowSize) words of one another
 
 			final String text = jCas.getDocumentText();

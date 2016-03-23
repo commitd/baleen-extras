@@ -40,21 +40,18 @@ public class SentenceEnhancer {
 
 		final Set<WordToken> pronounAnnotation = mentions.stream()
 				.filter(p -> p.getType() == MentionType.PRONOUN)
-				.map(p -> {
-					return (WordToken) p.getAnnotation();
-				}).collect(Collectors.toSet());
+				.map(p -> (WordToken) p.getAnnotation())
+				.collect(Collectors.toSet());
 
 		final Set<Entity> entityAnnotation = mentions.stream()
 				.filter(p -> p.getType() == MentionType.ENTITY)
-				.map(p -> {
-					return (Entity) p.getAnnotation();
-				}).collect(Collectors.toSet());
+				.map(p -> (Entity) p.getAnnotation())
+				.collect(Collectors.toSet());
 
 		final Set<PhraseChunk> npAnnotation = mentions.stream()
 				.filter(p -> p.getType() == MentionType.NP)
-				.map(p -> {
-					return (PhraseChunk) p.getAnnotation();
-				}).collect(Collectors.toSet());
+				.map(p -> (PhraseChunk) p.getAnnotation())
+				.collect(Collectors.toSet());
 
 		final Map<WordToken, Collection<Sentence>> wordToSentence = JCasUtil.indexCovering(jCas, WordToken.class,
 				Sentence.class).entrySet().stream()

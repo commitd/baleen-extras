@@ -217,9 +217,8 @@ public class RelationTypeFilter extends BaleenAnnotator {
 	 * @return true, if successful
 	 */
 	private boolean checkValid(final Set<RelationConstraint> rcs, final Relation relation) {
-		return rcs.stream().anyMatch(p -> {
-			return p.matches(relation, symetric);
-		});
+		return rcs.stream()
+				.anyMatch(p -> p.matches(relation, symetric));
 	}
 
 }

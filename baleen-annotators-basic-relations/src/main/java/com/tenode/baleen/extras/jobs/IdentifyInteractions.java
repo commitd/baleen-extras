@@ -251,17 +251,15 @@ public class IdentifyInteractions extends BaleenTask {
 					.orElse(lemma);
 
 			return interaction.toRelations(relationshipType, lemma);
-		}).distinct()
-				.forEach(r -> {
-					interactionWriters.forEach(w -> {
-
-						try {
-							w.write(r);
-						} catch (final IOException e) {
-							getMonitor().warn("Unable to initialise writer", e);
-						}
-					});
-				});
+		})
+				.distinct()
+				.forEach(r -> interactionWriters.forEach(w -> {
+					try {
+						w.write(r);
+					} catch (final IOException e) {
+						getMonitor().warn("Unable to initialise writer", e);
+					}
+				}));
 
 		interactionWriters.forEach(w -> w.destroy());
 	}

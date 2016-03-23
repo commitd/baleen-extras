@@ -148,11 +148,10 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 	protected Stream<Relation> createPairwiseRelations(final JCas jCas, final Interaction interaction,
 			final List<Entity> sources,
 			final List<Entity> targets) {
-		return sources.stream().flatMap(l -> {
-			return targets.stream().map(r -> {
-				return createRelation(jCas, interaction, l, r);
-			});
-		});
+		return sources.stream()
+				.flatMap(l -> targets.stream()
+						.map(r -> createRelation(jCas, interaction, l, r)));
+
 	}
 
 	/**

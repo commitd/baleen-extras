@@ -215,9 +215,7 @@ public class Coreference extends BaleenAnnotator {
 
 		Arrays.stream(sieves)
 				.filter(Objects::nonNull)
-				.forEach(s -> {
-					s.sieve();
-				});
+				.forEach(CoreferenceSieve::sieve);
 
 		return clusters;
 	}
@@ -310,8 +308,6 @@ public class Coreference extends BaleenAnnotator {
 	private void updateMentionClusters(List<Cluster> clusters, List<Mention> mentions) {
 		mentions.forEach(Mention::clearClusters);
 
-		clusters.forEach(c -> {
-			c.getMentions().forEach(m -> m.addToCluster(c));
-		});
+		clusters.forEach(c -> c.getMentions().forEach(m -> m.addToCluster(c)));
 	}
 }

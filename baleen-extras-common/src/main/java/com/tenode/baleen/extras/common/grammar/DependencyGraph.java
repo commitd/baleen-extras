@@ -271,9 +271,7 @@ public class DependencyGraph {
 
 			final int newDistance = distance - 1;
 			if (newDistance > 0) {
-				set.forEach(a -> {
-					extractWords(collector, newDistance, predicate, a);
-				});
+				set.forEach(a -> extractWords(collector, newDistance, predicate, a));
 			}
 		}
 	}
@@ -332,32 +330,27 @@ public class DependencyGraph {
 		final SetMultimap<WordToken, Dependency> filteredGovernor = HashMultimap.create();
 
 		edges.asMap().entrySet().stream()
-				.filter(w -> {
-					return predicate.test(w.getKey());
-				}).forEach(e -> {
+				.filter(w -> predicate.test(w.getKey()))
+				.forEach(e -> {
 					final WordToken key = e.getKey();
 					e.getValue().stream()
 							.filter(edge -> predicate.test(edge.getOther(key)))
 							.forEach(v -> filteredEdges.put(key, v));
 				});
 
-		governors.asMap().keySet().stream()
-				.filter(predicate)
-				.forEach(k -> {
-					final List<Dependency> filtered = governors.get(k).stream()
-							.filter(d -> predicate.test(d.getGovernor()) && predicate.test(d.getDependent()))
-							.collect(Collectors.toList());
-					filteredGovernor.putAll(k, filtered);
-				});
+		governors.asMap().keySet().stream().filter(predicate).forEach(k -> {
+			final List<Dependency> filtered = governors.get(k).stream()
+					.filter(d -> predicate.test(d.getGovernor()) && predicate.test(d.getDependent()))
+					.collect(Collectors.toList());
+			filteredGovernor.putAll(k, filtered);
+		});
 
-		dependents.asMap().keySet().stream()
-				.filter(predicate)
-				.forEach(k -> {
-					final List<Dependency> filtered = dependents.get(k).stream()
-							.filter(d -> predicate.test(d.getGovernor()) && predicate.test(d.getDependent()))
-							.collect(Collectors.toList());
-					filteredDependent.putAll(k, filtered);
-				});
+		dependents.asMap().keySet().stream().filter(predicate).forEach(k -> {
+			final List<Dependency> filtered = dependents.get(k).stream()
+					.filter(d -> predicate.test(d.getGovernor()) && predicate.test(d.getDependent()))
+					.collect(Collectors.toList());
+			filteredDependent.putAll(k, filtered);
+		});
 		return new DependencyGraph(filteredEdges, filteredDependent, filteredGovernor);
 	}
 

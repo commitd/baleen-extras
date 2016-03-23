@@ -94,11 +94,9 @@ public class ReuterReader extends AbstractStreamCollectionReader<String> {
 
 					return Stream.<Element> empty();
 
-				}).flatMap(e -> {
-					return nodeListToText(e.getElementsByTagName("BODY"));
-				}).filter(s -> {
-					return !s.isEmpty();
-				});
+				})
+				.flatMap(e -> nodeListToText(e.getElementsByTagName("BODY")))
+				.filter(s -> !s.isEmpty());
 	}
 
 	private Stream<String> nodeListToText(final NodeList list) {
