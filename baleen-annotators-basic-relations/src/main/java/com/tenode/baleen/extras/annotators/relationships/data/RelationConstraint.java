@@ -135,10 +135,6 @@ public class RelationConstraint {
 		String interactionType = interaction.getRelationshipType();
 		String interactionSubType = interaction.getRelationSubType();
 
-		if (interactionSubType.equalsIgnoreCase("attacked")) {
-
-		}
-
 		boolean typeMatch = type.equalsIgnoreCase(interactionType) && subType.equalsIgnoreCase(interactionSubType);
 		if (words == null || words.isEmpty()) {
 			return typeMatch;

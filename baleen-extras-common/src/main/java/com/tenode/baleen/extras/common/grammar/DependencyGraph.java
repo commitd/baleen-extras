@@ -368,7 +368,7 @@ public class DependencyGraph {
 	 *            the dependency
 	 */
 	private void addDependency(Dependency dependency) {
-		if ((dependency.getDependencyType() == null || !dependency.getDependencyType().equals("ROOT"))
+		if ((dependency.getDependencyType() == null || !"ROOT".equalsIgnoreCase(dependency.getDependencyType()))
 				&& dependency.getGovernor() != null
 				&& dependency.getDependent() != null) {
 			addEdge(dependency);

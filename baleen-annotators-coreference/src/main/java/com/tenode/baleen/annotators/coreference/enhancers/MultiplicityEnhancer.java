@@ -52,8 +52,8 @@ public class MultiplicityEnhancer implements MentionEnhancer {
 			Multiplicity m = Multiplicity.UNKNOWN;
 			final WordToken head = mention.getHeadWordToken();
 			if (head != null) {
-				if (head.getPartOfSpeech().equals("NNS")
-						|| mention.getHeadWordToken().getPartOfSpeech().equals("NPS")) {
+				if ("NNS".equalsIgnoreCase(head.getPartOfSpeech())
+						|| "NPS".equalsIgnoreCase(mention.getHeadWordToken().getPartOfSpeech())) {
 					m = Multiplicity.PLURAL;
 				} else {
 					m = Multiplicity.SINGULAR;

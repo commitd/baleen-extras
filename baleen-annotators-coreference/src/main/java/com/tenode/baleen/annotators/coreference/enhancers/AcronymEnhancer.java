@@ -72,7 +72,8 @@ public class AcronymEnhancer implements MentionEnhancer {
 
 			final StringBuilder upperCaseNNP = new StringBuilder();
 			final StringBuilder upperAndLowerCaseNNP = new StringBuilder();
-			words.stream().filter(p -> p.getPartOfSpeech().equals("NNP")).map(w -> w.getCoveredText().charAt(0))
+			words.stream().filter(p -> "NNP".equalsIgnoreCase(p.getPartOfSpeech()))
+					.map(w -> w.getCoveredText().charAt(0))
 					.forEach(c -> {
 						if (Character.isUpperCase(c)) {
 							upperCaseNNP.append(c);

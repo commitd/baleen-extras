@@ -27,7 +27,7 @@ import uk.gov.dstl.baleen.types.semantic.Location;
  */
 public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 
-	private static final Predicate<WordToken> CONJUNCTION_FILTER = w -> w.getPartOfSpeech().equals("CC");
+	private static final Predicate<WordToken> CONJUNCTION_FILTER = w -> "CC".equals(w.getPartOfSpeech());
 
 	private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
 
@@ -49,7 +49,7 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				// Appositive
 				// Look for (NP , NP)
 
-				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("NP")) {
+				if ("NP".equals(a.getChunk().getChunkType()) && "NP".equals(b.getChunk().getChunkType())) {
 
 					// Is there a comma between them, without AND/BUT/ETC
 					// Not in paper: Need to see if there's an AND in the larger noun phrase, eg
@@ -73,12 +73,12 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 				// Predicate nominative
 				// (NP VP(is / was) ) then take the NP under VP as
 
-				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("VP")) {
+				if ("NP".equals(a.getChunk().getChunkType()) && "VP".equals(b.getChunk().getChunkType())) {
 					final Optional<ParseTreeNode> np = b.getChildren().stream()
-							.filter(n -> n.getChunk().getChunkType().equals("NP"))
+							.filter(n -> "NP".equals(n.getChunk().getChunkType()))
 							.findFirst();
 					final Optional<WordToken> is = b.getWords().stream()
-							.filter(w -> w.getCoveredText().equalsIgnoreCase("is"))
+							.filter(w -> "is".equalsIgnoreCase(w.getCoveredText()))
 							.findFirst();
 
 					if (np.isPresent() && is.isPresent()) {
@@ -89,7 +89,7 @@ public class PreciseConstructsSieve extends AbstractCoreferenceSieve {
 
 				// Relative pronoun
 
-				if (a.getChunk().getChunkType().equals("NP") && b.getChunk().getChunkType().equals("WHNP")) {
+				if ("NP".equals(a.getChunk().getChunkType()) && "WHNP".equals(b.getChunk().getChunkType())) {
 					// The NP could be something that interests us, or it could a subpart of a large
 					// NP.
 					final List<Mention> mention = findMentionsExactly(a.getChunk().getBegin(), a.getChunk().getEnd());

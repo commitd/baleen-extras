@@ -190,7 +190,7 @@ public class MentionDetector {
 					if (pronouns.contains(t)) {
 						// Remove NP which are
 						return true;
-					} else if (t.getPartOfSpeech().equalsIgnoreCase("CD")) {
+					} else if ("CD".equalsIgnoreCase(t.getPartOfSpeech())) {
 						// Paper: Remove cardinal / numerics
 						return true;
 					} else {
