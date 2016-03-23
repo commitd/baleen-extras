@@ -41,7 +41,7 @@ public class RemoveOverlappingEntitiesTest extends AbstractAnnotatorTest {
 		Annotations.createPerson(jCas, 0, 5, "Eliza");
 		Annotations.createPerson(jCas, 1, 5, "liza");
 		Annotations.createDateType(jCas, 18, 31, "December 1972");
-		Annotations.createDateType(jCas, 15, 26, "in December");
+		Annotations.createDateType(jCas, 18, 26, "December");
 		Annotations.createLocation(jCas, 35, 37, "OX", null);
 		Annotations.createLocation(jCas, 35, 41, "Oxford", null);
 		Annotations.createLocation(jCas, 36, 41, "xford", null);

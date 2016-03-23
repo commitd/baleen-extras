@@ -96,7 +96,7 @@ public class CleanRelations extends BaleenAnnotator {
 	 * @return true, if is same
 	 */
 	private boolean isSame(final Entity a, final Entity b) {
-		if (a.equals(b)) {
+		if (a == null && b == null) {
 			return true;
 		}
 
@@ -119,7 +119,7 @@ public class CleanRelations extends BaleenAnnotator {
 	 * @return true, if is same
 	 */
 	private boolean isSame(final String a, final String b) {
-		if (a.equals(b)) {
+		if (a == null && b == null) {
 			return true;
 		} else if (a == null || b == null) {
 			return false;

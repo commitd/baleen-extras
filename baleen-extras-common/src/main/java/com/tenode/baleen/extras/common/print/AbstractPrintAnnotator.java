@@ -219,6 +219,10 @@ public abstract class AbstractPrintAnnotator<T extends Base> extends BaleenAnnot
 	// NOTE This is checked by the filter
 	@SuppressWarnings("unchecked")
 	protected <S> String asString(FSArray array, Class<S> clazz, Function<S, String> toString, String separator) {
+		if (array == null) {
+			return "";
+		}
+
 		final FeatureStructure[] fses = array.toArray();
 
 		if (fses == null) {
