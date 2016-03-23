@@ -54,7 +54,7 @@ public final class AnnotationUtils {
 		for (final T a : annotations) {
 			boolean covered = false;
 			for (final T b : annotations) {
-				if (a != b && b.getBegin() <= a.getBegin() && a.getEnd() <= b.getEnd()) {
+				if (!a.equals(b) && b.getBegin() <= a.getBegin() && a.getEnd() <= b.getEnd()) {
 					covered = true;
 					break;
 				}

@@ -173,7 +173,7 @@ public class MentionDetector {
 
 					// Remove all the small ones
 					for (final PhraseChunk p : e.getValue()) {
-						if (p != largest) {
+						if (p.equals(largest)) {
 							phrases.removeAll(headToChunk.values());
 						}
 					}

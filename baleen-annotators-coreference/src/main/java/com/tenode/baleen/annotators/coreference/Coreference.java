@@ -141,7 +141,7 @@ public class Coreference extends BaleenAnnotator {
 	 */
 	public static final String PARAM_INCLUDE_PRONOMIAL = "pronomial";
 	@ConfigurationParameter(name = PARAM_INCLUDE_PRONOMIAL, defaultValue = "false")
-	private Boolean includePronomial;
+	private boolean includePronomial;
 
 	@Override
 	protected void doProcess(JCas jCas) throws AnalysisEngineProcessException {
