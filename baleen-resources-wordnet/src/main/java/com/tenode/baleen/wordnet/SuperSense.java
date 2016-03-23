@@ -24,22 +24,36 @@ public final class SuperSense {
 	public static void main(String args[]) throws JWNLException {
 		final Dictionary dictionary = Dictionary.getDefaultResourceInstance();
 
+		if (args.length < 2) {
+			System.err.println("Usage: pos words...");
+			return;
+		}
+
 		final POS pos = POS.getPOSForLabel(args[0]);
+		if (pos == null) {
+			System.err.println(args[0] + " is not a valid POS");
+			return;
+		}
+
 		for (int i = 1; i < args.length; i++) {
 			final String word = args[i];
-			final IndexWord indexWord = dictionary.lookupIndexWord(pos, word);
+			try {
+				final IndexWord indexWord = dictionary.lookupIndexWord(pos, word);
 
-			if (indexWord == null) {
-				System.err.println(word + " not found");
-				return;
-			}
+				if (indexWord == null) {
+					System.err.println(word + " not found");
+					return;
+				}
 
-			final List<Synset> senses = indexWord.getSenses();
-			if (senses.isEmpty()) {
-				System.out.println(word + " has no senses");
-				return;
-			} else {
-				System.out.println(word + " supersense is " + senses.get(0).getLexFileName());
+				final List<Synset> senses = indexWord.getSenses();
+				if (senses.isEmpty()) {
+					System.out.println(word + " has no senses");
+				} else {
+					System.out.println(word + " supersense is " + senses.get(0).getLexFileName());
+				}
+			} catch (JWNLException e) {
+				System.err
+						.println("Error occured processing " + pos.getLabel() + ":" + word + ", as " + e.getMessage());
 			}
 		}
 	}

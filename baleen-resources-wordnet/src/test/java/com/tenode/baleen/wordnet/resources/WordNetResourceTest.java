@@ -55,15 +55,15 @@ public class WordNetResourceTest {
 	public void testSuperSense() throws JWNLException {
 		final List<String> word = wnr.getSuperSenses(POS.VERB, "employs").collect(Collectors.toList());
 
-		Assert.assertEquals("verb.consumption", word.get(0));
-		Assert.assertEquals("verb.social", word.get(1));
+		Assert.assertTrue("consumption".equals(word.get(0)) || "consumption".equals(word.get(1)));
+		Assert.assertTrue("social".equals(word.get(0)) || "social".equals(word.get(1)));
 	}
 
 	@Test
 	public void testBestSuperSense() throws JWNLException {
 		final Optional<String> word = wnr.getBestSuperSense(POS.VERB, "know");
 
-		Assert.assertEquals("verb.cognition", word.get());
+		Assert.assertEquals("cognition", word.get());
 	}
 
 	@Test
@@ -76,6 +76,9 @@ public class WordNetResourceTest {
 
 		final long count = wnr.getSuperSenses(POS.VERB, "ascasdcscz").count();
 		Assert.assertEquals(0, count);
+
+		final Optional<String> word = wnr.getBestSuperSense(POS.VERB, "ascasdcscz");
+		Assert.assertFalse(word.isPresent());
 	}
 
 }
