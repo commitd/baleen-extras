@@ -21,9 +21,14 @@ public final class SuperSense {
 	 * @throws JWNLException
 	 *             the JWNL exception
 	 */
-	public static void main(String args[]) throws JWNLException {
-		final Dictionary dictionary = Dictionary.getDefaultResourceInstance();
-
+	public static void main(String args[]) {
+		Dictionary dictionary;
+		try {
+			dictionary = Dictionary.getDefaultResourceInstance();
+		} catch (JWNLException e) {
+			System.err.println("Unable to open dictionary file:" + e.getMessage());
+			return;
+		}
 		if (args.length < 2) {
 			System.err.println("Usage: pos words...");
 			return;
@@ -53,7 +58,7 @@ public final class SuperSense {
 				}
 			} catch (JWNLException e) {
 				System.err
-						.println("Error occured processing " + pos.getLabel() + ":" + word + ", as " + e.getMessage());
+						.println("Error occured processing " + pos.getLabel() + " " + word + ": " + e.getMessage());
 			}
 		}
 	}

@@ -11,10 +11,13 @@ import uk.gov.dstl.baleen.types.language.WordToken;
  */
 public class WordDistance implements Comparable<WordDistance> {
 
+	/** The word. */
 	private final WordToken word;
 
+	/** The word distance. */
 	private final WordDistance wordDistance;
 
+	/** The distance. */
 	private final int distance;
 
 	/**
@@ -106,6 +109,58 @@ public class WordDistance implements Comparable<WordDistance> {
 	@Override
 	public int compareTo(WordDistance o) {
 		return Integer.compare(getDistance(), o.getDistance());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + distance;
+		result = prime * result + (word == null ? 0 : word.hashCode());
+		result = prime * result + (wordDistance == null ? 0 : wordDistance.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		WordDistance other = (WordDistance) obj;
+		if (distance != other.distance) {
+			return false;
+		}
+		if (word == null) {
+			if (other.word != null) {
+				return false;
+			}
+		} else if (!word.equals(other.word)) {
+			return false;
+		}
+		if (wordDistance == null) {
+			if (other.wordDistance != null) {
+				return false;
+			}
+		} else if (!wordDistance.equals(other.wordDistance)) {
+			return false;
+		}
+		return true;
 	}
 
 	/*

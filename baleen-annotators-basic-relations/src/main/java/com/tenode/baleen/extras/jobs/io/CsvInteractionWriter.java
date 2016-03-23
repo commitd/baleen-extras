@@ -8,6 +8,8 @@ import java.util.Iterator;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
 
@@ -22,6 +24,8 @@ import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
  *
  */
 public class CsvInteractionWriter implements InteractionWriter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CsvInteractionWriter.class);
 
 	private final String csvFilename;
 
@@ -39,7 +43,7 @@ public class CsvInteractionWriter implements InteractionWriter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#initialise()
 	 */
 	@Override
@@ -63,7 +67,7 @@ public class CsvInteractionWriter implements InteractionWriter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#write(com.tenode.baleen.extras.jobs.
 	 * interactions.data.InteractionDefinition, java.util.Collection)
 	 */
@@ -88,7 +92,7 @@ public class CsvInteractionWriter implements InteractionWriter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.tenode.baleen.extras.jobs.io.InteractionWriter#destroy()
 	 */
 	@Override
@@ -99,6 +103,7 @@ public class CsvInteractionWriter implements InteractionWriter {
 				writer.close();
 			}
 		} catch (final Exception e) {
+			LOGGER.warn("Unable to close the CSV writer", e);
 			writer = null;
 		}
 	}

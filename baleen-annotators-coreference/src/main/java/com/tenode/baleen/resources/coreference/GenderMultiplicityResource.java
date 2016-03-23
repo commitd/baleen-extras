@@ -113,7 +113,7 @@ public class GenderMultiplicityResource extends BaleenResource {
 						}
 
 					} catch (final Exception e) {
-						getMonitor().warn("Unable to parse line {}", s);
+						getMonitor().warn("Unable to parse line {}", s, e);
 					}
 
 				});
@@ -134,10 +134,6 @@ public class GenderMultiplicityResource extends BaleenResource {
 
 	private void saveGender(String np, Gender gender) {
 		final String key = np.replaceAll("!", "").trim();
-
-		if (key == "john") {
-			System.out.println(key);
-		}
 
 		if (np.startsWith("!")) {
 			endsWithGender.put(key, gender);

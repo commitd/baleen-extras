@@ -128,7 +128,7 @@ public class EnhanceInteractions extends BaleenTask {
 		try {
 			indexWord = dictionary.lookupIndexWord(word.getPos(), word.getLemma());
 		} catch (final Exception e) {
-			// Ignore - problems with wordnet
+			getMonitor().debug("Unable to find word in wordnet, defaulting to lemma form");
 		}
 
 		if (indexWord == null) {

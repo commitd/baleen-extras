@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.dstl.baleen.types.language.Interaction;
 import uk.gov.dstl.baleen.types.semantic.Entity;
@@ -11,7 +13,9 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 /**
  * Helpers for working with spans.
  */
-public class SpanUtils {
+public final class SpanUtils {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpanUtils.class);
 
 	/**
 	 * Instantiates a new span utils.
@@ -45,6 +49,7 @@ public class SpanUtils {
 			instance.setValue(entity.getValue());
 			return instance;
 		} catch (final Exception e) {
+			LOGGER.warn("Unable to copy entity", e);
 			return null;
 		}
 
@@ -72,6 +77,7 @@ public class SpanUtils {
 			instance.setValue(annotation.getValue());
 			return instance;
 		} catch (final Exception e) {
+			LOGGER.warn("Unable to copy entity", e);
 			return null;
 		}
 

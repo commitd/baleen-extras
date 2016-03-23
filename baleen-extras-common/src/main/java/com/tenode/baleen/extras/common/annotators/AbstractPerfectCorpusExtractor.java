@@ -136,7 +136,7 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 
 						addToJCasIndex(instance);
 					} catch (final Exception e) {
-						getMonitor().warn("Unable to create annotation of class {}", m.getClass().getSimpleName());
+						getMonitor().warn("Unable to create annotation of class {}", m.getClass().getSimpleName(), e);
 					}
 
 				}
