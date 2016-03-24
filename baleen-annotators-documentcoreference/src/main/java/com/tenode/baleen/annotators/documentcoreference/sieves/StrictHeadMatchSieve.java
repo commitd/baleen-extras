@@ -7,6 +7,7 @@ import org.apache.uima.jcas.JCas;
 
 import com.tenode.baleen.annotators.documentcoreference.data.Cluster;
 import com.tenode.baleen.annotators.documentcoreference.data.Mention;
+import com.tenode.baleen.annotators.documentcoreference.data.MentionType;
 import com.tenode.baleen.annotators.documentcoreference.utils.StopWordExtractor;
 
 /**
@@ -33,7 +34,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 		for (int i = 0; i < getMentions().size(); i++) {
 			final Mention a = getMentions().get(i);
 			String aHead = a.getHead();
-			if (aHead == null || aHead.isEmpty()) {
+			if (aHead == null || aHead.isEmpty() || a.getType() != MentionType.PRONOUN) {
 				continue;
 			}
 			aHead = aHead.toLowerCase();
@@ -41,7 +42,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 			for (int j = i + 1; j < getMentions().size(); j++) {
 				final Mention b = getMentions().get(j);
 				String bHead = b.getHead();
-				if (bHead == null || bHead.isEmpty()) {
+				if (bHead == null || bHead.isEmpty() || b.getType() != MentionType.PRONOUN) {
 					continue;
 				}
 				bHead = bHead.toLowerCase();

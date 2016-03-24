@@ -16,7 +16,20 @@ public enum Person {
 	 *            the b
 	 * @return true, if is compatible
 	 */
-	public static boolean isCompatible(Person a, Person b) {
+	public static boolean strictEquals(Person a, Person b) {
+		return a == b;
+	}
+
+	/**
+	 * Checks if is compatible, allowing unknowns to match anything.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return true, if is compatible
+	 */
+	public static boolean lenientEquals(Person a, Person b) {
 		return a == Person.UNKNOWN || b == Person.UNKNOWN || a == b;
 	}
 

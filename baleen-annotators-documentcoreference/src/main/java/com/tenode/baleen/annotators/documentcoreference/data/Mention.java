@@ -254,10 +254,24 @@ public class Mention {
 		// The paper also mentions NER labels, but I can't see how they could be (other than what is
 		// down in people)
 		// eg is Person entity we have already have it as a Animate so it won't match "it".
-		return Gender.isCompatible(getGender(), b.getGender())
-				&& Animacy.isCompatible(getAnimacy(), b.getAnimacy())
-				&& Multiplicity.isCompatible(getMultiplicity(), b.getMultiplicity())
-				&& Person.isCompatible(getPerson(), b.getPerson());
+		if (getType() == MentionType.ENTITY && b.getType() == MentionType.ENTITY) {
+			Class<? extends Base> aClass = getAnnotation().getClass();
+			Class<? extends Base> bClass = b.getAnnotation().getClass();
+
+			// Stop if they are different types semantically
+			// That could still mean you consider an Entity (super type) to a Person (sub type)
+			// so could be even more strict here and want aClass = bClass.
+			if (!aClass.isAssignableFrom(bClass) && !bClass.isAssignableFrom(aClass)) {
+				return false;
+			}
+		}
+
+		// You can be more or less lenient here..
+		// gender is our worst dataset so I think its safer to be lenient
+		return Gender.lenientEquals(getGender(), b.getGender())
+				&& Animacy.strictEquals(getAnimacy(), b.getAnimacy())
+				&& Multiplicity.strictEquals(getMultiplicity(), b.getMultiplicity())
+				&& Person.strictEquals(getPerson(), b.getPerson());
 	}
 
 }

@@ -15,7 +15,20 @@ public enum Multiplicity {
 	 *            the b
 	 * @return true, if is compatible
 	 */
-	public static boolean isCompatible(Multiplicity a, Multiplicity b) {
+	public static boolean strictEquals(Multiplicity a, Multiplicity b) {
+		return a == b;
+	}
+
+	/**
+	 * Checks if is compatible allow for unknowns to match anything.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return true, if is compatible
+	 */
+	public static boolean lenientEquals(Multiplicity a, Multiplicity b) {
 		return a == Multiplicity.UNKNOWN || b == Multiplicity.UNKNOWN || a == b;
 	}
 }

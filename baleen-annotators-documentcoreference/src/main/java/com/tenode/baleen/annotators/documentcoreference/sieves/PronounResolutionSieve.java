@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.uima.jcas.JCas;
 
@@ -45,6 +46,7 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 					continue;
 				}
 
+				// Don't coreference a pronoun to a pronoun
 				if (a.getType() == MentionType.PRONOUN && b.getType() == MentionType.PRONOUN) {
 					continue;
 				}
@@ -55,6 +57,19 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 
 				final Mention pronoun = a.getType() == MentionType.PRONOUN ? a : b;
 				final Mention other = a.getType() == MentionType.PRONOUN ? b : a;
+
+				// Not in paper: If the pronoun is before the other that's odd, (He said Hello. John
+				// did.)
+				if (pronoun.getAnnotation().getEnd() < other.getAnnotation().getBegin()) {
+					continue;
+				}
+
+				// Not in paper: We found poor results for "it" really because it never refers to
+				// something that Baleen annotates
+				// it would be good for say money oy maybe speak but currently we'll just drop it
+				if (pronoun.getText().toLowerCase().startsWith("it")) {
+					continue;
+				}
 
 				// If pronouns then we can have either way around, otherwise we need the entity/np
 				// first.
@@ -80,7 +95,7 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 					}
 				}
 
-				// Are the attributes compatible (gender=gender)
+				// Are the attributes compatible (gender=gender, etc)
 				if (!a.isAttributeCompatible(b)) {
 					continue;
 				}
@@ -120,42 +135,40 @@ public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 
 		// For each of the matches we need to select the best one
 
-		potential.asMap().entrySet().stream().forEach(e -> {
-			final Mention key = e.getKey();
-			final Collection<Mention> collection = e.getValue();
+		potential.asMap().entrySet().stream().forEach(e -> addBestAsMatch(e.getKey(), e.getValue()));
+	}
 
-			Mention match = null;
-			if (collection.size() > 1) {
-				final List<Mention> list = new ArrayList<Mention>(collection);
-				Collections.sort(list, (a, b) -> {
-					final int sentenceIndex = Integer.compare(a.getSentenceIndex(), b.getSentenceIndex());
-					if (sentenceIndex != 0) {
-						return sentenceIndex;
-					} else {
-						// NOTE: WE'd like to find the minimum distance here
+	private void addBestAsMatch(Mention key, Collection<Mention> potentialMatches) {
 
-						if (a.overlaps(b)) {
-							return 0;
-						}
+		final Collection<Mention> matched;
+		if (potentialMatches.size() > 1) {
+			List<Mention> list = new ArrayList<Mention>(potentialMatches);
+			Collections.sort(list, (a, b) -> {
+				if (a.overlaps(b)) {
+					return 0;
+				}
 
-						// Use in-sentence word distance
-						if (a.getAnnotation().getEnd() <= b.getAnnotation().getBegin()) {
-							return b.getAnnotation().getBegin() - a.getAnnotation().getEnd();
-						} else {
-							return b.getAnnotation().getEnd() - a.getAnnotation().getBegin();
-						}
+				// Use in-sentence word distance
+				if (a.getAnnotation().getEnd() <= b.getAnnotation().getBegin()) {
+					return b.getAnnotation().getBegin() - a.getAnnotation().getEnd();
+				} else {
+					return b.getAnnotation().getEnd() - a.getAnnotation().getBegin();
+				}
+			});
 
-					}
-				});
+			matched = list;
+		} else {
+			// Either empty or just one...
+			matched = potentialMatches;
+		}
 
-				// Take the closest match
-				// TODO: Need more heuristics about this to determine if its the best!
-				match = list.get(0);
-			} else {
-				match = collection.iterator().next();
-			}
+		// Get the first (nearest) which doesn't overlap
+		Optional<Mention> match = matched.stream()
+				.filter(m -> !key.overlaps(m))
+				.findFirst();
 
-			addToCluster(key, match);
-		});
+		if (match.isPresent()) {
+			addToCluster(key, match.get());
+		}
 	}
 }

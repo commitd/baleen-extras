@@ -13,7 +13,6 @@ import uk.gov.dstl.baleen.types.common.CommsIdentifier;
 import uk.gov.dstl.baleen.types.common.DocumentReference;
 import uk.gov.dstl.baleen.types.common.Frequency;
 import uk.gov.dstl.baleen.types.common.Money;
-import uk.gov.dstl.baleen.types.common.Nationality;
 import uk.gov.dstl.baleen.types.common.Person;
 import uk.gov.dstl.baleen.types.common.Url;
 import uk.gov.dstl.baleen.types.common.Vehicle;
@@ -43,10 +42,10 @@ public class AnimacyEnhancer implements MentionEnhancer {
 				Vehicle.class, Coordinate.class, MilitaryPlatform.class, Location.class, Temporal.class)
 				.stream().forEach(s -> semanticMap.put(s, Animacy.INANIMATE));
 
-		Arrays.asList(Person.class, Nationality.class)
+		Arrays.asList(Person.class)
 				.stream().forEach(s -> semanticMap.put(s, Animacy.ANIMATE));
 
-		// Organisation.class could be either?
+		// Organisation.class and Nationality could be either
 	}
 
 	@Override

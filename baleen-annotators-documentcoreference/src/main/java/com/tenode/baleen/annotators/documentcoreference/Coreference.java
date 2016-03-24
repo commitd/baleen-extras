@@ -262,6 +262,8 @@ public class Coreference extends BaleenAnnotator {
 		merged.forEach(c -> {
 			ReferenceTarget target = new ReferenceTarget(jCas);
 
+			System.out.println("In same cluster");
+
 			for (Mention m : c.getMentions()) {
 				// We overwrite the referent target here, given that we used the initial target to
 				// bootstrap our work
@@ -269,6 +271,7 @@ public class Coreference extends BaleenAnnotator {
 
 				Base annotation = m.getAnnotation();
 				annotation.setReferent(target);
+				System.out.println("\t" + annotation.getCoveredText());
 			}
 
 			addToJCasIndex(target);

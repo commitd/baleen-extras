@@ -32,6 +32,10 @@ public class PersonEnhancer implements MentionEnhancer {
 
 		if (mention.getType() == MentionType.PRONOUN) {
 			mention.setPerson(map.getOrDefault(mention.getText().toLowerCase(), Person.UNKNOWN));
+		} else if (mention.getType() == MentionType.ENTITY) {
+			// TODO: reallt this should be for entities which can play this role - temporal is
+			// questioable?
+			mention.setPerson(Person.THIRD);
 		} else {
 			mention.setPerson(Person.UNKNOWN);
 		}
