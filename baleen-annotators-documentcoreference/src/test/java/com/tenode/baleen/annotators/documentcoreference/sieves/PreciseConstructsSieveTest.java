@@ -1,4 +1,4 @@
-package com.tenode.baleen.annotators.coreference.sieves;
+package com.tenode.baleen.annotators.documentcoreference.sieves;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

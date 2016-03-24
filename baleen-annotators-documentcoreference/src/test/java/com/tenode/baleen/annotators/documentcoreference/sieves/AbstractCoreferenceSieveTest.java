@@ -1,4 +1,4 @@
-package com.tenode.baleen.annotators.coreference.sieves;
+package com.tenode.baleen.annotators.documentcoreference.sieves;
 
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
