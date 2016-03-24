@@ -49,6 +49,6 @@
 		<module>baleen-resources-wordnet</module>
 		<module>baleen-extras-readers</module>
 		<module>baleen-annotators-basic-relations</module>
-		<module>baleen-annotators-coreference</module>
+		<module>baleen-annotators-documentcoreference</module>
 	</modules>
 </project>
