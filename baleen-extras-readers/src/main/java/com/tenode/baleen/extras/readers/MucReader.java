@@ -63,7 +63,7 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 		final File[] files = new File(mucPath)
 				.listFiles(f -> !f.getName().startsWith("key-") && f.isFile());
 
-		Stream<MucEntry> map = Arrays.stream(files)
+		return Arrays.stream(files)
 				.flatMap(f -> {
 					try {
 						final byte[] bytes = Files.readAllBytes(f.toPath());
@@ -100,8 +100,6 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 					e.setText(text);
 					return e;
 				});
-
-		return map;
 	}
 
 	@Override

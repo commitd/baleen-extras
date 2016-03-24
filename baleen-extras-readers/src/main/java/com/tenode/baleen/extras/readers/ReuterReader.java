@@ -33,10 +33,6 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
  */
 public class ReuterReader extends AbstractStreamCollectionReader<String> {
 
-	public ReuterReader() {
-		// Do nothing
-	}
-
 	/**
 	 * Location of the directory containing the sgm files.
 	 *
@@ -45,6 +41,10 @@ public class ReuterReader extends AbstractStreamCollectionReader<String> {
 	public static final String KEY_PATH = "path";
 	@ExternalResource(key = KEY_PATH, mandatory = false)
 	private String sgmPath;
+
+	public ReuterReader() {
+		// Do nothing
+	}
 
 	/**
 	 * Sets the path to the Reuters SGM files.
