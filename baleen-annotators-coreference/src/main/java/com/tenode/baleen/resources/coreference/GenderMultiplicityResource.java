@@ -2,6 +2,7 @@ package com.tenode.baleen.resources.coreference;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,10 +64,13 @@ public class GenderMultiplicityResource extends BaleenResource {
 				.stream()
 				.flatMap(f -> {
 					try (BufferedReader reader = new BufferedReader(
-							new InputStreamReader(new GZIPInputStream(getClass().getResourceAsStream(f))))) {
+							new InputStreamReader(new GZIPInputStream(getClass().getResourceAsStream(f)),
+									StandardCharsets.UTF_8))) {
 						// Crazy, but if we retun then the inputstream gets closed so the lines()
 						// stream fails.
-						return reader.lines().collect(Collectors.toList()).stream();
+						return reader.lines()
+								.collect(Collectors.toList())
+								.stream();
 					} catch (final Exception e) {
 						getMonitor().warn("Unable to load from gender file", e);
 						return Stream.empty();
@@ -77,48 +81,52 @@ public class GenderMultiplicityResource extends BaleenResource {
 				// TODO; Currently ignore any of the numerical stuff its too tedious to work with
 				.filter(s -> !s.contains("#"))
 				.forEach(s -> {
-					try {
-						final String[] line = s.split("\t", 2);
-						final String np = line[0].trim().toLowerCase();
-						final Iterable<String> counts = LINE_SPLITTER.split(line[1]);
-						final Iterator<String> iterator = counts.iterator();
-
-						final int m = Integer.parseInt(iterator.next());
-						final int f = Integer.parseInt(iterator.next());
-						final int n = Integer.parseInt(iterator.next());
-						final int p = Integer.parseInt(iterator.next());
-
-						final int genderTotal = m + f + n;
-
-						if (genderTotal > GENDER_SAMPLE_THRESHOLD) {
-
-							if (m > 2 * Math.max(f, n)) {
-								saveGender(np, Gender.M);
-							} else if (f > 2 * Math.max(m, n)) {
-								saveGender(np, Gender.F);
-							} else if (n > 2 * Math.max(m, f)) {
-								saveGender(np, Gender.N);
-							}
-						}
-
-						if (p > PLURAL_THRESHOLD) {
-							// TODO: Since we don't have a singular count I guess we just have a
-							// threshold here? I can't see how you compare to the m/f/n words
-
-							saveMultiplicity(np, Multiplicity.PLURAL);
-
-						} else if (genderTotal > GENDER_SAMPLE_THRESHOLD) {
-							// If we've seen it a lot otherwise we assume it must be singular
-							saveMultiplicity(np, Multiplicity.SINGULAR);
-						}
-
-					} catch (final Exception e) {
-						getMonitor().warn("Unable to parse line {}", s, e);
-					}
+					loadFromGenderRow(s);
 
 				});
 
 		return super.doInitialize(specifier, additionalParams);
+	}
+
+	private void loadFromGenderRow(String s) {
+		try {
+			final String[] line = s.split("\t", 2);
+			final String np = line[0].trim().toLowerCase();
+			final Iterable<String> counts = LINE_SPLITTER.split(line[1]);
+			final Iterator<String> iterator = counts.iterator();
+
+			final int m = Integer.parseInt(iterator.next());
+			final int f = Integer.parseInt(iterator.next());
+			final int n = Integer.parseInt(iterator.next());
+			final int p = Integer.parseInt(iterator.next());
+
+			final int genderTotal = m + f + n;
+
+			if (genderTotal > GENDER_SAMPLE_THRESHOLD) {
+
+				if (m > 2 * Math.max(f, n)) {
+					saveGender(np, Gender.M);
+				} else if (f > 2 * Math.max(m, n)) {
+					saveGender(np, Gender.F);
+				} else if (n > 2 * Math.max(m, f)) {
+					saveGender(np, Gender.N);
+				}
+			}
+
+			if (p > PLURAL_THRESHOLD) {
+				// TODO: Since we don't have a singular count I guess we just have a
+				// threshold here? I can't see how you compare to the m/f/n words
+
+				saveMultiplicity(np, Multiplicity.PLURAL);
+
+			} else if (genderTotal > GENDER_SAMPLE_THRESHOLD) {
+				// If we've seen it a lot otherwise we assume it must be singular
+				saveMultiplicity(np, Multiplicity.SINGULAR);
+			}
+
+		} catch (final Exception e) {
+			getMonitor().warn("Unable to parse line {}", s, e);
+		}
 	}
 
 	private void saveMultiplicity(String np, Multiplicity multiplicity) {
@@ -152,9 +160,9 @@ public class GenderMultiplicityResource extends BaleenResource {
 		return lookup(exactMultiplicity, startsWithMultiplicity, endsWithMultiplicity, text, Multiplicity.UNKNOWN);
 	}
 
-	private <T> T lookup(Map<String, T> exact, Map<String, T> startsWith, Map<String, T> endsWith, String text,
+	private <T> T lookup(Map<String, T> exact, Map<String, T> startsWith, Map<String, T> endsWith, String inputText,
 			T defaultValue) {
-		text = text.toLowerCase();
+		String text = inputText.toLowerCase();
 
 		// Try an exact match
 		T t = exact.get(text);

@@ -62,6 +62,8 @@ public class MultiplicityEnhancer implements MentionEnhancer {
 
 			mention.setMultiplicity(m);
 			break;
+		default:
+			return;
 		}
 
 		// TODO: Should we always check our resource and then override the multiplicity?

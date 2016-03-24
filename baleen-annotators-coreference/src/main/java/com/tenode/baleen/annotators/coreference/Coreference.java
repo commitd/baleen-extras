@@ -152,7 +152,7 @@ public class Coreference extends BaleenAnnotator {
 
 		// Extract head words and other aspects needed for later, determine acronyms, denonym,
 		// gender, etc
-		enhanceMention(jCas, dependencyGraph, parseTree, mentions);
+		enhanceMention(dependencyGraph, parseTree, mentions);
 
 		List<Cluster> clusters = sieve(jCas, parseTree, mentions);
 
@@ -163,7 +163,7 @@ public class Coreference extends BaleenAnnotator {
 		outputReferenceTargets(jCas, clusters);
 	}
 
-	private void enhanceMention(JCas jCas, DependencyGraph dependencyGraph, ParseTree parseTree,
+	private void enhanceMention(DependencyGraph dependencyGraph, ParseTree parseTree,
 			List<Mention> mentions) {
 
 		MentionEnhancer[] enhancers = new MentionEnhancer[] {

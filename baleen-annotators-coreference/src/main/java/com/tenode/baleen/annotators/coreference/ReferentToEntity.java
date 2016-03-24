@@ -69,7 +69,9 @@ public class ReferentToEntity extends BaleenAnnotator {
 	 * @return the best entity
 	 */
 	private Entity getBestEntity(Collection<Entity> list) {
-		return list.stream().reduce((a, b) -> isBetterEntity(a, b) ? b : a).get();
+		return list.stream()
+				.reduce((a, b) -> isBetterEntity(a, b) ? b : a)
+				.get();
 	}
 
 	/**

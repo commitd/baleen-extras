@@ -18,10 +18,6 @@ public class RelaxedStringMatchSieve extends AbstractCoreferenceSieve {
 
 	private static final Set<String> EXCLUDED = new HashSet<>(Arrays.asList("that", "there"));
 
-	static {
-
-	}
-
 	public RelaxedStringMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
 		super(jCas, clusters, mentions);
 	}
