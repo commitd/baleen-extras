@@ -54,6 +54,38 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  */
 public class MaltParser extends BaleenAnnotator {
 
+	private static final String INTJ = "INTJ";
+
+	private static final String PRON = "PRON";
+
+	private static final String PART = "PART";
+
+	private static final String PROPN = "PROPN";
+
+	private static final String ADP = "ADP";
+
+	private static final String X = "X";
+
+	private static final String NOUN = "NOUN";
+
+	private static final String ADV = "ADV";
+
+	private static final String DET = "DET";
+
+	private static final String NUM = "NUM";
+
+	private static final String VERB = "VERB";
+
+	private static final String CONJ = "CONJ";
+
+	private static final String ADJ = "ADJ";
+
+	private static final String SYM = "SYM";
+
+	private static final String PUNCT = "PUNCT";
+
+	private static final Map<String, String> pennToUniversalTags = new HashMap<>();
+
 	/**
 	 * The model file, (.mco), to be loaded into the parser.
 	 *
@@ -188,57 +220,55 @@ public class MaltParser extends BaleenAnnotator {
 		}
 	}
 
-	private static final Map<String, String> pennToUniversalTags = new HashMap<>();
-
 	static {
 		// See http://universaldependencies.github.io/docs/tagset-conversion/en-penn-uposf.html
-		MaltParser.pennToUniversalTags.put("#", "SYM");
-		MaltParser.pennToUniversalTags.put("$", "SYM");
-		MaltParser.pennToUniversalTags.put("\"", "PUNCT");
-		MaltParser.pennToUniversalTags.put(",", "PUNCT");
-		MaltParser.pennToUniversalTags.put("-LRB-", "PUNCT");
-		MaltParser.pennToUniversalTags.put("-RRB-", "PUNCT");
-		MaltParser.pennToUniversalTags.put(".", "PUNCT");
-		MaltParser.pennToUniversalTags.put(":", "PUNCT");
-		MaltParser.pennToUniversalTags.put("AFX", "ADJ");
-		MaltParser.pennToUniversalTags.put("CC", "CONJ");
-		MaltParser.pennToUniversalTags.put("CD", "NUM");
-		MaltParser.pennToUniversalTags.put("DT", "DET");
-		MaltParser.pennToUniversalTags.put("EX", "ADV");
-		MaltParser.pennToUniversalTags.put("FW", "X");
-		MaltParser.pennToUniversalTags.put("HYPH", "PUNCT");
-		MaltParser.pennToUniversalTags.put("IN", "ADP");
-		MaltParser.pennToUniversalTags.put("JJ", "ADJ");
-		MaltParser.pennToUniversalTags.put("JJR", "ADJ");
-		MaltParser.pennToUniversalTags.put("JJS", "ADJ");
-		MaltParser.pennToUniversalTags.put("LS", "PUNCT");
-		MaltParser.pennToUniversalTags.put("MD", "VERB");
-		MaltParser.pennToUniversalTags.put("NN", "NOUN");
-		MaltParser.pennToUniversalTags.put("NNP", "PROPN");
-		MaltParser.pennToUniversalTags.put("NNPS", "PROPN");
-		MaltParser.pennToUniversalTags.put("NNS", "NOUN");
-		MaltParser.pennToUniversalTags.put("PDT", "DET");
-		MaltParser.pennToUniversalTags.put("POS", "PART");
-		MaltParser.pennToUniversalTags.put("PRP", "PRON");
-		MaltParser.pennToUniversalTags.put("PRP$", "DET");
-		MaltParser.pennToUniversalTags.put("RB", "ADV");
-		MaltParser.pennToUniversalTags.put("RBR", "ADV");
-		MaltParser.pennToUniversalTags.put("RBS", "ADV");
-		MaltParser.pennToUniversalTags.put("RP", "PART");
-		MaltParser.pennToUniversalTags.put("SYM", "SYM");
-		MaltParser.pennToUniversalTags.put("TO", "PART");
-		MaltParser.pennToUniversalTags.put("UH", "INTJ");
-		MaltParser.pennToUniversalTags.put("VB", "VERB");
-		MaltParser.pennToUniversalTags.put("VBD", "VERB");
-		MaltParser.pennToUniversalTags.put("VBG", "VERB");
-		MaltParser.pennToUniversalTags.put("VBN", "VERB");
-		MaltParser.pennToUniversalTags.put("VBP", "VERB");
-		MaltParser.pennToUniversalTags.put("VBZ", "VERB");
-		MaltParser.pennToUniversalTags.put("WDT", "DET");
-		MaltParser.pennToUniversalTags.put("WP", "PRON");
-		MaltParser.pennToUniversalTags.put("WP$", "DET");
-		MaltParser.pennToUniversalTags.put("WRB", "ADV");
-		MaltParser.pennToUniversalTags.put("`", "PUNCT");
+		MaltParser.pennToUniversalTags.put("#", SYM);
+		MaltParser.pennToUniversalTags.put("$", SYM);
+		MaltParser.pennToUniversalTags.put("\"", PUNCT);
+		MaltParser.pennToUniversalTags.put(",", PUNCT);
+		MaltParser.pennToUniversalTags.put("-LRB-", PUNCT);
+		MaltParser.pennToUniversalTags.put("-RRB-", PUNCT);
+		MaltParser.pennToUniversalTags.put(".", PUNCT);
+		MaltParser.pennToUniversalTags.put(":", PUNCT);
+		MaltParser.pennToUniversalTags.put("AFX", ADJ);
+		MaltParser.pennToUniversalTags.put("CC", CONJ);
+		MaltParser.pennToUniversalTags.put("CD", NUM);
+		MaltParser.pennToUniversalTags.put("DT", DET);
+		MaltParser.pennToUniversalTags.put("EX", ADV);
+		MaltParser.pennToUniversalTags.put("FW", X);
+		MaltParser.pennToUniversalTags.put("HYPH", PUNCT);
+		MaltParser.pennToUniversalTags.put("IN", ADP);
+		MaltParser.pennToUniversalTags.put("JJ", ADJ);
+		MaltParser.pennToUniversalTags.put("JJR", ADJ);
+		MaltParser.pennToUniversalTags.put("JJS", ADJ);
+		MaltParser.pennToUniversalTags.put("LS", PUNCT);
+		MaltParser.pennToUniversalTags.put("MD", VERB);
+		MaltParser.pennToUniversalTags.put("NN", NOUN);
+		MaltParser.pennToUniversalTags.put("NNP", PROPN);
+		MaltParser.pennToUniversalTags.put("NNPS", PROPN);
+		MaltParser.pennToUniversalTags.put("NNS", NOUN);
+		MaltParser.pennToUniversalTags.put("PDT", DET);
+		MaltParser.pennToUniversalTags.put("POS", PART);
+		MaltParser.pennToUniversalTags.put("PRP", PRON);
+		MaltParser.pennToUniversalTags.put("PRP$", DET);
+		MaltParser.pennToUniversalTags.put("RB", ADV);
+		MaltParser.pennToUniversalTags.put("RBR", ADV);
+		MaltParser.pennToUniversalTags.put("RBS", ADV);
+		MaltParser.pennToUniversalTags.put("RP", PART);
+		MaltParser.pennToUniversalTags.put(SYM, SYM);
+		MaltParser.pennToUniversalTags.put("TO", PART);
+		MaltParser.pennToUniversalTags.put("UH", INTJ);
+		MaltParser.pennToUniversalTags.put("VB", VERB);
+		MaltParser.pennToUniversalTags.put("VBD", VERB);
+		MaltParser.pennToUniversalTags.put("VBG", VERB);
+		MaltParser.pennToUniversalTags.put("VBN", VERB);
+		MaltParser.pennToUniversalTags.put("VBP", VERB);
+		MaltParser.pennToUniversalTags.put("VBZ", VERB);
+		MaltParser.pennToUniversalTags.put("WDT", DET);
+		MaltParser.pennToUniversalTags.put("WP", PRON);
+		MaltParser.pennToUniversalTags.put("WP$", DET);
+		MaltParser.pennToUniversalTags.put("WRB", ADV);
+		MaltParser.pennToUniversalTags.put("`", PUNCT);
 	}
 
 	/**
