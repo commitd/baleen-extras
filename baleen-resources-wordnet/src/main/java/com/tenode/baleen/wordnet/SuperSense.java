@@ -13,6 +13,10 @@ import net.sf.extjwnl.dictionary.Dictionary;
  */
 public final class SuperSense {
 
+	private SuperSense() {
+		// Singleton
+	}
+
 	/**
 	 * The main method.
 	 *
@@ -21,7 +25,7 @@ public final class SuperSense {
 	 * @throws JWNLException
 	 *             the JWNL exception
 	 */
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		Dictionary dictionary;
 		try {
 			dictionary = Dictionary.getDefaultResourceInstance();
