@@ -64,54 +64,59 @@ public class CsvEventEvalationConsumer extends AbstractCsvConsumer {
 				ComplexEvent.class,
 				Sentence.class);
 
-		JCasUtil.select(jCas, ComplexEvent.class).stream().map(e -> {
+		JCasUtil.select(jCas, ComplexEvent.class).stream()
+				.map(e -> extracted(source, coveringSentence, e))
+				.filter(Objects::nonNull)
+				.forEach(this::write);
 
-			String sentence = "";
-			final Collection<Sentence> sentences = coveringSentence.get(e);
-			if (!sentences.isEmpty()) {
-				sentence = sentences.iterator().next().getCoveredText();
-			} else {
-				// TODO: How could this be null?
-				return null;
-			}
+	}
 
-			final List<String> list = new ArrayList<>();
-			list.add(source);
-			list.add(sentence);
+	private String[] extracted(final String source, final Map<ComplexEvent, Collection<Sentence>> coveringSentence,
+			ComplexEvent e) {
+		String sentence = "";
+		final Collection<Sentence> sentences = coveringSentence.get(e);
+		if (!sentences.isEmpty()) {
+			sentence = sentences.iterator().next().getCoveredText();
+		} else {
+			// This shouldn't be empty, unless you have no sentence annotation
+			return null;
+		}
 
-			if (e.getEventType() != null) {
-				list.add(Arrays.stream(UimaTypesUtils.toArray(e.getEventType()))
-						.collect(Collectors.joining(",")));
-			} else {
-				list.add("");
-			}
+		final List<String> list = new ArrayList<>();
+		list.add(source);
+		list.add(sentence);
 
-			if (e.getTokens() != null) {
-				list.add(Arrays.stream(e.getTokens().toArray())
-						.map(w -> ((WordToken) w).getCoveredText())
-						.map(this::normalize)
-						.collect(Collectors.joining(" ")));
-			} else {
-				list.add("");
-			}
+		if (e.getEventType() != null) {
+			list.add(Arrays.stream(UimaTypesUtils.toArray(e.getEventType()))
+					.collect(Collectors.joining(",")));
+		} else {
+			list.add("");
+		}
 
-			if (e.getEntities() != null && e.getEntities().size() > 0) {
-				Arrays.stream(e.getEntities().toArray())
-						.forEach(x -> {
-							final Entity t = (Entity) x;
-							list.add(normalize(t.getCoveredText()));
-						});
-			}
+		if (e.getTokens() != null) {
+			list.add(Arrays.stream(e.getTokens().toArray())
+					.map(w -> ((WordToken) w).getCoveredText())
+					.map(this::normalize)
+					.collect(Collectors.joining(" ")));
+		} else {
+			list.add("");
+		}
 
-			if (e.getArguments() != null && e.getArguments().size() > 0) {
-				Arrays.stream(e.getArguments().toArray())
-						.map(this::normalize)
-						.forEach(list::add);
-			}
+		if (e.getEntities() != null && e.getEntities().size() > 0) {
+			Arrays.stream(e.getEntities().toArray())
+					.forEach(x -> {
+						final Entity t = (Entity) x;
+						list.add(normalize(t.getCoveredText()));
+					});
+		}
 
-			return list.toArray(new String[list.size()]);
-		}).filter(Objects::nonNull).forEach(this::write);
+		if (e.getArguments() != null && e.getArguments().size() > 0) {
+			Arrays.stream(e.getArguments().toArray())
+					.map(this::normalize)
+					.forEach(list::add);
+		}
 
+		return list.toArray(new String[list.size()]);
 	}
 
 }

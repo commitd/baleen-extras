@@ -52,9 +52,7 @@ public abstract class AbstractPrintAnnotator<T extends Base> extends BaleenAnnot
 		JCasUtil.select(jCas, clazz).stream()
 				.map(this::print)
 				.filter(Objects::nonNull)
-				.forEach(s -> {
-					getMonitor().info("{}: {}", clazz.getName(), s);
-				});
+				.forEach(s -> getMonitor().info("{}: {}", clazz.getName(), s));
 	}
 
 	/**
@@ -230,7 +228,7 @@ public abstract class AbstractPrintAnnotator<T extends Base> extends BaleenAnnot
 		}
 
 		return Arrays.stream(fses)
-				.filter(fs -> fs != null)
+				.filter(Objects::nonNull)
 				.filter(fs -> clazz.isAssignableFrom(fs.getClass()))
 				.map(fs -> toString.apply((S) fs))
 				.collect(Collectors.joining(separator));

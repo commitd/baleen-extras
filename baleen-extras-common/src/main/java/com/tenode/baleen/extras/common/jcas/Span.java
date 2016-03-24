@@ -5,10 +5,9 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 /**
  * A span of text (begin/end) which can be assoicated with an entity.
  *
- * // NOTE: Entity is specifically excluded from the equals / hashcode so that we get uniqueness
- * based on span and type alone
+ * NOTE: Entity is specifically excluded from the equals / hashcode so that we get uniqueness based
+ * on span and type alone
  */
-// .
 public class Span {
 
 	private final int begin;

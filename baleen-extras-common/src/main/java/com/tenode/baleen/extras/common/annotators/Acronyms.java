@@ -14,6 +14,7 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
  */
 public class Acronyms extends AbstractRegexAnnotator<Entity> {
 
+	private static final double CONFIDENCE = 0.5;
 	private static final String PATTERN = "\\b[A-Z]{2,}\\b";
 
 	/**
@@ -21,7 +22,7 @@ public class Acronyms extends AbstractRegexAnnotator<Entity> {
 	 */
 	public Acronyms() {
 		// Note lower confidence so that it can be overridden on merge
-		super(PATTERN, true, 0.5);
+		super(PATTERN, true, CONFIDENCE);
 	}
 
 	/*

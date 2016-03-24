@@ -1,7 +1,9 @@
 package com.tenode.baleen.extras.common.consumers;
 
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 import org.apache.commons.csv.CSVFormat;
@@ -19,7 +21,7 @@ import uk.gov.dstl.baleen.uima.BaleenConsumer;
  */
 public abstract class AbstractCsvConsumer extends BaleenConsumer {
 
-	private final static Pattern NORMALIZE = Pattern.compile("\\s+");
+	private static final Pattern NORMALIZE_PATTERN = Pattern.compile("\\s+");
 
 	private static final String KEY_PREFIX = "filename";
 	@ConfigurationParameter(name = KEY_PREFIX, defaultValue = "evaluation-relations.csv")
@@ -44,7 +46,10 @@ public abstract class AbstractCsvConsumer extends BaleenConsumer {
 		super.doInitialize(aContext);
 
 		try {
-			writer = new CSVPrinter(new FileWriter(filename, false), CSVFormat.TDF);
+
+			writer = new CSVPrinter(
+					new OutputStreamWriter(new FileOutputStream(filename, false), StandardCharsets.UTF_8),
+					CSVFormat.TDF);
 		} catch (final IOException e) {
 			throw new ResourceInitializationException(e);
 		}
@@ -123,6 +128,6 @@ public abstract class AbstractCsvConsumer extends BaleenConsumer {
 	 * @return the string
 	 */
 	protected String normalize(String text) {
-		return NORMALIZE.matcher(text).replaceAll(" ").trim();
+		return NORMALIZE_PATTERN.matcher(text).replaceAll(" ").trim();
 	}
 }

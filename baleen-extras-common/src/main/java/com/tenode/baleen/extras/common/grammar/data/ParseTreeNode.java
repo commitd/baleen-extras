@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tenode.baleen.extras.common.grammar.ParseTree;
-
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
@@ -21,7 +19,7 @@ import uk.gov.dstl.baleen.types.language.WordToken;
  */
 public final class ParseTreeNode {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ParseTree.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParseTreeNode.class);
 
 	private final PhraseChunk chunk;
 
@@ -39,6 +37,18 @@ public final class ParseTreeNode {
 	 */
 	public ParseTreeNode(PhraseChunk chunk) {
 		this.chunk = chunk;
+	}
+
+	/**
+	 * Instantiates a new node based on a set of children.
+	 *
+	 * @param children
+	 *            the children
+	 */
+	public ParseTreeNode(List<ParseTreeNode> children) {
+		this.chunk = null;
+		addAllChildren(children);
+
 	}
 
 	/**
@@ -68,18 +78,6 @@ public final class ParseTreeNode {
 				parent.traverseParent(consumer);
 			}
 		}
-	}
-
-	/**
-	 * Instantiates a new node based on a set of children.
-	 *
-	 * @param children
-	 *            the children
-	 */
-	public ParseTreeNode(List<ParseTreeNode> children) {
-		this.chunk = null;
-		addAllChildren(children);
-
 	}
 
 	/**
@@ -217,6 +215,12 @@ public final class ParseTreeNode {
 		return false;
 	}
 
+	/**
+	 * Log the tree in an indent (pretty) fashion
+	 *
+	 * @param indent
+	 *            the indent
+	 */
 	public void log(String indent) {
 		String wordString = "";
 		if (words != null) {

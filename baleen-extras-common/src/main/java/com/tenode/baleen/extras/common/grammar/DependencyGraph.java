@@ -439,7 +439,8 @@ public class DependencyGraph {
 	public static DependencyGraph build(final JCas jCas) {
 		final DependencyGraph graph = new DependencyGraph();
 
-		JCasUtil.select(jCas, Dependency.class).stream().forEach(graph::addDependency);
+		JCasUtil.select(jCas, Dependency.class).stream()
+				.forEach(graph::addDependency);
 
 		return graph;
 	}
@@ -459,7 +460,8 @@ public class DependencyGraph {
 	public static DependencyGraph build(final JCas jCas, AnnotationFS annnotation) {
 		final DependencyGraph graph = new DependencyGraph();
 
-		JCasUtil.selectCovered(jCas, Dependency.class, annnotation).stream().forEach(graph::addDependency);
+		JCasUtil.selectCovered(jCas, Dependency.class, annnotation).stream()
+				.forEach(graph::addDependency);
 
 		return graph;
 	}

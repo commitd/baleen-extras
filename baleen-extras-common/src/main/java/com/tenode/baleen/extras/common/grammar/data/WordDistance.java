@@ -7,17 +7,14 @@ import java.util.List;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
 /**
- * A word and its distance in depedency graph space.
+ * A word and its distance in dependency graph space.
  */
 public class WordDistance implements Comparable<WordDistance> {
 
-	/** The word. */
 	private final WordToken word;
 
-	/** The word distance. */
-	private final WordDistance wordDistance;
+	private final WordDistance previous;
 
-	/** The distance. */
 	private final int distance;
 
 	/**
@@ -28,7 +25,7 @@ public class WordDistance implements Comparable<WordDistance> {
 	 */
 	public WordDistance(WordToken word) {
 		this.word = word;
-		this.wordDistance = null;
+		this.previous = null;
 		this.distance = 0;
 	}
 
@@ -38,11 +35,11 @@ public class WordDistance implements Comparable<WordDistance> {
 	 * @param word
 	 *            the word
 	 * @param wordDistance
-	 *            the word distance
+	 *            the word distance parent / previous edge
 	 */
 	public WordDistance(WordToken word, WordDistance wordDistance) {
 		this.word = word;
-		this.wordDistance = wordDistance;
+		this.previous = wordDistance;
 		this.distance = wordDistance.getDistance() + 1;
 	}
 
@@ -70,7 +67,7 @@ public class WordDistance implements Comparable<WordDistance> {
 	 * @return the word distance
 	 */
 	public WordDistance getWordDistance() {
-		return wordDistance;
+		return previous;
 	}
 
 	/**
@@ -79,7 +76,7 @@ public class WordDistance implements Comparable<WordDistance> {
 	 * @return the words
 	 */
 	public List<WordToken> getWords() {
-		if (wordDistance == null) {
+		if (previous == null) {
 			return Collections.singletonList(word);
 		} else {
 			return collate(new ArrayList<>(distance));
@@ -90,15 +87,16 @@ public class WordDistance implements Comparable<WordDistance> {
 	 * Collate all the words in the stack into the list.
 	 *
 	 * @param list
-	 *            the list
-	 * @return the list
+	 *            the list to add words to
+	 * @return the (same as param) list
 	 */
 	protected List<WordToken> collate(List<WordToken> list) {
-		if (wordDistance != null) {
-			list = wordDistance.collate(list);
+		List<WordToken> result = list;
+		if (previous != null) {
+			result = previous.collate(list);
 		}
-		list.add(word);
-		return list;
+		result.add(word);
+		return result;
 	}
 
 	/*
@@ -122,7 +120,7 @@ public class WordDistance implements Comparable<WordDistance> {
 		int result = 1;
 		result = prime * result + distance;
 		result = prime * result + (word == null ? 0 : word.hashCode());
-		result = prime * result + (wordDistance == null ? 0 : wordDistance.hashCode());
+		result = prime * result + (previous == null ? 0 : previous.hashCode());
 		return result;
 	}
 
@@ -153,11 +151,11 @@ public class WordDistance implements Comparable<WordDistance> {
 		} else if (!word.equals(other.word)) {
 			return false;
 		}
-		if (wordDistance == null) {
-			if (other.wordDistance != null) {
+		if (previous == null) {
+			if (other.previous != null) {
 				return false;
 			}
-		} else if (!wordDistance.equals(other.wordDistance)) {
+		} else if (!previous.equals(other.previous)) {
 			return false;
 		}
 		return true;

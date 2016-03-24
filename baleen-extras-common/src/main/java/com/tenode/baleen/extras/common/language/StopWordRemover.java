@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
  * Checks words against a provided stop word list.
  *
  */
-// TODO: JBaker has a shared resource which is to be open source soon.
-// This class will be merged in and deprecated when that happens.
 public class StopWordRemover {
 
 	// Taken from http://xpo6.com/list-of-english-stop-words/
@@ -96,8 +94,7 @@ public class StopWordRemover {
 	 */
 	public String clean(final String text) {
 		// TODO: not very efficient, should create a regex in the constructor
-		// from all the stop
-		// words and do it once here
+		// from all the stop words and do it once here
 		String clean = text;
 		for (final String s : stopWords) {
 			clean = clean.replaceAll("\\b" + Pattern.quote(s) + "\\b", "");

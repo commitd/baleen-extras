@@ -64,7 +64,7 @@ public final class SpanUtils {
 	 *            the begin
 	 * @param end
 	 *            the end
-	 * @param interaction
+	 * @param annotation
 	 *            the interaction
 	 * @return the interaction
 	 */
@@ -100,7 +100,7 @@ public final class SpanUtils {
 	}
 
 	/**
-	 * Does the entities collection contain an entity coveringthe range begin-end of the correct
+	 * Does the entities collection contain an entity covering the range begin-end of the correct
 	 * class?.
 	 *
 	 * @param entities

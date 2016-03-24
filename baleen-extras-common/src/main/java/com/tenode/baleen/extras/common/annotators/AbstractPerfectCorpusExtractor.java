@@ -153,6 +153,6 @@ public abstract class AbstractPerfectCorpusExtractor extends BaleenAnnotator {
 	 */
 	private Consumer<? super String> addToMap(Class<? extends Entity> clazz) {
 		return s -> missing.put(Pattern.compile("\\b" + s + "\\b"), clazz);
-	};
+	}
 
 }
