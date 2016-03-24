@@ -38,7 +38,7 @@ public class ClearNlpParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doInitialize(org.apache.uima.UimaContext)
 	 */
 	@Override
@@ -53,7 +53,7 @@ public class ClearNlpParser extends BaleenAnnotator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see uk.gov.dstl.baleen.uima.BaleenAnnotator#doProcess(org.apache.uima.jcas.JCas)
 	 */
 	@Override
@@ -72,7 +72,7 @@ public class ClearNlpParser extends BaleenAnnotator {
 				final DEPNode node = tree.get(i);
 
 				// Logic taken from DKPro Core (ASL)
-				// https://github.com/dkpro/dkpro-core/blob/master/dkpro-core-clearnlp-asl/src/main/java/de/tudarmstadt/ukp/dkpro/core/clearnlp/ClearNlpParser.java
+				// dkpro-core-clearnlp-asl/src/main/java/de/tudarmstadt/ukp/dkpro/core/clearnlp/ClearNlpParser.java
 				if (node.hasHead()) {
 					final Dependency dep = new Dependency(jCas);
 					if (node.getHead().getID() != 0) {
@@ -103,7 +103,7 @@ public class ClearNlpParser extends BaleenAnnotator {
 		final DEPTree tree = new DEPTree(tokens.size());
 		int tokenIndex = 0;
 		for (final WordToken wt : tokens) {
-			final DEPNode node = new DEPNode(tokenIndex++, wt.getCoveredText());
+			final DEPNode node = new DEPNode(tokenIndex, wt.getCoveredText());
 			node.setPOSTag(wt.getPartOfSpeech());
 			final FSArray lemmas = wt.getLemmas();
 			if (lemmas != null && lemmas.size() > 0) {
@@ -111,6 +111,7 @@ public class ClearNlpParser extends BaleenAnnotator {
 				node.setLemma(wl.getLemmaForm());
 			}
 			tree.add(node);
+			tokenIndex++;
 		}
 		return tree;
 	}
