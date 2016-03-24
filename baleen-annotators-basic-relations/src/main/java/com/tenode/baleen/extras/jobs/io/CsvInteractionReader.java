@@ -79,7 +79,10 @@ public class CsvInteractionReader {
 
 						List<String> alternatives = new ArrayList<>(r.size() - 6);
 						for (int j = 6; j < r.size(); j++) {
-							alternatives.add(r.get(j));
+							String alternative = r.get(j).trim();
+							if (!alternative.isEmpty()) {
+								alternatives.add(alternative);
+							}
 						}
 
 						consumer.accept(i, alternatives);

@@ -14,12 +14,14 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBCollection;
 import com.tenode.baleen.extras.common.jcas.SpanUtils;
 
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
 import uk.gov.dstl.baleen.resources.SharedMongoResource;
 import uk.gov.dstl.baleen.types.language.Interaction;
 import uk.gov.dstl.baleen.types.language.WordToken;
@@ -98,7 +100,30 @@ public class AssignTypeToInteraction extends BaleenAnnotator {
 	@ConfigurationParameter(name = PARAM_VALUES_FIELD, defaultValue = "value")
 	private String valuesField;
 
-	private final Multimap<String, InteractionTypeDefinition> definitions = ArrayListMultimap.create();
+	/**
+	 * The stemming algorithm to use, as defined in OpenNLP's SnowballStemmer.ALGORITHM enum
+	 *
+	 * @baleen.config ENGLISH
+	 */
+	public static final String PARAM_ALGORITHM = "algorithm";
+	@ConfigurationParameter(name = PARAM_ALGORITHM, defaultValue = "ENGLISH")
+	protected String algorithm;
+
+	/**
+	 * Should the words be stemmed before processing?
+	 *
+	 * Set false if you want a very precise match against your values, effectively they must be the
+	 * interaction values. Set to true for a more relaxed match but which might produce false
+	 * positives.
+	 *
+	 * @baleen.config true
+	 */
+	public static final String PARAM_STEM = "stem";
+	@ConfigurationParameter(name = PARAM_STEM, defaultValue = "true")
+	protected boolean stem;
+
+	private final Multimap<String, InteractionTypeDefinition> definitions = HashMultimap.create();
+	private SnowballStemmer stemmer;
 
 	/*
 	 * (non-Javadoc)
@@ -108,6 +133,12 @@ public class AssignTypeToInteraction extends BaleenAnnotator {
 	@Override
 	public void doInitialize(final UimaContext aContext) throws ResourceInitializationException {
 		super.doInitialize(aContext);
+
+		ALGORITHM algo = ALGORITHM.valueOf(algorithm);
+		if (algo == null) {
+			algo = ALGORITHM.ENGLISH;
+		}
+		stemmer = new SnowballStemmer(algo);
 
 		final DBCollection dbCollection = mongo.getDB().getCollection(collection);
 
@@ -129,7 +160,11 @@ public class AssignTypeToInteraction extends BaleenAnnotator {
 	}
 
 	private String toKey(String pos, String word) {
-		return Character.toLowerCase(pos.charAt(0)) + ":" + word.toLowerCase();
+		CharSequence normalised = word.toLowerCase().trim();
+		if (stem) {
+			normalised = stemmer.stem(normalised);
+		}
+		return String.format("%s:%s", Character.toLowerCase(pos.charAt(0)), normalised);
 	}
 
 	/*
