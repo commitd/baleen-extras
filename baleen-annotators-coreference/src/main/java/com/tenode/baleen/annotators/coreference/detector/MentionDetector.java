@@ -118,12 +118,10 @@ public class MentionDetector {
 			// TODO: No idea if its it possible to get more than one if all things work.
 			// I think this would be a case of marking an entity which cross the NP boundary and is
 			// likely wrong.
-			final WordToken head = candidates.get(0);
-
 			// TODO: Not sure if we should pull out compound words here... (its a head word but even
 			// so)
 
-			return head;
+			return candidates.get(0);
 		}
 	}
 

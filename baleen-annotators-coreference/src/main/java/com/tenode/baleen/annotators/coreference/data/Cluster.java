@@ -56,7 +56,7 @@ public class Cluster {
 
 	public boolean intersects(Cluster cluster) {
 		return mentions.stream()
-				.anyMatch(m -> cluster.contains(m));
+				.anyMatch(cluster::contains);
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.tenode.baleen.annotators.coreference.sieves;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,5 +106,9 @@ public class PreciseConstructsSieveTest extends AbstractCoreferenceSieveTest {
 
 		List<ReferenceTarget> targets = new ArrayList<>(JCasUtil.select(jCas, ReferenceTarget.class));
 		assertEquals(1, targets.size());
+		List<Organisation> orgs = new ArrayList<Organisation>(JCasUtil.select(jCas, Organisation.class));
+		assertEquals(2, orgs.size());
+		assertNotNull(orgs.get(0).getReferent());
+		assertEquals(orgs.get(0).getReferent().getInternalId(), orgs.get(1).getReferent().getInternalId());
 	}
 }

@@ -13,7 +13,7 @@ import com.tenode.baleen.annotators.coreference.data.Person;
  */
 public class PersonEnhancer implements MentionEnhancer {
 
-	private final static Map<String, Person> map = new HashMap<>();
+	private static final Map<String, Person> map = new HashMap<>();
 
 	static {
 		// See Person

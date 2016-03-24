@@ -18,9 +18,15 @@ import com.tenode.baleen.annotators.coreference.data.Mention;
 import com.tenode.baleen.annotators.coreference.data.MentionType;
 
 /**
- * Seive based on exact matching of the head word.
+ * Sieve based on exact matching of the head word.
  */
 public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
+	// TODO: Does this cover reasonable one (we could have 200k for example)
+	private static final Pattern NUMBER = Pattern.compile("-?\\d+(,\\d+)*(\\.\\d+)?");
+
+	// TODO: Find a complete list of these
+	private final Set<String> spatialModifiers = new HashSet<String>(
+			Arrays.asList("northern", "southern", "western", "eastern", "south", "east", "north", "west"));
 
 	public ProperHeadMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
 		super(jCas, clusters, mentions);
@@ -74,10 +80,6 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 		}
 	}
 
-	// TODO: Find a complete list of these
-	private final Set<String> spatialModifiers = new HashSet<String>(
-			Arrays.asList("northern", "southern", "western", "eastern", "south", "east", "north", "west"));
-
 	private boolean hasSameModifiers(Mention a, Mention b) {
 		// TODO: The paper says location named entities, other proper nouns or other spatial
 		// modifiers but since locations should be other proper nouns we ignore that clause. We
@@ -96,10 +98,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 				.collect(Collectors.toSet());
 	}
 
-	// TODO: Does this cover reasonable one (we could have 200k for example)
-	private static final Pattern NUMBER = Pattern.compile("-?\\d+(,\\d+)*(\\.\\d+)?");
-
-	// Assymetric
+	// Asymetric
 	private List<Double> extractNumbers(String text) {
 		final List<Double> list = new LinkedList<>();
 		final Matcher matcher = NUMBER.matcher(text);
@@ -112,7 +111,7 @@ public class ProperHeadMatchSieve extends AbstractCoreferenceSieve {
 		return list;
 	}
 
-	// Assymetric
+	// Asymetric
 	private boolean hasSameNumbers(Collection<Double> aNumbers, Collection<Double> bNumbers) {
 
 		for (final double b : bNumbers) {

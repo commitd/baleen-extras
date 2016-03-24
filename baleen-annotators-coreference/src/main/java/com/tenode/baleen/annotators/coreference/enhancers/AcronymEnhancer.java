@@ -46,13 +46,14 @@ public class AcronymEnhancer implements MentionEnhancer {
 			boolean considerNext = true;
 			for (int i = 0; i < text.length(); i++) {
 				final char c = text.charAt(i);
-				if (considerNext == true) {
+				if (considerNext) {
 					if (Character.isUpperCase(c)) {
 						upperCase.append(c);
 						upperAndLowerCase.append(c);
 					} else {
 						upperAndLowerCase.append(c);
 					}
+					considerNext = false;
 				}
 
 				if (Character.isWhitespace(c)) {

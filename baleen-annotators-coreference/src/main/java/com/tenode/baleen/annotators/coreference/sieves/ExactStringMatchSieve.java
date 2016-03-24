@@ -19,12 +19,6 @@ import com.tenode.baleen.annotators.coreference.data.MentionType;
 public class ExactStringMatchSieve extends AbstractCoreferenceSieve {
 	private static final Set<String> EXCLUDED = new HashSet<>(Arrays.asList("that", "there"));
 
-	/**
-	 * Instantiates a new insatnce
-	 *
-	 * @param jCas
-	 *            the jcas
-	 */
 	public ExactStringMatchSieve(JCas jCas, List<Cluster> clusters, List<Mention> mentions) {
 		super(jCas, clusters, mentions);
 	}

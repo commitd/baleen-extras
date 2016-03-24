@@ -27,9 +27,9 @@ import uk.gov.dstl.baleen.types.semantic.Temporal;
  */
 public class AnimacyEnhancer implements MentionEnhancer {
 
-	private final static Map<String, Animacy> pronounMap = new HashMap<>();
+	private static final Map<String, Animacy> pronounMap = new HashMap<>();
 
-	private final static Map<Class<? extends Base>, Animacy> semanticMap = new HashMap<>();
+	private static final Map<Class<? extends Base>, Animacy> semanticMap = new HashMap<>();
 
 	static {
 		Arrays.asList("i", "me", "mine", "my", "myself", "we", "us", "our", "ours", "ourselves", "yourself",

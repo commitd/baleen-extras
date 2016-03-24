@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
@@ -102,7 +101,6 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * @baleen.javadoc
  */
 public class Coreference extends BaleenAnnotator {
-	private static final Predicate<String> NP_FILTER = s -> s.startsWith("N");
 
 	/**
 	 * GenderMultiplicityResource to provide information on gender and multiplicity from a
@@ -201,7 +199,7 @@ public class Coreference extends BaleenAnnotator {
 				new StrictHeadMatchSieve(jCas, clusters, mentions, false, true), // Good
 				new ProperHeadMatchSieve(jCas, clusters, mentions), // Good
 				new RelaxedHeadMatchSieve(jCas, clusters, mentions), // Good
-				includePronomial == true ? new PronounResolutionSieve(jCas, clusters, mentions) : null
+				includePronomial ? new PronounResolutionSieve(jCas, clusters, mentions) : null
 				// Questionable - Needs more help from
 				// Baleen entities yet and more data from animacy if its to work well.
 		};
@@ -297,7 +295,7 @@ public class Coreference extends BaleenAnnotator {
 				}
 			}
 
-			if (overlap == false) {
+			if (!overlap) {
 				merged.add(cluster);
 			}
 		}
