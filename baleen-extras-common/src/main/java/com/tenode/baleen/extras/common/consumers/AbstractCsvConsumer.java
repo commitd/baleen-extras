@@ -1,5 +1,6 @@
 package com.tenode.baleen.extras.common.consumers;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -46,6 +47,8 @@ public abstract class AbstractCsvConsumer extends BaleenConsumer {
 		super.doInitialize(aContext);
 
 		try {
+			// Attempt to create the path if it doesn't exist
+			new File(filename).getParentFile().mkdirs();
 
 			writer = new CSVPrinter(
 					new OutputStreamWriter(new FileOutputStream(filename, false), StandardCharsets.UTF_8),

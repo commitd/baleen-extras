@@ -63,6 +63,11 @@ public class MucReader extends AbstractStreamCollectionReader<MucEntry> {
 		final File[] files = new File(mucPath)
 				.listFiles(f -> !f.getName().startsWith("key-") && f.isFile());
 
+		if (files == null || files.length == 0) {
+			getMonitor().info("No MUC files found is the path correct: {}", mucPath);
+			throw new BaleenException("No MUC files found to process");
+		}
+
 		return Arrays.stream(files)
 				.flatMap(f -> {
 					try {
