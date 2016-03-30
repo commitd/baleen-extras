@@ -23,10 +23,9 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 /**
  * A base class for relationship extractors which use interaction words as a trigger.
  *
- * Implementations should override extract, and potentially preExtract and postExtract. These latter
- * functions allow for creation and tidying up of objects related to extraction.
- *
- * There are numerous helper methods which support relations.
+ * Implementations should override {@link #extract(JCas) extract}, and potentially
+ * {@link #preExtract(JCas) preExtract} and {@link #postExtract(JCas) postExtract}, which both allow
+ * for creation and clean up of objects related to extraction.
  *
  */
 public abstract class AbstractInteractionBasedRelationshipAnnotator extends BaleenAnnotator {

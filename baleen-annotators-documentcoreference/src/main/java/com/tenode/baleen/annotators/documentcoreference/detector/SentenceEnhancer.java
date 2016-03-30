@@ -22,7 +22,7 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
  * Adds the sentence and its index (count from the start) to each mention.
- *
+ * <p>
  * Thanks to UIMA this is a tremendous amount of work for such a simple task.
  */
 public class SentenceEnhancer {

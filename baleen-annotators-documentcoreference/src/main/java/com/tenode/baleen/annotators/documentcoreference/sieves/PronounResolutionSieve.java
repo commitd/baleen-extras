@@ -19,8 +19,8 @@ import com.tenode.baleen.annotators.documentcoreference.data.Person;
 
 /**
  * Attempts to connect pronouns to an entity.
- *
- * This is very difficult problems which will likely fail in the current implementation.
+ * <p>
+ * This is very difficult problem which may perform suboptimally in the current implementation.
  */
 public class PronounResolutionSieve extends AbstractCoreferenceSieve {
 

@@ -12,7 +12,7 @@ import uk.gov.dstl.baleen.types.common.Organisation;
 import uk.gov.dstl.baleen.types.language.WordToken;
 
 /**
- * Add multiplicity information to mention.
+ * Add multiplicity information to mentions.
  */
 public class MultiplicityEnhancer implements MentionEnhancer {
 

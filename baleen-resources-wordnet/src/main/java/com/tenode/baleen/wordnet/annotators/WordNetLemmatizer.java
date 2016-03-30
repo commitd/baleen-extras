@@ -19,7 +19,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
  * Add lemma form of word to the WordToken (if the WordToken has no getLemma already).
- *
+ * <p>
  * Uses WordNet, hence coverage will be as good as their dictionary.
  *
  * @baleen.javadoc

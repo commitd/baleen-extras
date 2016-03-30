@@ -25,16 +25,16 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
- * Removes relationships which don't match UIMA type constraints.
- *
- * Many relationships will only make sense between specific entity tpes. For example (Person, went
- * to, Location) not (DateTime, went to, Location). This filter allows the type constraints of
- * relations to be defined.
- *
- * Since relatioship extractors may have different capabilities (eg find direction of relationship,
- * discover new unknown relationships ) there are several configuration parameters which relax the
- * strictness of filtering.
- *
+ * Removes relationships that don't match UIMA type constraints.
+ * <p>
+ * Many relationships will only make sense between specific entity types. For example (Person, went
+ * to, Location) not (DateTime, went to, Location). This filter allows for relational type
+ * constraints.
+ * <p>
+ * Since relationship extractors may have different capabilities (e.g. finding the direction of
+ * relationships, discovering new unknown relationships) there are several configuration parameters
+ * which relax the strictness of filtering.
+ * <p>
  * Mongo constraint documents are formed as:
  *
  * <pre>

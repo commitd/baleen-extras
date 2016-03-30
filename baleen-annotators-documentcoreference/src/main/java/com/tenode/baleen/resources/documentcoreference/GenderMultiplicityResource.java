@@ -23,14 +23,14 @@ import com.tenode.baleen.annotators.documentcoreference.data.Multiplicity;
 import uk.gov.dstl.baleen.uima.BaleenResource;
 
 /**
- * sGenderMultiplicityResource.
- *
- * Due to the nature of the data the gender should be reasonable high quality, but the multiplicity
- * is poor. This is because ther is no singular mention counts in the data, so its impossible to
- * understand how many times relatively a word is used a singular vs plural.
- *
- * Patterns with numbers are ingnored.
- *
+ * Resource for gender multiplicities
+ * <p>
+ * Due to the nature of the data the gender should be of reasonably high quality, but the
+ * multiplicity is poor. This is because there is no singular mention of counts in the data, so its
+ * impossible to understand how many times relatively a word is used a singular vs plural.
+ * <p>
+ * Patterns with numbers are ignored.
+ * <p>
  * The implementation stores three maps (per gender / multiplicity) one for exact matches, one for
  * starts with and one for endsWith. To improve performance endsWith contains the reversed text so
  * it can be matched backwards.

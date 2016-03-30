@@ -13,7 +13,7 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
 
 /**
  * Write relations to CSV for evaluation purposes.
- *
+ * <p>
  * Format is:
  *
  * <ul>

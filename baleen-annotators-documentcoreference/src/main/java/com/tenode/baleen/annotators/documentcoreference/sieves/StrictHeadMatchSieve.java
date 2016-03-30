@@ -11,7 +11,7 @@ import com.tenode.baleen.annotators.documentcoreference.data.MentionType;
 import com.tenode.baleen.annotators.documentcoreference.utils.StopWordExtractor;
 
 /**
- * THeda matching sieve which has controllable parameters.
+ * Head matching sieve that has controllable parameters.
  */
 public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 

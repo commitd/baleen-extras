@@ -16,11 +16,12 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
- * Add title (mr, president, etc) information to previous found people.
- *
- * Often NLP models we find John Smith but omit the title infromation (General John Smith, General
- * Sir John Smith). This annotator adds that information back onto the entity, thus improving the
- * quality of person extraction and reducing the number of unannotated words in a document.
+ * Add title (mr, president, etc) information to previously found people.
+ * <p>
+ * Often with NLP models we find a person, e.g. John Smith but omit the title information, e.g.
+ * General John Smith, General Sir John Smith. This annotator adds that information back onto the
+ * entity, thus improving the quality of person extraction and reducing the number of unannotated
+ * words in a document.
  *
  * @baleen.javadoc
  */

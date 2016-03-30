@@ -8,7 +8,7 @@ import uk.gov.dstl.baleen.annotators.regex.helpers.AbstractRegexAnnotator;
 import uk.gov.dstl.baleen.types.common.Person;
 
 /**
- * Annotates Person from social methods for example @username.
+ * Annotates Person using social methods, for example @username.
  *
  * @baleen.javadoc
  */

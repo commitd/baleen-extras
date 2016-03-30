@@ -22,21 +22,30 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
- * Find patterns in the document text.
+ * Finds patterns in document text.
  *
- * A pattern is a set of words between two entities. They are typically used to form a training set
- * for relationship extraction.
+ * <p>
+ * A pattern is a set of words between two entities. Patterns are typically used to form a training
+ * set for relationship extraction.
  *
+ * <p>
  * As a result this annotator must be run after Entity and WordToken annotations have been added to
- * the JCas. That is post POS tagging (eg by OpenNlp) and after entity extraction (and ideally clean
- * up).
+ * the JCas. That is post POS tagging (e.g. by OpenNlp) and after entity extraction (and ideally
+ * clean up).
  *
- * The algorithm is basically described as follow. For each sentence we find entities which are less
- * than "windowSize" away from each other (measured in words). This are our candidate patterns. We
- * filter any patterns containing negatives (eg the words no or not). We then remove from the
- * pattern any stop words and any other entities which appear within the pattern text. We remove any
- * empty patterns and then create a new Pattern annotation. The Pattern annotation holds the
- * original range, plus the list of retained words (in the form of WordTokens).
+ * <p>
+ * The algorithm can be described as follows:
+ * 
+ * 
+ * <ol>
+ * <li>For each sentence we find entities which are less than "windowSize" away from each other
+ * (measured in words). These are our candidate patterns.</li>
+ * <li>We filter any patterns containing negatives (e.g. the words no or not).</li>
+ * <li>We then remove from each pattern any stop words and any other entities which appear within
+ * the pattern text, then remove any patterns that are now empty.</li>
+ * <li>We then create Pattern annotations. Pattern annotations hold the original range for each
+ * pattern, plus the list of retained words (in the form of WordTokens).</li>
+ * </ol>
  *
  * @baleen.javadoc
  */

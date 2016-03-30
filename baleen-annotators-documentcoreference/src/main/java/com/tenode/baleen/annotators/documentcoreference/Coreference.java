@@ -41,21 +41,21 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
  * Resolves coreferent entities.
- *
- * In effect the Standford approach is a set of 10+ passes which address the different types of
- * coreference. At each stage mentions are related and when related the are added to a cluster (a
+ * <p>
+ * In effect the Stanford approach is a set of 10+ passes which address the different types of
+ * coreference. At each stage mentions are related, each related mention is added to a cluster (a
  * set of mentions which are related). At the end of the process the clusters are joined
- * transitively and all mentions inside are considered coreferent.
- *
- * A mention is a NP, entity or pronoun. In Standford the largest NP is taken, within Baleen we felt
+ * transitively and all mentions inside a cluster are considered coreferent.
+ * <p>
+ * A mention is a NP, entity or pronoun. In Stanford the largest NP is taken, within Baleen we felt
  * that entities are more important, therefore we take the largest NP which does not contain a NP.
- *
- * TODO; Review the mention extraction its not quite right
- *
+ * <p>
+ * TODO: Review mention extraction
+ * <p>
  * This is a partial implementation at present, and so will not perform as well as the
- * StandfordCoreNlp coreference. It is partial due to time constraints, and largely unavailabled
- *
- * The following details implementation to date:
+ * StanfordCoreNlp coreference. This is partially due to time constraints.
+ * <p>
+ * The following implementation details to date:
  * <ul>
  * <li>Mention detection: Done
  * <li>Pass 1 Speaker Identification: TODO
@@ -76,12 +76,12 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * Attributes of mentions (gender, animacy, number) are included, but for animacy we could not get
  * the data (Ji and Lin, 2009) and it says for research use only anyway. As such we ignore the
  * dictionary lookup.
- *
- * We discard any the algorithm which are for a specific corpus (eg OntoNotes).
- *
+ * <p>
+ * We discard any algorithms which are for a specific corpus (eg OntoNotes).
+ * <p>
  * This is very much unoptimised. Each sieve will calculate over all entities, even though many will
  * already in the same cluster.
- *
+ * <p>
  * TODO: At the moment we don't do the clustering properly. We need just perform pairwise operations
  * repeated.
  *
@@ -94,7 +94,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * <li>http://nlp.stanford.edu/pubs/coreference-emnlp10.pdf
  * </ul>
  *
- * TODO: To really improve further needs an analysis of what is missing higher up baleen. For
+ * TODO: To really improve further, we need an analysis of what is missing higher up Baleen. For
  * example we don't have roles or the animacy information so "a doctor" is just a noun phrase and
  * hence could be mapped to it. If we had "person role" entity marker we would mark this an ANIMATE.
  *

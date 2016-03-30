@@ -10,9 +10,9 @@ import edu.emory.clir.clearnlp.component.utils.GlobalLexica;
 import uk.gov.dstl.baleen.uima.BaleenResource;
 
 /**
- * A fake shared model which sets up ClearNlp entity dictionary.
- *
- * Fake in the sense the this class provides no public additional functions.
+ * A fake shared model which sets up the ClearNlp entity dictionary.
+ * <p>
+ * It is fake in the sense the this class provides no public additional functions.
  */
 public class ClearNlpEntityDictionary extends BaleenResource {
 

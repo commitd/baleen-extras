@@ -22,7 +22,7 @@ import uk.gov.dstl.baleen.types.semantic.Location;
 import uk.gov.dstl.baleen.types.semantic.Temporal;
 
 /**
- * Adds animacy information to the mention.
+ * Adds animacy information to a mention.
  */
 public class AnimacyEnhancer implements MentionEnhancer {
 

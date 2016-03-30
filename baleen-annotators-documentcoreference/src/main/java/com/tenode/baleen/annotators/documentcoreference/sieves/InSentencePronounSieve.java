@@ -11,13 +11,12 @@ import com.tenode.baleen.annotators.documentcoreference.data.Person;
 
 /**
  * Joins pronouns which are in the same sentence.
- *
+ * <p>
  * This is not part of the original paper, and it might have been taken care of during their
  * implementation. However it seems sensible.
- *
- * There are probably areas of english where this does not work well.
- * "Jim saw James and he was going to town" (James = he?) vs "He saw James and he was going to town"
- * (he = ?).
+ * <p>
+ * There are probably areas of english where this does not work well. "Jim saw James and he was
+ * going to town" (James = he?) vs "He saw James and he was going to town" (he = ?).
  *
  */
 public class InSentencePronounSieve extends AbstractCoreferenceSieve {

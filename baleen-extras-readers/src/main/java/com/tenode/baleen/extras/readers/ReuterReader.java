@@ -24,9 +24,9 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
 
 /**
  * A collection reader which loads SGM files from the Reuters21578 archive.
- *
+ * <p>
  * Available for download at http://www.daviddlewis.com/resources/testcollections/reuters21578/
- *
+ * <p>
  * Extract the data (use 'tar xvf reuters21579.tar.gz' or 7zip on Windows).
  *
  * @baleen.javadoc
@@ -92,7 +92,7 @@ public class ReuterReader extends AbstractStreamCollectionReader<String> {
 						getMonitor().warn("Unable to process SGML file {}", sgmlFile.getAbsolutePath(), e);
 					}
 
-					return Stream.<Element> empty();
+					return Stream.<Element>empty();
 
 				})
 				.flatMap(e -> nodeListToText(e.getElementsByTagName("BODY")))

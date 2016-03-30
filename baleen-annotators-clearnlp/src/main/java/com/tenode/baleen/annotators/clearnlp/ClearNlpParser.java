@@ -23,10 +23,10 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
  * A ClearNlp based dependency parser annotator.
- *
+ * <p>
  * ClearNlp needs a considerable amount of memory to load its models. Suggest running with -Xmx4g at
  * least. This annotator will take around 30 seconds to initialise (load its model).
- *
+ * <p>
  * This annotator generates Dependency annotations.
  *
  * @baleen.javadoc

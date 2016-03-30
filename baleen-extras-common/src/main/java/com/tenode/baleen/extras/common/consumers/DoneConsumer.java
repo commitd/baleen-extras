@@ -7,7 +7,7 @@ import uk.gov.dstl.baleen.uima.BaleenConsumer;
 
 /**
  * Logs when a document is done.
- *
+ * <p>
  * Useful for development, when you need to set a breakpoint at the end of a documents processing.
  *
  * @baleen.javadoc

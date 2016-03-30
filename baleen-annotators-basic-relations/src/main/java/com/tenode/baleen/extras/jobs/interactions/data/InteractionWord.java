@@ -4,11 +4,12 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * A word which represents an interaction trigger (ie relation of interest) between two types of
+ * A word that represents an interaction trigger (ie relation of interest) between two types of
  * entities.
- *
- * Since the word might connect many pair (John and Sally went to London then Birmingham) we allow
- * multple relation pairs (John,London), (Sally, London), (John, Birmingham), (Sally, Birmingham).
+ * <p>
+ * Since the word might connect many pairs (John and Sally went to London then Birmingham) we allow
+ * for multiple relation pairs (John,London), (Sally, London), (John, Birmingham), (Sally,
+ * Birmingham).
  */
 public class InteractionWord {
 

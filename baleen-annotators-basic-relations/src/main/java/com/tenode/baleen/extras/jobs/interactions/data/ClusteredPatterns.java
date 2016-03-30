@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A set of patterns which have been clustered together based on their similarity.
+ * A set of patterns that have been clustered together based on their similarity.
  */
 public class ClusteredPatterns {
 

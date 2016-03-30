@@ -7,8 +7,8 @@ import java.util.Set;
 
 /**
  * A cluster of mentions.
- *
- * All the mentions in this cluster are considered to be coreferent.
+ * <p>
+ * All mentions in a cluster are considered to be coreferent.
  */
 public class Cluster {
 

@@ -7,9 +7,9 @@ import java.util.Collections;
 import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
 
 /**
- * A writer to for Interactions.
- *
- * Implementations will saves to database, file or print to console.
+ * A writer for Interactions.
+ * <p>
+ * Implementations can save to database, file or print to console.
  */
 @FunctionalInterface
 public interface InteractionWriter extends AutoCloseable {

@@ -10,7 +10,7 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 /**
  * A java bean corresponding to an extracted Pattern.
  *
- * A pattern is a range of text which it between two entities.
+ * A pattern is a range of text between two entities.
  */
 public final class PatternExtract {
 

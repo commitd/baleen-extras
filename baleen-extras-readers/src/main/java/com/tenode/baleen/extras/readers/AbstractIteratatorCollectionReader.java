@@ -12,8 +12,8 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
 import uk.gov.dstl.baleen.uima.BaleenCollectionReader;
 
 /**
- * A collection reader which will can be can be represented by iterator, where each next() generates
- * a new document.
+ * A collection reader that can be represented by an iterator, where each call to next() generates a
+ * new document.
  *
  * @param <T>
  *            the generic type

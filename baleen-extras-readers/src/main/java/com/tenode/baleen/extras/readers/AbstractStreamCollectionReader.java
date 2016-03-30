@@ -9,7 +9,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import uk.gov.dstl.baleen.exceptions.BaleenException;
 
 /**
- * A collection reader which is generated as a stream..
+ * A collection reader that is generated as a stream.
  *
  * @param <T>
  *            the generic type

@@ -30,7 +30,7 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
  * Used to supply lists of words to match directly - effectively a simple gazetteer which is
  * precompiled.
  *
- * Override the get* methods to provide the terms.
+ * Override the get methods to provide the terms.
  *
  * @baleen.javadoc
  */

@@ -15,9 +15,11 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
 /**
  * A base class for building relationship extractors which work at a sentence level.
  *
- * Override the extract method which provides sentence, interaction and entities within that
- * sentence.
+ * <p>
+ * Override the {@link #extract(JCas) extract} method which provide interactions and entities
+ * per-sentence.
  *
+ * <p>
  * See {@link AbstractInteractionBasedRelationshipAnnotator} for further information on options.
  */
 public abstract class AbstractInteractionBasedSentenceRelationshipAnnotator

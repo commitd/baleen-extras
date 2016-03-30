@@ -29,25 +29,25 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
- * Use MaltParser to create a dependency grammar.
- *
+ * Uses a MaltParser to create a dependency grammar.
+ * <p>
  * See http://www.maltparser.org/ for more details of the implementation.
- *
- * The English language model of maltparser is trained on the Penn Treebank corpus, and as such its
- * is not freely licensed. To avoid this this project contains an english model trained form the
+ * <p>
+ * The English language model of maltparser is trained on the Penn Treebank corpus, and as such it
+ * is is not freely licensed. To avoid this this project contains an english model trained from the
  * English universal dependencies dataset (http://universaldependencies.org/docs/) where the
  * original data is licensed under https://creativecommons.org/licenses/by-sa/4.0/. As such the
- * training data is licenced under the same agreement.
- *
- * The universal depedency model uses their own tags. This annotator converts between the UD and
+ * training data is licensed under the same agreement.
+ * <p>
+ * The universal dependency model uses their own tags. This annotator converts between the UD and
  * standard tags.
- *
- * The MaltParser appears to be fast, low memory use and stable. As all trained alogirthms it will
+ * <p>
+ * The MaltParser appears to be fast, low memory use and stable. As all trained algorithms it will
  * function only as well as its training set. We found the original Penn Treebank to be
  * (subjectively) better than the Universal Dependency model. However if an algorithm requires only
  * dependency distance or an understanding of word linkage the universal dependency model functions
  * well enough.
- *
+ * <p>
  * The output of this annotator is Dependency annotations.
  *
  * @baleen.javadoc

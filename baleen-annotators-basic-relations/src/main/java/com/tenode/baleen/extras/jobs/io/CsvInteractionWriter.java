@@ -15,11 +15,11 @@ import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
 
 /**
  * Writes interaction data to a CSV file.
- *
+ * <p>
  * The column format is Type, Subtype, Source type, Target type, Lemma, Lemma POS, Alternatives....
  * where the 'alternatives' is a list of words which could stand in for the lemma. POS will be
  * 'noun', 'verb', 'adverb', 'adjective'.
- *
+ * <p>
  * The CSV file is RFC 4180 compliant.
  *
  */

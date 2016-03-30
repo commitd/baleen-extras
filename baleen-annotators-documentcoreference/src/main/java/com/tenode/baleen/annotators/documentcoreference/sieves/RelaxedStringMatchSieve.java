@@ -12,7 +12,7 @@ import com.tenode.baleen.annotators.documentcoreference.data.Mention;
 import com.tenode.baleen.annotators.documentcoreference.data.MentionType;
 
 /**
- * String matching which is more easily satisified that exact matching.
+ * String matching which is more easily satisfied than exact matching.
  */
 public class RelaxedStringMatchSieve extends AbstractCoreferenceSieve {
 

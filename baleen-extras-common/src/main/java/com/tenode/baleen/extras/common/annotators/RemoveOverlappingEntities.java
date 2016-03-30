@@ -17,13 +17,13 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
  * Remove entities which are contained within other entities of any type.
- *
- * This is useful for relation and event extraction pipelines where having overlapping entities will
- * produces poorer results.
- *
+ * <p>
+ * This is useful for relations and event extraction pipelines where having overlapping entities
+ * will produce poorer results.
+ * <p>
  * For example the "The British Army fought in Iraq" might provide entities British[Nationality],
  * British Army[Location] and Iraq[Location]. A simple relationship extraction may relate all
- * enntities in a sentnce British-British Army, British Army-Iraq and British-Iraq. The final
+ * entities in a sentence British-British Army, British Army-Iraq and British-Iraq. The final
  * relation is true in this case but not really the meaning of the text - the word British was not
  * meant to be considered in isolation.
  * 

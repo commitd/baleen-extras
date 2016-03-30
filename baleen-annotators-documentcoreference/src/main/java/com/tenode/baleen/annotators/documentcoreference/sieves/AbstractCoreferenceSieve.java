@@ -14,8 +14,8 @@ import com.tenode.baleen.annotators.documentcoreference.data.Mention;
 import uk.gov.dstl.baleen.types.language.PhraseChunk;
 
 /**
- * Base class for coreference sieve.
- *
+ * Base class for coreference sieves.
+ * <p>
  * Provides helper functions to manage clusters, etc.
  */
 public abstract class AbstractCoreferenceSieve implements CoreferenceSieve {

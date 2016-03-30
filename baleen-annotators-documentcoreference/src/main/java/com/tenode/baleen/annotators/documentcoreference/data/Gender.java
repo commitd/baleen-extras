@@ -1,7 +1,7 @@
 package com.tenode.baleen.annotators.documentcoreference.data;
 
 /**
- * The gender of term.
+ * The gender of a term.
  */
 public enum Gender {
 	M, F, N, UNKNOWN;

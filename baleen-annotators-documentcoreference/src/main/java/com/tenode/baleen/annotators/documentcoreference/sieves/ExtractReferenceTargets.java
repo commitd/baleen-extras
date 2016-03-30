@@ -12,7 +12,7 @@ import com.tenode.baleen.annotators.documentcoreference.data.Mention;
 import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
 
 /**
- * Reads the reference targets from the mentions creates clusters from them.
+ * Reads the reference targets from the mentions and creates clusters from them.
  */
 public class ExtractReferenceTargets extends AbstractCoreferenceSieve {
 

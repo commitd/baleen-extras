@@ -13,7 +13,7 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
- * A Mention which can be coreferenced.
+ * A Mention that may be coreferenced.
  *
  */
 public class Mention {

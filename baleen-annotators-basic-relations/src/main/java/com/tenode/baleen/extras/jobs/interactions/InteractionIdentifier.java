@@ -23,13 +23,13 @@ import net.sf.extjwnl.data.POS;
 import uk.gov.dstl.baleen.uima.UimaMonitor;
 
 /**
- * Identify interaction words based on the patterns.
- *
+ * Identify interaction words based on patterns.
+ * <p>
  * This algorithm is based on the paper
  * http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0102039.
- *
+ * <p>
  * In effect having found all the patterns (word strings) which sit between two entities we look for
- * common trigger/interaction words The patterns are clustered by similarity (based ont he words
+ * common trigger/interaction words. The patterns are clustered by similarity (based on the words
  * they contain). Then the content of the clusters is and common words extracted
  */
 public class InteractionIdentifier {

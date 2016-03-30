@@ -9,7 +9,7 @@ import net.sf.extjwnl.data.Synset;
 import net.sf.extjwnl.dictionary.Dictionary;
 
 /**
- * A command line application convert words into supersenses.
+ * A command line application that converts words into supersenses.
  */
 public final class SuperSense {
 
