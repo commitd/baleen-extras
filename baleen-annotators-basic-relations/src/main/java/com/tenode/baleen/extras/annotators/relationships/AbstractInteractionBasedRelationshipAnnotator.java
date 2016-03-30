@@ -99,8 +99,7 @@ public abstract class AbstractInteractionBasedRelationshipAnnotator extends Bale
 					// TODO: Is this sensible? These are direct connection between A and
 					// B for the dependency graph (you can't be more connected than
 					// that) but then you have no relationship text to work with.
-					.filter(r -> r.getRelationshipType() != null
-							|| !StringUtils.isBlank(r.getRelationshipType()))
+					.filter(r -> r.getRelationshipType() != null || !StringUtils.isBlank(r.getRelationshipType()))
 					.forEach(this::addToJCasIndex);
 		}
 	}
