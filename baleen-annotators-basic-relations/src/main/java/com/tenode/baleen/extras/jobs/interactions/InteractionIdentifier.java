@@ -30,7 +30,9 @@ import uk.gov.dstl.baleen.uima.UimaMonitor;
  * <p>
  * In effect having found all the patterns (word strings) which sit between two entities we look for
  * common trigger/interaction words. The patterns are clustered by similarity (based on the words
- * they contain). Then the content of the clusters is and common words extracted
+ * they contain). Clusters which are too small are discarded, and frequently seen common words
+ * extracted.
+ *
  */
 public class InteractionIdentifier {
 
