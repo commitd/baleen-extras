@@ -34,7 +34,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 		for (int i = 0; i < getMentions().size(); i++) {
 			final Mention a = getMentions().get(i);
 			String aHead = a.getHead();
-			if (aHead == null || aHead.isEmpty() || a.getType() != MentionType.PRONOUN) {
+			if (aHead == null || aHead.isEmpty() || a.getType() == MentionType.PRONOUN) {
 				continue;
 			}
 			aHead = aHead.toLowerCase();
@@ -42,7 +42,7 @@ public class StrictHeadMatchSieve extends AbstractCoreferenceSieve {
 			for (int j = i + 1; j < getMentions().size(); j++) {
 				final Mention b = getMentions().get(j);
 				String bHead = b.getHead();
-				if (bHead == null || bHead.isEmpty() || b.getType() != MentionType.PRONOUN) {
+				if (bHead == null || bHead.isEmpty() || b.getType() == MentionType.PRONOUN) {
 					continue;
 				}
 				bHead = bHead.toLowerCase();
