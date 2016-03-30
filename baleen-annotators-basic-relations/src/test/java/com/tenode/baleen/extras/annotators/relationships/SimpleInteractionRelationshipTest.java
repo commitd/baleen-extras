@@ -9,7 +9,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.tenode.baleen.extras.annotators.relationships.SimpleInteractionRelationship;
+import com.tenode.baleen.extras.relations.annotators.SimpleInteractionRelationship;
 
 import uk.gov.dstl.baleen.annotators.testing.AbstractAnnotatorTest;
 import uk.gov.dstl.baleen.annotators.testing.Annotations;

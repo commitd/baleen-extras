@@ -12,6 +12,8 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.relations.annotators.RelationTypeFilter;
+
 import uk.gov.dstl.baleen.annotators.testing.AbstractAnnotatorTest;
 import uk.gov.dstl.baleen.resources.SharedFongoResource;
 import uk.gov.dstl.baleen.types.common.Person;

@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.tenode.baleen.extras.annotators.relationships.data.PatternExtract;
+import com.tenode.baleen.extras.patterns.annotators.data.PatternExtract;
 
 import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;

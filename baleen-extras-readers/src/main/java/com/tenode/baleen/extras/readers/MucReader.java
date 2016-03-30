@@ -17,6 +17,8 @@ import org.elasticsearch.common.base.Splitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.tenode.baleen.extras.readers.data.MucEntry;
+
 import uk.gov.dstl.baleen.exceptions.BaleenException;
 import uk.gov.dstl.baleen.uima.UimaSupport;
 

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.RelationPair;
+
 public class RelationPairTest {
 
 	@Test

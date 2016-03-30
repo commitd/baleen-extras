@@ -12,6 +12,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.annotators.PatternExtractor;
+
 import uk.gov.dstl.baleen.annotators.testing.AnnotatorTestBase;
 import uk.gov.dstl.baleen.types.language.Pattern;
 import uk.gov.dstl.baleen.types.language.Sentence;

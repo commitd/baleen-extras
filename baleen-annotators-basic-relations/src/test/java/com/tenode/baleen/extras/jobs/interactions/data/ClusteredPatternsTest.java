@@ -9,6 +9,10 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.ClusteredPatterns;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.PatternReference;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.Word;
+
 import net.sf.extjwnl.data.POS;
 
 public class ClusteredPatternsTest {

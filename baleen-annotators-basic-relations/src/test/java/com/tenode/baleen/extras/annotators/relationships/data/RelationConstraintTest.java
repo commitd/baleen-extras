@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.annotators.data.RelationConstraint;
+
 public class RelationConstraintTest {
 
 	@Test

@@ -8,6 +8,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.interactions.annotators.RemoveInteractionInEntities;
+
 import uk.gov.dstl.baleen.annotators.testing.AbstractAnnotatorTest;
 import uk.gov.dstl.baleen.types.common.Person;
 import uk.gov.dstl.baleen.types.language.Interaction;

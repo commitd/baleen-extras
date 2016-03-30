@@ -20,7 +20,7 @@ import org.junit.Test;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.tenode.baleen.extras.consumers.relationships.MongoPatternSaver;
+import com.tenode.baleen.extras.patterns.consumers.MongoPatternSaver;
 
 import uk.gov.dstl.baleen.annotators.testing.AnnotatorTestBase;
 import uk.gov.dstl.baleen.resources.SharedFongoResource;

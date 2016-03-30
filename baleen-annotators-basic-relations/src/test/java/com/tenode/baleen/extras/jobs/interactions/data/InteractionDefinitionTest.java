@@ -6,6 +6,9 @@ import static org.junit.Assert.assertSame;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.InteractionDefinition;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.Word;
+
 import net.sf.extjwnl.data.POS;
 
 public class InteractionDefinitionTest {

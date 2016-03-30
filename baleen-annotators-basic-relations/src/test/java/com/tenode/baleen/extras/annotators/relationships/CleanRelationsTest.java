@@ -7,6 +7,8 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.relations.annotators.CleanRelations;
+
 import uk.gov.dstl.baleen.annotators.testing.AbstractAnnotatorTest;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;

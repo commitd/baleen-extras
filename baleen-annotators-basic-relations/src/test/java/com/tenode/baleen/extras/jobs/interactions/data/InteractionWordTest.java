@@ -9,6 +9,10 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.InteractionWord;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.RelationPair;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.Word;
+
 import net.sf.extjwnl.data.POS;
 
 public class InteractionWordTest {

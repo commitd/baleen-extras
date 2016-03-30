@@ -14,10 +14,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.tenode.baleen.extras.jobs.interactions.InteractionIdentifier;
-import com.tenode.baleen.extras.jobs.interactions.data.InteractionWord;
-import com.tenode.baleen.extras.jobs.interactions.data.PatternReference;
-import com.tenode.baleen.extras.jobs.interactions.data.Word;
+import com.tenode.baleen.extras.patterns.jobs.interactions.InteractionIdentifier;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.InteractionWord;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.PatternReference;
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.Word;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.jobs.interactions.data.Word;
+
 import net.sf.extjwnl.data.POS;
 
 public class WordTest {

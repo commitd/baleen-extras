@@ -9,6 +9,8 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
+import com.tenode.baleen.extras.patterns.annotators.data.RelationWrapper;
+
 import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.types.semantic.Relation;
 

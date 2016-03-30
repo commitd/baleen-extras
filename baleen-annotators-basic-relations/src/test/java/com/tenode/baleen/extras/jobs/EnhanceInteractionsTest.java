@@ -16,7 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.io.Files;
-import com.tenode.baleen.wordnet.resources.WordNetResource;
+import com.tenode.baleen.extras.patterns.jobs.EnhanceInteractions;
+import com.tenode.baleen.extras.wordnet.resources.WordNetResource;
 
 import uk.gov.dstl.baleen.uima.jobs.AbstractBaleenTaskTest;
 

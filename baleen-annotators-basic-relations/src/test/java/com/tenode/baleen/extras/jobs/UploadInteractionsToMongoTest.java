@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.google.common.io.Files;
 import com.mongodb.DBCollection;
+import com.tenode.baleen.extras.patterns.jobs.UploadInteractionsToMongo;
 
 import uk.gov.dstl.baleen.resources.SharedFongoResource;
 import uk.gov.dstl.baleen.uima.jobs.AbstractBaleenTaskTest;
