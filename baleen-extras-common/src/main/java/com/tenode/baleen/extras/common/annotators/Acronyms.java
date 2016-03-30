@@ -8,7 +8,7 @@ import uk.gov.dstl.baleen.annotators.regex.helpers.AbstractRegexAnnotator;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
- * Annotate acryonyms, found in a basic fashion.
+ * Annotate acronyms, found in a basic fashion.
  *
  * @baleen.javadoc
  */
