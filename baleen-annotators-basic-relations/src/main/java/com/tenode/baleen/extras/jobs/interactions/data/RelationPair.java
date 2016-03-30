@@ -2,8 +2,8 @@ package com.tenode.baleen.extras.jobs.interactions.data;
 
 /**
  * Captures the source and target (UIMA) types of a relationship.
- *
- * Has sensible hashcode, equals and toString.
+ * <p>
+ * Has sensible hashcode, equals and toString implementations.
  *
  */
 public class RelationPair {

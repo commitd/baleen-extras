@@ -21,8 +21,8 @@ import uk.gov.dstl.baleen.exceptions.BaleenException;
 import uk.gov.dstl.baleen.uima.UimaSupport;
 
 /**
- * Read the MUC-3 dataset.
- *
+ * Reads the MUC-3 dataset.
+ * <p>
  * The text is all upper case, which Baleen performs poorly on, it also contains metadata (not just
  * the article text). We lower case the extra and remove excess metadata to create the jCas document
  * text.

@@ -4,8 +4,8 @@ import net.sf.extjwnl.data.POS;
 
 /**
  * A simple representation of a word (as Lemma and Part of Speech).
- *
- * Has sensible hashcode, equals and toString.
+ * <p>
+ * Has sensible hashcode, equals and toString implementations.
  */
 public class Word {
 

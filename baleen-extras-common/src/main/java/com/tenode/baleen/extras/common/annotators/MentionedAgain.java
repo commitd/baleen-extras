@@ -18,12 +18,12 @@ import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
- * Creates entity annotations for each piece of text which is the same as the covered text.
- *
- * This is useful when a model is used (rather than a regex) and it only find a subset of the
+ * Creates entity annotations for each piece of text that is the same as the covered text.
+ * <p>
+ * This is useful when a model is used (rather than a regex) and it only finds a subset of the
  * mentions in a document.
- *
- * It an annotation of the same type already exists on the covering text then another is not added.
+ * <p>
+ * If an annotation of the same type already exists on the covering text then another is not added.
  *
  */
 public class MentionedAgain extends BaleenAnnotator {

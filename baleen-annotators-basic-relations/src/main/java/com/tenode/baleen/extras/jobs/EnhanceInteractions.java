@@ -23,16 +23,16 @@ import uk.gov.dstl.baleen.uima.jobs.JobSettings;
 
 /**
  * Enhance and extend the list of interaction words through WordNet.
- *
+ * <p>
  * This is useful for increasing the range of a words which are considered for interaction gazetteer
- * matching without increasing the manual effort. It is likely that the user will will to review the
- * words after running this, to ensure the words truely have the same meaning at the relationship
+ * matching without increasing the manual effort. It is likely that the user will want to review the
+ * words after running this, to ensure the words truly have the same meaning that the relationship
  * requires.
- *
+ * <p>
  * The CSV file, see {@link CsvInteractionReader} and {@link CsvInteractionWriter} for format
  * information, is read. This lemma and POS are used to find additional dictionary words which have
  * the same meaning.
- *
+ * <p>
  * The output is saved back in the same format.
  *
  *

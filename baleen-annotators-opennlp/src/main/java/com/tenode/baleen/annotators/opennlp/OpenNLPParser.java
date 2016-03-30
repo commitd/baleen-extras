@@ -28,9 +28,9 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
  * Perform grammatical parsing with OpenNLP parser.
- *
+ * <p>
  * The document content is passed through the OpenNLP parser in order to create a parse tree.
- *
+ * <p>
  * It is assumed that first the document has been passed through the OpenNLP pipeline (or similar)
  * so that sentences, POS, etc are extracted into the jCas. Note that this annotator will REMOVE any
  * PhraseChunks and replace them with its output.

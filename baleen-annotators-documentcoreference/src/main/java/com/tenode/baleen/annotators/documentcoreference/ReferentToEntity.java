@@ -20,10 +20,10 @@ import uk.gov.dstl.baleen.types.semantic.ReferenceTarget;
 import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
- * Convert annotations which aren't entities but which have an referent target which is shared with
- * an entity into an entity.
- *
- * This is useful for consumers which work specifically with entities but not with other types.
+ * Convert non-entity annotations into entity annotations, in the case that an annotation has a
+ * referent target that is shared with an entity.
+ * <p>
+ * This is useful for consumers that work specifically with entities but not with other types.
  *
  * @baleen.javadoc
  */

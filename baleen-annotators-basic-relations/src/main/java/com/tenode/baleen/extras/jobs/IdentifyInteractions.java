@@ -34,15 +34,15 @@ import uk.gov.dstl.baleen.uima.jobs.JobSettings;
 
 /**
  * Identify interaction words based on a Mongo collection of patterns.
- *
- * This requires a wordnet dictionary and a mongo resource (to read from). The mongo collection
+ * <p>
+ * This requires a Wordnet dictionary and a Mongo resource (to read from). The Mongo collection
  * should hold patterns which have been extracted by a pipeline containing {@Link MongoPatternSaver}
- *
+ * <p>
  * See {@link InteractionIdentifier} for more details of the implementation.
- *
+ * <p>
  * The relationship types are based on Wordnet supersenses (meaning the original file in which the
- * word is defined). The provided a group of around 40 definitions.
- *
+ * word is defined). This provides a group of around 40 definitions.
+ * <p>
  * The output of this process is a CSV (format defined by {@link CsvInteractionWriter}.
  *
  * <pre>

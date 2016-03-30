@@ -20,8 +20,8 @@ import uk.gov.dstl.baleen.types.semantic.Entity;
 import uk.gov.dstl.baleen.uima.utils.UimaTypesUtils;
 
 /**
- * Write event to CSV for evaluation purposes.
- *
+ * Write events to CSV for evaluation purposes.
+ * <p>
  * Format is:
  * <ul>
  * <li>source

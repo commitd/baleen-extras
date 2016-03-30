@@ -3,7 +3,7 @@ package com.tenode.baleen.extras.common.print;
 import uk.gov.dstl.baleen.types.language.Pattern;
 
 /**
- * Print patterns;.
+ * Print out all patterns.
  */
 public class Patterns extends AbstractPrintAnnotator<Pattern> {
 

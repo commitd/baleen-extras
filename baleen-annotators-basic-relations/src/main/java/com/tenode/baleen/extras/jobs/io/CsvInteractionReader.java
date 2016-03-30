@@ -18,8 +18,8 @@ import com.tenode.baleen.extras.jobs.interactions.data.Word;
 import net.sf.extjwnl.data.POS;
 
 /**
- * Read interactions from CSV.
- *
+ * Reads interactions from CSV.
+ * <p>
  * This reads interaction data as written by the {@link CsvInteractionWriter}.
  *
  */

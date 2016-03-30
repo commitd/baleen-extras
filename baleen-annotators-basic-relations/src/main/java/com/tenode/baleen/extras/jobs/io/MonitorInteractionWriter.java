@@ -8,7 +8,7 @@ import com.tenode.baleen.extras.jobs.interactions.data.InteractionDefinition;
 import uk.gov.dstl.baleen.uima.UimaMonitor;
 
 /**
- * Writes the interactions to a UimaMonitor logger.
+ * Writes interactions to a UimaMonitor logger.
  */
 public class MonitorInteractionWriter implements InteractionWriter {
 

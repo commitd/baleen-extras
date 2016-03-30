@@ -18,8 +18,8 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Entity;
 
 /**
- * WRite coreference information to a CSV.
- *
+ * Write coreference information to a CSV.
+ * <p>
  * The format is as follows:
  * <ul>
  * <li>source

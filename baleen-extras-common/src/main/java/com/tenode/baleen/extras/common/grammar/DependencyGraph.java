@@ -28,12 +28,12 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 
 /**
  * A graph of grammar dependencies within an annotated jCas.
- *
+ * <p>
  * Whilst UIMA annotations can store the output of a dependency grammar it is difficult to work with
  * and slow to query. This class builds a cache which means finding nearest neighbours (based on
  * dependency distance) faster and easier.
  *
- * The JCAS must have been annotated by a dependency grammer (MaltParser, ClearNlp) before passing
+ * The JCAS must have been annotated by a dependency grammar (MaltParser, ClearNlp) before passing
  * to build().
  *
  */

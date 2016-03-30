@@ -22,13 +22,13 @@ import uk.gov.dstl.baleen.uima.BaleenConsumer;
 
 /**
  * Saves patterns in a JCas to a Mongo collection.
- *
+ * <p>
  * Use this after a pattern extraction annotator (eg PatternExtractor) in order to create a training
  * set in Mongo for offlne analysis. In other words this annotator will save UIMA Pattern types to
  * Mongo.
- *
+ * <p>
  * This will clear the existing collection, unless clear = false is set as configuration parameter.
- *
+ * <p>
  * Note this is BaleenConsumer but, like all consumers, it can be used as annotator. So if you wish
  * to save midway through a pipeline, clear the result and then create more patterns that is
  * supported with Baleen.

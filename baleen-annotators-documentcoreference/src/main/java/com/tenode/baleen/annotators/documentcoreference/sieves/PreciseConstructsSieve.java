@@ -18,10 +18,10 @@ import uk.gov.dstl.baleen.types.language.WordToken;
 import uk.gov.dstl.baleen.types.semantic.Location;
 
 /**
- * Seives based on very specific (precise) rules.
- *
+ * Sieves based on very specific (precise) rules.
+ * <p>
  * Includes acronyms or certain constructs like "Prime Minister, Tony Blair".
- *
+ * <p>
  * Our parser, OpenNlp, does not output (,) so we need to do a manual check for that.
  *
  */

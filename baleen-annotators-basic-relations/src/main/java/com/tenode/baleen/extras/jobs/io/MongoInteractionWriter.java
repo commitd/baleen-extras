@@ -16,20 +16,19 @@ import uk.gov.dstl.baleen.annotators.gazetteer.Mongo;
 
 /**
  * Write interaction data to Mongo database.
- *
+ * <p>
  * This will output interaction data into two different collection for different uses by other
  * annotators.
- *
+ * <p>
  * It first outputs interaction words into Mongo gazetteer format (see {@link Mongo} for more
  * details). This allows the standard Baleen Mongo gazetteer annotators to mark up Interaction
  * words.
- *
- *
+ * <p>
  * Secondly it saves information about relationship type constraints to the relationTypeCollection.
  * This is used by the {@link RelationTypeFilter} in order to remove any invalid relationships
  * between types. The relation (DateTime, said, Location) is likely to be invalid for example. Valid
  * options is derived directly from the
- *
+ * <p>
  * See {@link UploadInteractionsToMongo} for more details.
  *
  */

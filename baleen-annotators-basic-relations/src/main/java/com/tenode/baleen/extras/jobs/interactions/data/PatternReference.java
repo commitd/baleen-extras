@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Holds information relating to a word pattern (set of words).
- *
- * Use to hold intermediate cluster calculations.
+ * Holds information relating to a word pattern (a set of words).
+ * <p>
+ * Can be used to hold intermediate cluster calculations.
  *
  */
 public final class PatternReference {

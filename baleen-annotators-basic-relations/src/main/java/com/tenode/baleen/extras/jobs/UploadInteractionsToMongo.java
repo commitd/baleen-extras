@@ -17,10 +17,10 @@ import uk.gov.dstl.baleen.uima.jobs.JobSettings;
 
 /**
  * Upload interaction data from CSV to Mongo.
- *
- * The CSV will be in {@link CsvInteractionWriter} format and the Mongo output will be a
+ * <p>
+ * The CSV will be in {@link CsvInteractionWriter} format and the Mongo output will be in
  * {@link Mongo} format.
- *
+ * <p>
  * The upload job will typically look like:
  *
  * <pre>
@@ -38,14 +38,13 @@ import uk.gov.dstl.baleen.uima.jobs.JobSettings;
  * {@link IdentifyInteractions} task, or it should be generated or manually created previously. The
  * former provides a fast route to getting started, through typically the CSV will need some editing
  * to tune performance.
- *
+ * <p>
  * Typically the extraction pipeline will then use the MongoStemming gazetteer:
  *
  * <pre>
  * - class: gazetteer.MongoStemming
  *   collection: interactions
  *   type: Interaction
- *
  * </pre>
  *
  * A second, optional, annotator can be used to filter relations to only the correct UIMA types.

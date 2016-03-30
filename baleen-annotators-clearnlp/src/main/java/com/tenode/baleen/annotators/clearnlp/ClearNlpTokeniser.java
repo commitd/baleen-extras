@@ -25,13 +25,13 @@ import uk.gov.dstl.baleen.uima.BaleenAnnotator;
 
 /**
  * ClearNlp tokeniser performing Sentence segmentation, POS tagging and word analysis.
- *
- * This annotator perform functions similar to the OpenNlp annotator - outputting full complete
+ * <p>
+ * This annotator performs functions similar to the OpenNlp annotator - outputting full complete
  * Sentence and WordToken annotations.
- *
+ * <p>
  * This annotator might be preferable to the OpenNlp equivalent if the pipeline uses other ClearNlp
  * functions.
- *
+ * <p>
  * NOTE: Unlike ClearNlp itself this annotator supports only English (is hard coded to it).
  *
  * @baleen.javadoc

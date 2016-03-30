@@ -14,7 +14,7 @@ import uk.gov.dstl.baleen.types.common.Nationality;
 import uk.gov.dstl.baleen.types.common.Person;
 
 /**
- * Adds gender information to the mention.
+ * Adds gender information to a mention.
  */
 public class GenderEnhancer implements MentionEnhancer {
 	private static final Map<String, Gender> pronounMap = new HashMap<>();

@@ -14,17 +14,17 @@ import uk.gov.dstl.baleen.types.semantic.Relation;
 
 /**
  * Extract relationships based on the pattern [entity]-[interaction]-[entity].
- *
+ * <p>
  * Any other words in the sentence are ignored, this is purely based on the ordering. The
  * interaction text is used as the relationship. So additional parsing information is used.
- *
- * This is likely to produce a lot of noise but could be useful for simple sentences. For example
- * (where animals are entities, jumps and 'capital' are considered interactions - so that London is
- * the capital of UK):
+ * <p>
+ * This is likely to produce a lot of noise but could be useful for simple sentences. For example,
+ * where animals are entities, 'jumps' and 'capital' are considered interactions - so that London is
+ * the capital of UK:
  * <ul>
  * <li>The fox jumps the dog - Correct (fox-jumps-dog)</li>
  * <li>The fox jumps the dog and the cat- Correct (fox-jumps-dog,fox-jumps-cat)</li>
- * <li>The London is the capital of the UK - Correct (london-captial-UK)</li>
+ * <li>The London is the capital of the UK - Correct (london-capital-UK)</li>
  * <li>The fox jumps the dog and the cat in London - Incorrect fox jumps London
  * (fox-jumps-dog,fox-jumps-cat,fox-jumps-london)</li>
  * <li>The fox jumps the dog in capital city, London. - Incorrect

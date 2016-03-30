@@ -18,8 +18,8 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import uk.gov.dstl.baleen.uima.BaleenResource;
 
 /**
- * A shared resource which provides WordNet.
- *
+ * A shared resource that provides WordNet.
+ * <p>
  * The default dictionary is loaded during initialisation and is assumed to be be included on the
  * classpath.
  *
