@@ -130,7 +130,7 @@ public class MaltParser extends BaleenAnnotator {
 			// shaded Jar
 			// So we copy it our and delete it on exit
 
-			InputStream is = getClass().getClassLoader().getResourceAsStream(modelFilename);
+			InputStream is = getClass().getResourceAsStream(modelFilename);
 			if (is != null) {
 				try {
 					modelFile = File.createTempFile("baleen", "maltpaser-model");
