@@ -1,6 +1,13 @@
 /**
  * This package contains annotators which help process interaction to relations.
  *
+ * A relationship is defined by the Baleen type system. A relationship as both a Baleen annotation
+ * and concept is a linkage between two entities which appear in a document. Relationships have a
+ * main type and a subtype, though Baleen is not perscriptive of the meaning of these allows for
+ * domain / corpus interpretation of the level of granularity required. For example, the sentence
+ * "John lives in London" has highlights a relationship between John and London, the type of
+ * location should be "located" and the subtype "lives".
+ *
  * Assuming that interaction words have been identified they must first be annotated, @see
  * com.tenode.baleen.extras.interactions.annotators for details.
  *
@@ -34,5 +41,12 @@
  * {@link com.tenode.baleen.extras.common.print.Relations} to print to console. Or the Mongo
  * consumer will also saves relation information.
  *
+ *
+ * <h3>Building your own extractor</h3>
+ *
+ * To build a relationship extractor based on interaction processes a helper class is available
+ * through the AbstractInteractionRelationshipExtractor. The abstract class provides numerous helper
+ * functions, common to the needs of relationships extractors. It also simplifies the doProcess
+ * annotator by performing common processing and offering a per sentence processing instead.
  */
 package com.tenode.baleen.extras.relations.annotators;
