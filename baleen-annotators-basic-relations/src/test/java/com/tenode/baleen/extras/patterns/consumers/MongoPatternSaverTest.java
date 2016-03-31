@@ -1,4 +1,4 @@
-package com.tenode.baleen.extras.consumers.relationships;
+package com.tenode.baleen.extras.patterns.consumers;
 
 import java.util.Collections;
 

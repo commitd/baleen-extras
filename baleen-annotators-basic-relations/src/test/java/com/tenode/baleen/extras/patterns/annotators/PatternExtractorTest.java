@@ -1,4 +1,4 @@
-package com.tenode.baleen.extras.annotators.relationships;
+package com.tenode.baleen.extras.patterns.annotators;
 
 import java.util.Collection;
 

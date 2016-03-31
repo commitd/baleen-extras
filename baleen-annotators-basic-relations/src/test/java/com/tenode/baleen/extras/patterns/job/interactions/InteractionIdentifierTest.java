@@ -1,4 +1,4 @@
-package com.tenode.baleen.extras.job.interactions;
+package com.tenode.baleen.extras.patterns.job.interactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

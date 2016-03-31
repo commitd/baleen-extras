@@ -1,4 +1,4 @@
-package com.tenode.baleen.extras.jobs;
+package com.tenode.baleen.extras.patterns.jobs;
 
 import static org.junit.Assert.assertTrue;
 

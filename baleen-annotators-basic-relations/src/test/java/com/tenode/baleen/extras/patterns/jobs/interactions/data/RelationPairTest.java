@@ -1,4 +1,4 @@
-package com.tenode.baleen.extras.jobs.interactions.data;
+package com.tenode.baleen.extras.patterns.jobs.interactions.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

@@ -1,4 +1,4 @@
-package com.tenode.baleen.extras.annotators.relationships;
+package com.tenode.baleen.extras.relations.annotators;
 
 import static org.junit.Assert.assertEquals;
 
